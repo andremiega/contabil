@@ -96,20 +96,20 @@ export default function LaboratorioPlanoContas() {
   };
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', padding: '24px', borderRadius: '24px', animation: 'fadeIn 0.5s ease-out', minHeight: '85vh', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '24px', animation: 'fadeIn 0.5s ease-out', minHeight: '85vh', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
       {/* HEADER EXPLICATIVO */}
-      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: 'white', padding: '24px 32px', borderRadius: '20px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
-        <div>
-          <span style={{ backgroundColor: '#3b82f6', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '900', letterSpacing: '1px' }}>CERTIFICAÇÃO CONTÁBIL: NÍVEL 16</span>
-          <h2 style={{ margin: '8px 0', fontSize: '28px', fontWeight: '900' }}>Engenharia do Plano de Contas 🧩</h2>
+      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: 'white', padding: '24px', borderRadius: '20px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
+        <div style={{ flex: '1 1 280px' }}>
+          <span style={{ backgroundColor: '#3b82f6', color: '#ffffff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '900', letterSpacing: '1px' }}>CERTIFICAÇÃO CONTÁBIL: NÍVEL 16</span>
+          <h2 style={{ margin: '8px 0', fontSize: '24px', fontWeight: '900' }}>Engenharia do Plano de Contas 🧩</h2>
           <p style={{ margin: 0, color: '#94a3b8', fontSize: '14px', maxWidth: '600px' }}>
             Domine a lógica dos números! Ajude a organizar a contabilidade de uma <strong>Pequena Empresa</strong> montando o código exato (Grupo, Subgrupo e Conta) para 16 situações reais.
           </p>
         </div>
-        <div style={{ textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.05)', padding: '16px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', minWidth: '150px' }}>
+        <div style={{ flex: '1 1 auto', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.05)', padding: '16px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ fontSize: '11px', color: '#cbd5e1', fontWeight: 'bold', textTransform: 'uppercase' }}>Progresso Total</div>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#4ade80' }}>{contasConcluidas.length} <span style={{fontSize:'16px', color:'#64748b'}}>/ 16</span></div>
+          <div style={{ fontSize: '28px', fontWeight: '900', color: '#4ade80' }}>{contasConcluidas.length} <span style={{fontSize:'14px', color:'#64748b'}}>/ 16</span></div>
         </div>
       </div>
 
@@ -119,39 +119,40 @@ export default function LaboratorioPlanoContas() {
       </div>
 
       {!concluido ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(400px, 1fr) 1fr', gap: '24px', flex: 1 }}>
+        /* GRELHA INTELIGENTE: Adapta-se perfeitamente a telemóveis e tablets */
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '24px', flex: 1 }}>
           
           {/* PAINEL ESQUERDO: O CONSTRUTOR DE CÓDIGOS */}
-          <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', padding: '24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', padding: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column' }}>
             
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
               <span style={{ fontSize: '24px', padding: '10px', backgroundColor: '#f1f5f9', borderRadius: '12px' }}>🏢</span>
               <div>
                 <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Desafio {indiceDesafio + 1} de 16:</div>
-                <h3 style={{ margin: 0, color: '#0f172a', fontSize: '22px' }}>{desafioAtual.nome}</h3>
+                <h3 style={{ margin: 0, color: '#0f172a', fontSize: '18px' }}>{desafioAtual.nome}</h3>
               </div>
             </div>
 
-            <div style={{ backgroundColor: '#fffbeb', padding: '16px', borderRadius: '12px', color: '#92400e', fontSize: '13.5px', fontStyle: 'italic', marginBottom: '24px', borderLeft: '4px solid #f59e0b' }}>
+            <div style={{ backgroundColor: '#fffbeb', padding: '14px', borderRadius: '12px', color: '#92400e', fontSize: '13px', fontStyle: 'italic', marginBottom: '20px', borderLeft: '4px solid #f59e0b' }}>
               <strong style={{ display: 'block', marginBottom: '4px', fontStyle: 'normal' }}>🦉 Dica do Tutor:</strong> {desafioAtual.dica}
             </div>
 
             {/* MOSTRADOR DO CÓDIGO (VISUAL) */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '32px' }}>
-              <div style={{ padding: '12px 20px', borderRadius: '12px', fontSize: '24px', fontWeight: '900', backgroundColor: codigoAtual[0] ? '#dcfce7' : '#f8fafc', color: codigoAtual[0] ? '#166534' : '#cbd5e1', border: `2px solid ${codigoAtual[0] ? '#4ade80' : '#e2e8f0'}`, transition: 'all 0.3s' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '24px' }}>
+              <div style={{ padding: '10px 16px', borderRadius: '10px', fontSize: '20px', fontWeight: '900', backgroundColor: codigoAtual[0] ? '#dcfce7' : '#f8fafc', color: codigoAtual[0] ? '#166534' : '#cbd5e1', border: `2px solid ${codigoAtual[0] ? '#4ade80' : '#e2e8f0'}`, transition: 'all 0.3s' }}>
                 {codigoAtual[0] ? codigoAtual[0] : 'X'}
               </div>
-              <span style={{ fontSize: '24px', color: '#cbd5e1', display: 'flex', alignItems: 'center' }}>.</span>
-              <div style={{ padding: '12px 20px', borderRadius: '12px', fontSize: '24px', fontWeight: '900', backgroundColor: codigoAtual[1] ? '#dcfce7' : '#f8fafc', color: codigoAtual[1] ? '#166534' : '#cbd5e1', border: `2px solid ${codigoAtual[1] ? '#4ade80' : '#e2e8f0'}`, transition: 'all 0.3s' }}>
+              <span style={{ fontSize: '20px', color: '#cbd5e1', display: 'flex', alignItems: 'center' }}>.</span>
+              <div style={{ padding: '10px 16px', borderRadius: '10px', fontSize: '20px', fontWeight: '900', backgroundColor: codigoAtual[1] ? '#dcfce7' : '#f8fafc', color: codigoAtual[1] ? '#166534' : '#cbd5e1', border: `2px solid ${codigoAtual[1] ? '#4ade80' : '#e2e8f0'}`, transition: 'all 0.3s' }}>
                 {codigoAtual[1] ? codigoAtual[1].split('.')[1] : 'X'}
               </div>
-              <span style={{ fontSize: '24px', color: '#cbd5e1', display: 'flex', alignItems: 'center' }}>.</span>
-              <div style={{ padding: '12px 20px', borderRadius: '12px', fontSize: '24px', fontWeight: '900', backgroundColor: codigoAtual[2] ? '#dcfce7' : '#f8fafc', color: codigoAtual[2] ? '#166534' : '#cbd5e1', border: `2px solid ${codigoAtual[2] ? '#4ade80' : '#e2e8f0'}`, transition: 'all 0.3s' }}>
+              <span style={{ fontSize: '20px', color: '#cbd5e1', display: 'flex', alignItems: 'center' }}>.</span>
+              <div style={{ padding: '10px 16px', borderRadius: '10px', fontSize: '20px', fontWeight: '900', backgroundColor: codigoAtual[2] ? '#dcfce7' : '#f8fafc', color: codigoAtual[2] ? '#166534' : '#cbd5e1', border: `2px solid ${codigoAtual[2] ? '#4ade80' : '#e2e8f0'}`, transition: 'all 0.3s' }}>
                 {codigoAtual[2] ? codigoAtual[2].split('.')[2] : 'X'}
               </div>
             </div>
 
-            <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 'bold', color: '#0f172a', textAlign: 'center' }}>
+            <div style={{ marginBottom: '14px', fontSize: '14px', fontWeight: 'bold', color: '#0f172a', textAlign: 'center' }}>
               {etapaCodigo === 0 && 'Passo 1: Selecione o Grupo Principal'}
               {etapaCodigo === 1 && 'Passo 2: Defina o Prazo/Categoria (Subgrupo)'}
               {etapaCodigo === 2 && 'Passo 3: Identifique a Conta Específica'}
@@ -163,28 +164,28 @@ export default function LaboratorioPlanoContas() {
                 <button 
                   key={opcao.cod}
                   onClick={() => handleSelecao(opcao.cod)}
-                  style={{ padding: '16px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#334155', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', gap: '12px', alignItems: 'center' }}
+                  style={{ padding: '14px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#334155', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', gap: '10px', alignItems: 'center' }}
                   onMouseOver={e => { e.currentTarget.style.borderColor = '#3b82f6'; e.currentTarget.style.backgroundColor = '#f0f9ff'; e.currentTarget.style.transform = 'translateX(4px)'; }}
                   onMouseOut={e => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.transform = 'translateX(0)'; }}
                 >
-                  <span style={{ backgroundColor: '#e2e8f0', color: '#475569', padding: '6px 10px', borderRadius: '6px', fontSize: '13px', fontFamily: 'monospace' }}>{opcao.cod}</span>
+                  <span style={{ backgroundColor: '#e2e8f0', color: '#475569', padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontFamily: 'monospace' }}>{opcao.cod}</span>
                   {opcao.label.replace(/^[0-9.]+\s/, '')}
                 </button>
               ))}
             </div>
 
             {feedback && (
-              <div style={{ marginTop: '20px', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: feedback.tipo === 'sucesso' ? '#dcfce7' : '#fee2e2', border: `1px solid ${feedback.tipo === 'sucesso' ? '#86efac' : '#fca5a5'}`, color: feedback.tipo === 'sucesso' ? '#166534' : '#991b1b', animation: 'fadeIn 0.3s' }}>
+              <div style={{ marginTop: '16px', padding: '14px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: feedback.tipo === 'sucesso' ? '#dcfce7' : '#fee2e2', border: `1px solid ${feedback.tipo === 'sucesso' ? '#86efac' : '#fca5a5'}`, color: feedback.tipo === 'sucesso' ? '#166534' : '#991b1b', animation: 'fadeIn 0.3s' }}>
                 <span style={{ fontSize: '20px' }}>{feedback.tipo === 'sucesso' ? '✅' : '🚨'}</span>
-                <span style={{ fontWeight: '600', fontSize: '14px' }}>{feedback.msg}</span>
+                <span style={{ fontWeight: '600', fontSize: '13px' }}>{feedback.msg}</span>
               </div>
             )}
           </div>
 
           {/* PAINEL DIREITO: A ÁRVORE CONTÁBIL (RESULTADO VISUAL) */}
-          <div style={{ backgroundColor: '#0f172a', borderRadius: '20px', padding: '24px', border: '1px solid #1e293b', boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.5)', color: '#e2e8f0', maxHeight: '700px', overflowY: 'auto' }}>
-            <h3 style={{ margin: '0 0 20px 0', fontSize: '16px', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '8px', position: 'sticky', top: 0, backgroundColor: '#0f172a', paddingBottom: '10px', borderBottom: '1px solid #1e293b' }}>
-              <span style={{ fontSize: '20px' }}>🌳</span> Árvore Oficial Mapeada
+          <div style={{ backgroundColor: '#0f172a', borderRadius: '20px', padding: '20px', border: '1px solid #1e293b', boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.5)', color: '#e2e8f0', maxHeight: '600px', overflowY: 'auto' }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '15px', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '8px', position: 'sticky', top: 0, backgroundColor: '#0f172a', paddingBottom: '10px', borderBottom: '1px solid #1e293b' }}>
+              <span style={{ fontSize: '18px' }}>🌳</span> Árvore Oficial Mapeada
             </h3>
             
             {contasConcluidas.length === 0 ? (
@@ -192,13 +193,13 @@ export default function LaboratorioPlanoContas() {
                 O Plano de Contas será ramificado aqui à medida que você acerta os desafios.
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px', fontFamily: 'monospace' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px', fontFamily: 'monospace' }}>
                 {contasConcluidas.map((conta, idx) => (
-                  <div key={idx} style={{ backgroundColor: '#1e293b', padding: '12px 16px', borderRadius: '10px', borderLeft: '3px solid #4ade80', animation: 'fadeIn 0.5s' }}>
-                    <div style={{ color: '#94a3b8', marginBottom: '4px' }}>{conta.descricoes[0]} &gt; {conta.descricoes[1]}</div>
+                  <div key={idx} style={{ backgroundColor: '#1e293b', padding: '10px 14px', borderRadius: '8px', borderLeft: '3px solid #4ade80', animation: 'fadeIn 0.5s' }}>
+                    <div style={{ color: '#94a3b8', marginBottom: '2px', fontSize: '11px' }}>{conta.descricoes[0]} &gt; {conta.descricoes[1]}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <strong style={{ color: '#f8fafc', fontSize: '14px' }}>{conta.codigoFinal} - {conta.nome}</strong>
-                      <span style={{ fontSize: '11px', color: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', padding: '2px 8px', borderRadius: '4px' }}>Mapeada</span>
+                      <strong style={{ color: '#f8fafc', fontSize: '13px' }}>{conta.codigoFinal} {conta.nome}</strong>
+                      <span style={{ fontSize: '10px', color: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', padding: '2px 6px', borderRadius: '4px' }}>Mapeada</span>
                     </div>
                   </div>
                 ))}
@@ -208,16 +209,16 @@ export default function LaboratorioPlanoContas() {
         </div>
       ) : (
         /* TELA DE CONCLUSÃO ÉPICA */
-        <div style={{ textAlign: 'center', padding: '60px 40px', backgroundColor: '#ffffff', borderRadius: '20px', border: '2px dashed #4ade80', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ fontSize: '72px', marginBottom: '20px', animation: 'bounce 2s infinite' }}>🏆</span>
-          <h2 style={{ color: '#064e3b', margin: '0 0 16px 0', fontSize: '36px', fontWeight: '900' }}>Mestre do Plano de Contas!</h2>
-          <p style={{ color: '#475569', fontSize: '16px', maxWidth: '600px', lineHeight: '1.6' }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px', backgroundColor: '#ffffff', borderRadius: '20px', border: '2px dashed #4ade80', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          <span style={{ fontSize: '60px', marginBottom: '16px', animation: 'bounce 2s infinite' }}>🏆</span>
+          <h2 style={{ color: '#064e3b', margin: '0 0 16px 0', fontSize: '28px', fontWeight: '900' }}>Mestre do Plano de Contas!</h2>
+          <p style={{ color: '#475569', fontSize: '15px', maxWidth: '600px', lineHeight: '1.6', marginBottom: '20px' }}>
             Fabuloso! Você mapeou com sucesso os <strong>16 pilares principais</strong> de uma empresa. 
             Agora você entende na prática que o código <strong>2.2.1</strong> não é apenas um número, mas sim o DNA de uma obrigação: <strong>Passivo &gt; Não Circulante &gt; Financiamento a Longo Prazo</strong>.
           </p>
           <button 
             onClick={() => { setIndiceDesafio(0); setEtapaCodigo(0); setCodigoAtual([]); setContasConcluidas([]); }}
-            style={{ marginTop: '30px', padding: '16px 36px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 15px rgba(37,99,235,0.4)', transition: 'transform 0.2s' }}
+            style={{ padding: '14px 32px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 15px rgba(37,99,235,0.4)', transition: 'transform 0.2s', width: '100%', maxWidth: '300px' }}
             onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
             onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
           >

@@ -208,18 +208,35 @@ export default function DashboardPrincipal({ setAbaAtiva, setTarefaCorrente, cli
         </div>
       </div>
 
-      {/* =================================================================
-          3. GRÁFICO DE ÁREA + FILA DE AUDITORIA
+     {/* =================================================================
+          3. GRÁFICO DE ÁREA + FILA DE AUDITORIA (Vacinado para Mobile)
          ================================================================= */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '20px' }}>
-        <div style={{ backgroundColor: 'white', padding: '22px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ 
+        display: 'grid', 
+        /* O truque mágico: min(100%, 320px) garante que ele nunca será maior que a tela do telemóvel */
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', 
+        gap: '20px' 
+      }}>
+        <div style={{ 
+          backgroundColor: 'white', 
+          padding: '22px', 
+          borderRadius: '12px', 
+          border: '1px solid #cbd5e1', 
+          display: 'flex', 
+          flexDirection: 'column',
+          /* Blindagem extra: impede que o conteúdo de dentro estique esta caixa */
+          minWidth: 0,
+          overflowX: 'auto' 
+        }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div>
               <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '800' }}>📈 Evolução de {isTerceiroSetor ? 'Arrecadação vs Aplicação' : 'Receitas vs Custos'}</h3>
               <span style={{ fontSize: '12px', color: '#64748b' }}>Regime de Competência (R$)</span>
             </div>
           </div>
-          <div style={{ width: '100%', height: '270px' }}>
+          
+          {/* Se a tela for muito pequena, o gráfico ganha um pequeno scroll só para ele, mas não quebra a página */}
+          <div style={{ width: '100%', minWidth: '300px', height: '270px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={dadosGraficoFluxo} margin={{ top: 10, right: 15, left: 0, bottom: 0 }}>
                 <defs>
@@ -239,7 +256,7 @@ export default function DashboardPrincipal({ setAbaAtiva, setTarefaCorrente, cli
             </ResponsiveContainer>
           </div>
         </div>
-
+      
         <div style={{ backgroundColor: 'white', padding: '22px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px', marginBottom: '14px' }}>
             <div style={{ display: 'flex', gap: '10px' }}>

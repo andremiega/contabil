@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import InputCustomizado from './InputCustomizado'; 
+import ServicosIniciais from './ServicosIniciais';
 import AssistenteRobo from './AssistenteRobo';
 import DashboardPrincipal from './Dashboard'; 
 import SimuladorHP12c from './SimuladorHP12c';
@@ -20,8 +21,6 @@ import SimuladorPontoEquilibrio from './SimuladorPontoEquilibrio';
 import SimuladorFerramentasQualidade from './SimuladorFerramentasQualidade';
 import SimuladorRateioCustos from './SimuladorRateioCustos';
 import SimuladorAnaliseBalanco from './SimuladorAnaliseBalanco';
-import SimuladorNotaFiscal from './SimuladorNotaFiscal';
-import SimuladorNFe from './SimuladorNFe';
 import SimuladorCEO from './SimuladorCEO';
 import SimuladorGreenBelt from './SimuladorGreenBelt';
 import SimuladorDepreciacao from './SimuladorDepreciacao';
@@ -73,6 +72,24 @@ import { supabase } from './supabase';
 import './App.css';
 
 export default function App() {
+  
+  // =====================================================================
+  // CÉREBRO DO SMART HEADER E DETEÇÃO DE SCROLL (PARA MOBILE E PC)
+  // =====================================================================
+  const [mostrarSmartHeader, setMostrarSmartHeader] = useState(true);
+  const [ultimoScrollY, setUltimoScrollY] = useState(0);
+
+  const handleScrollMain = (e) => {
+    const scrollAtual = e.target.scrollTop;
+    if (scrollAtual > ultimoScrollY && scrollAtual > 50) {
+      setMostrarSmartHeader(false);
+    } else {
+      setMostrarSmartHeader(true);
+    }
+    setUltimoScrollY(scrollAtual);
+  };
+  // =====================================================================
+
   // 🌟 O TRUQUE GLOBAL DO FOCO 🌟
   useEffect(() => {
     const selecionarTexto = (e) => {
@@ -87,6 +104,8 @@ export default function App() {
       document.removeEventListener('focusin', selecionarTexto);
     };
   }, []);
+
+  
 
   const formatMoeda = (valor) => (valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   
@@ -136,6 +155,7 @@ export default function App() {
     const formatMoeda = (val) => Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
     return (
+      
       <div className="print-area" style={{ backgroundColor: '#ffffff', padding: '22px', borderRadius: '12px', border: `1.5px solid ${badgeCor}`, marginBottom: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', width: '100%', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -200,6 +220,31 @@ export default function App() {
     if (menuMobileAberto) document.body.classList.add('menu-mobile-ativo');
     else document.body.classList.remove('menu-mobile-ativo');
   }, [menuMobileAberto]);
+
+  // =====================================================================
+  // CORREÇÃO: FECHAR MENU AO CLICAR FORA (MOBILE)
+  // =====================================================================
+  useEffect(() => {
+    const handleClickFora = (event) => {
+      // Se o menu estiver aberto e o clique NÃO foi dentro da sidebar e NEM no botão de abrir menu
+      if (
+        menuMobileAberto && 
+        !event.target.closest('.app-sidebar') && 
+        !event.target.closest('.menu-toggle-btn')
+      ) {
+        setMenuMobileAberto(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickFora);
+    document.addEventListener('touchstart', handleClickFora); // Suporte a toque em mobile
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickFora);
+      document.removeEventListener('touchstart', handleClickFora);
+    };
+  }, [menuMobileAberto]);
+  // =====================================================================
 
   const [modalSuporte, setModalSuporte] = useState(false);
   const [modalPrivacidade, setModalPrivacidade] = useState(false);
@@ -473,6 +518,7 @@ export default function App() {
   const [xp, setXp] = useState(0); 
   const [abaAtiva, setAbaAtiva] = useState(isGestor ? 'gerencial' : 'inicio');
   const [tutorAberto, setTutorAberto] = useState(false);
+  const [roboAberto, setRoboAberto] = useState(false);
 
   const configAtiva = clienteSelecionado ? (configEmpresas[clienteSelecionado.id] || { modo: 'automatico', mesAtual: 1, pendenciasManuais: [] }) : { modo: 'automatico', mesAtual: 1, pendenciasManuais: [] };
 
@@ -521,7 +567,8 @@ export default function App() {
         nomeDebito: cDebito?.nome_conta || 'Conta Operacional', 
         credito: cCredito?.codigo_contabil || '2.1.1.01', 
         nomeCredito: cCredito?.nome_conta || 'Fornecedores / Caixa', 
-        valor: parseFloat(l.valor) || 0 
+        valor: parseFloat(l.valor) || 0,
+        historico: l.historico
       };
     });
     
@@ -534,11 +581,33 @@ export default function App() {
     mostrarToast(`Entidade alterada para ${cliente.nome_empresa}`, "sucesso");
   };
 
+  // =====================================================================
+  // GERADOR DE UUID PARA INSERÇÕES NO BANCO DE DADOS
+  // =====================================================================
+  const generateUUID = () => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  };
+
+  // =====================================================================
+  // GESTÃO DE EMPRESAS (PARALEGAL)
+  // =====================================================================
   const criarNovaEmpresaParalegal = async () => {
     const nome = prompt("Nome da nova empresa gerada no Paralegal:");
     if (!nome) return;
     setLoading(true);
-    const { data, error } = await supabase.from('clientes_ficticios').insert([{ nome_empresa: nome, regime_tributario: 'Simples Nacional', saldo_caixa_inicial: 0 }]).select();
+    
+    const { data, error } = await supabase.from('clientes_ficticios').insert([{
+      id: generateUUID(), // Forçando um UUID válido na criação
+      nome_empresa: nome, 
+      regime_tributario: 'Simples Nacional', 
+      saldo_caixa_inicial: 0,
+      user_id: userAuth.id // <--- ISOLAMENTO DA EMPRESA PARA O ALUNO
+    }]).select();
+    
     if (error) mostrarToast("Erro ao criar empresa: " + error.message, "erro");
     else if (data && data.length > 0) {
       setClientes(prev => [...prev, data[0]]);
@@ -547,6 +616,35 @@ export default function App() {
       mostrarToast(`Empresa criada e ativada!`, "sucesso");
     }
     setLoading(false);
+  };
+
+  const excluirEmpresaParalegal = async () => {
+    if (!clienteSelecionado) return;
+    
+    // Proteção para não apagar a empresa padrão/matriz do sistema
+    if (!clienteSelecionado.user_id) {
+      return mostrarToast("A empresa matriz do sistema não pode ser excluída.", "aviso");
+    }
+
+    if (window.confirm(`Tem a certeza que deseja excluir a empresa ${clienteSelecionado.nome_empresa} permanentemente?`)) {
+      setLoading(true);
+      
+      // 1. Apaga os lançamentos diários vinculados para evitar lixo no banco
+      await supabase.from('lancamentos_diario').delete().eq('id_cliente', clienteSelecionado.id);
+      
+      // 2. Apaga a empresa em si
+      const { error } = await supabase.from('clientes_ficticios').delete().eq('id', clienteSelecionado.id);
+      
+      if (error) {
+        mostrarToast("Erro ao excluir empresa: " + error.message, "erro");
+      } else {
+        const novaLista = clientes.filter(c => c.id !== clienteSelecionado.id);
+        setClientes(novaLista);
+        setClienteSelecionado(novaLista[0]); // Volta para a empresa padrão
+        mostrarToast("Empresa excluída com sucesso!", "sucesso");
+      }
+      setLoading(false);
+    }
   };
 
   const handleResetarTreinamento = async () => {
@@ -574,6 +672,9 @@ export default function App() {
     }
   };
 
+  // =====================================================================
+  // ESCRITURAÇÃO DIÁRIA (REGISTRO DO FATO GERADOR)
+  // =====================================================================
   const registrarFatoGerador = async (descricao, valor, modulo, debitos = [], creditos = []) => {
     if (!clienteSelecionado) return;
 
@@ -630,23 +731,16 @@ export default function App() {
       if (!idDebito || !idCredito) {
         return mostrarToast(`Erro crítico: Não foi possível processar os IDs das contas.`, 'erro');
       }
-      
-      const generateUUID = () => {
-        if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-          const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-      };
 
       const payload = {
         id: generateUUID(),
         id_cliente: clienteSelecionado.id,
+        user_id: userAuth.id, // <--- GARANTA QUE ESTA LINHA ESTÁ AQUI
         data_lancamento: new Date().toISOString().split('T')[0],
         id_conta_debito: idDebito,
         id_conta_credito: idCredito,
         valor: Number(valor) || 0,
-        historico: `${descricao} (Auto) [ID: ${userAuth?.id || 'anon'}]`
+        historico: `${descricao} (Auto)`
       };
 
       const { error } = await supabase.from('lancamentos_diario').insert([payload]);
@@ -666,7 +760,6 @@ export default function App() {
       mostrarToast('Erro na Base de Dados: ' + err.message, 'erro');
     }
   };
-
   // ==========================================================
   // TELA DE LOGIN 
   // ==========================================================
@@ -764,9 +857,9 @@ export default function App() {
               </>
             ) : (
               <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {isModoRegisto && <input type="text" placeholder="Seu Nome Completo" value={inputNome} onChange={e => setInputNome(e.target.value)} required style={{ width: '100%', padding: '14px 16px', borderRadius: '10px', border: '1px solid #cbd5e1', backgroundColor: '#f8fafc', fontSize: '15px' }} />}
-                <input type="email" placeholder="nome@exemplo.com" value={inputEmail} onChange={e => setInputEmail(e.target.value)} required style={{ width: '100%', padding: '14px 16px', borderRadius: '10px', border: '1px solid #cbd5e1', backgroundColor: '#f8fafc', fontSize: '15px' }} />
-                <input type="password" placeholder="••••••••" value={inputSenha} onChange={e => setInputSenha(e.target.value)} required style={{ width: '100%', padding: '14px 16px', borderRadius: '10px', border: '1px solid #cbd5e1', backgroundColor: '#f8fafc', fontSize: '15px' }} />
+                {isModoRegisto && <input type="text" placeholder="Seu Nome Completo" value={inputNome} onChange={e => setInputNome(e.target.value)} required style={{ width: '100%', padding: '14px 16px', borderRadius: '10px', border: '1px solid #cbd5e1', backgroundColor: '#f8fafc', fontSize: '15px', boxSizing: 'border-box' }} />}
+                <input type="email" placeholder="nome@exemplo.com" value={inputEmail} onChange={e => setInputEmail(e.target.value)} required style={{ width: '100%', padding: '14px 16px', borderRadius: '10px', border: '1px solid #cbd5e1', backgroundColor: '#f8fafc', fontSize: '15px', boxSizing: 'border-box' }} />
+                <input type="password" placeholder="••••••••" value={inputSenha} onChange={e => setInputSenha(e.target.value)} required style={{ width: '100%', padding: '14px 16px', borderRadius: '10px', border: '1px solid #cbd5e1', backgroundColor: '#f8fafc', fontSize: '15px', boxSizing: 'border-box' }} />
                 
                 {isModoRegisto && inputEmail !== 'admin@erp.com' && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -827,12 +920,12 @@ export default function App() {
         <div style={{ backgroundColor: 'white', padding: '40px', borderRadius: '16px', maxWidth: '450px', width: '100%', textAlign: 'center' }}>
           <h2>Ativação do Laboratório</h2>
           <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '15px' }}>Realize o pagamento via PIX para liberar o seu acesso imediato.</p>
-          <div style={{ backgroundColor: '#eff6ff', padding: '15px', borderRadius: '8px', border: '2px dashed #3b82f6', color: '#1e3a8a', fontSize: '16px', fontWeight: 'bold', marginBottom: '15px' }}>{configAdmin.pix}</div>
+          <div style={{ backgroundColor: '#eff6ff', padding: '15px', borderRadius: '8px', border: '2px dashed #3b82f6', color: '#1e3a8a', fontSize: '16px', fontWeight: 'bold', marginBottom: '15px', wordBreak: 'break-all' }}>{configAdmin.pix}</div>
           
-          <a href={`https://wa.me/${configAdmin.whatsapp}?text=${encodeURIComponent(msgWpp)}`} target="_blank" rel="noreferrer" style={{ display: 'block', width: '100%', padding: '12px', backgroundColor: '#25D366', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', textDecoration: 'none', marginBottom: '10px' }}>
+          <a href={`https://wa.me/${configAdmin.whatsapp}?text=${encodeURIComponent(msgWpp)}`} target="_blank" rel="noreferrer" style={{ display: 'block', width: '100%', padding: '12px', backgroundColor: '#25D366', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', textDecoration: 'none', marginBottom: '10px', boxSizing: 'border-box' }}>
             💬 Enviar Comprovante no WhatsApp
           </a>
-          <button onClick={handleConfirmarCheckout} style={{ width: '100%', padding: '12px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Já paguei, entrar no sistema</button>
+          <button onClick={handleConfirmarCheckout} style={{ width: '100%', padding: '12px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', boxSizing: 'border-box' }}>Já paguei, entrar no sistema</button>
         </div>
       </div>
     );
@@ -880,30 +973,50 @@ export default function App() {
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
       `}</style>
-      <ToastNotificacao />
+      <ToastNotificacao /> 
 
-      <header className="no-print" style={{ backgroundColor: '#0f172a', color: 'white', padding: '14px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', flexShrink: 0, zIndex: 1100 }}>
+      <header className="no-print" style={{ backgroundColor: '#0f172a', color: 'white', padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', flexShrink: 0, zIndex: 1100 }}>
+        
+        {/* Lado Esquerdo: Menu Sanduíche colado + Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button onClick={() => setMenuMobileAberto(!menuMobileAberto)} style={{ backgroundColor: '#1e293b', border: '1px solid #334155', color: 'white', padding: '8px', borderRadius: '8px', cursor: 'pointer' }}>☰</button>
+          <button className="menu-toggle-btn" onClick={() => setMenuMobileAberto(!menuMobileAberto)} style={{ backgroundColor: 'transparent', border: 'none', color: 'white', padding: '4px', cursor: 'pointer', fontSize: '20px' }}>☰</button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <LogoSistema />
             <span style={{ fontWeight: '900', fontSize: '18px', color: '#f8fafc' }}>Contábil <span style={{ color: '#38bdf8' }}>Cloud</span></span>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#1e293b', padding: '6px 12px', borderRadius: '8px', gap: '10px' }}>
+
+        {/* Lado Direito: Apenas o Primeiro Nome e o X limpo (sem fundo/caixa) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{ fontSize: '14px' }}>👤</span>
-          <strong style={{ fontSize: '12.5px', color: '#ffffff' }}>{alunoNome} {isGestor && '(Admin)'}</strong>
-          <button onClick={handleLogout} style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', width: '24px', height: '24px', borderRadius: '6px', cursor: 'pointer' }}>✖</button>
+          <strong style={{ fontSize: '13px', color: '#ffffff' }}>
+            {alunoNome ? alunoNome.split(' ')[0] : ''} {isGestor && '(Admin)'}
+          </strong>
+          <button onClick={handleLogout} style={{ backgroundColor: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', padding: '4px' }} title="Sair">✖</button>
         </div>
       </header>
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        <aside className={`sidebar-scroll no-print app-sidebar ${menuMobileAberto ? 'mobile-open' : ''}`} style={{ width: '280px', backgroundColor: '#0f172a', borderRight: '1px solid #1e293b', overflowY: 'auto', padding: '10px 16px 30px 16px', transition: 'all 0.3s' }}>
+        <aside 
+          className={`sidebar-scroll no-print app-sidebar ${menuMobileAberto ? 'mobile-open' : ''}`} 
+          style={{ 
+            width: '280px', 
+            backgroundColor: '#0f172a', 
+            borderRight: '1px solid #1e293b', 
+            overflowY: 'auto', 
+            padding: '10px 16px 90px 16px', // Espaço folgado para último item aparecer no mobile
+            transition: 'all 0.3s',
+            flexShrink: 0
+          }}
+        >
           {isGestor && (
             <>
               <div className="sidebar-cat-custom" style={{ color: '#38bdf8' }}>Painel do Gestor (Admin)</div>
-              <button onClick={() => { setAbaAtiva('gerencial'); setMenuMobileAberto(false); }} className={`sidebar-btn-custom ${abaAtiva === 'gerencial' ? 'active' : ''}`}>
-                <span style={{ fontSize: '18px', width: '24px' }}></span> Configurações & Alunos
+              <button 
+                onClick={() => { setAbaAtiva('gerencial'); setMenuMobileAberto(false); }} 
+                className={`sidebar-btn-custom ${abaAtiva === 'gerencial' ? 'active' : ''}`}
+              >
+                <span style={{ fontSize: '18px', width: '24px', textAlign: 'center' }}>⚙️</span> Configurações & Alunos
               </button>
               <div style={{ margin: '16px 0', borderTop: '1px solid rgba(255,255,255,0.05)' }}></div>
             </>
@@ -911,52 +1024,51 @@ export default function App() {
 
           {[
             {
-    titulo: "🏢 Gestão & Estratégia",
-    itens: [
-      { id: 'inicio', icone: '🏠', label: 'Comando Central' },
-      { id: 'dashboard', icone: '📊', label: 'Dashboard Analítico' },
-      { id: 'canvas_simulator', icone: '🎯', label: 'Business Canvas' },
-      { id: 'pdca_realista', icone: '🔄', label: 'Ciclo PDCA' },
-      { id: 'pmp_10passos', icone: '📋', label: 'Projetos (PMBOK)' },
-      { id: 'esg_carbono', icone: '🌳', label: 'Balanço Social & ESG' },
-      { id: 'consultoria', icone: '💡', label: 'Consultoria Estratégica' },
-      { id: 'greenbelt', icone: '🥋', label: 'Gestão da Qualidade' },
-      { id: 'qualidade_tools', icone: '🛠️', label: 'Ferramentas da Qualidade' },
-      { id: 'ceo', icone: '👔', label: 'Simulador CEO (Business Game)' },
-    ]
-  },
-  {
-    titulo: "🏛️ Legal & Societário",
-    itens: [
-      { id: 'legalizacao', icone: '⚖️', label: 'Paralegal & Abertura' },
-      { id: 'portaisgov', icone: '🏛️', label: 'MEI / REDESIM' },
-      { id: 'certificados', icone: '🔐', label: 'Certificados Digitais' },
-      { id: 'onboarding', icone: '📝', label: 'Onboarding & Contratos' },
-      { id: 'compliance_leasing', icone: '🤝', label: 'Leasing & Compliance' },
-      { id: 'direito', icone: '⚖️', label: 'Direito & Elisão Fiscal' },
-      { id: 'direito_empresarial', icone: '🏢', label: 'Direito Societário & M&A' },
-      { id: 'comex', icone: '🚢', label: 'Comércio Exterior' },
-    ]
-  },
-  {
-    titulo: "💼 Contabilidade Oficial",
-    itens: [
-      { id: 'diario', icone: '📖', label: 'Livro Diário' },
-      { id: 'kardex', icone: '📦', label: 'Ficha Kardex' },
-      { id: 'depreciacao', icone: '🏢', label: 'Ativo Imobilizado (CPC 27)' },
-      { id: 'encerramento', icone: '🏁', label: 'Encerramento (ARE)' },
-      { id: 'demonstracoes', icone: '📑', label: 'Balanço & DRE' },
-      { id: 'analise', icone: '🔎', label: 'Auditoria de Balanço' },
-      { id: 'infoprodutos', icone: '🛒', label: 'Contabilidade Infoprodutos' },
-      { id: 'criptoativos', icone: '⛓️', label: 'Contabilidade Criptoativos' },
-    ]
-  },
-  {
+              titulo: "🏢 Gestão & Estratégia",
+              itens: [
+                { id: 'inicio', icone: '🏠', label: 'Comando Central' },
+                { id: 'dashboard', icone: '📊', label: 'Dashboard Analítico' },
+                { id: 'canvas_simulator', icone: '🎯', label: 'Business Canvas' },
+                { id: 'pdca_realista', icone: '🔄', label: 'Ciclo PDCA' },
+                { id: 'pmp_10passos', icone: '📋', label: 'Projetos (PMBOK)' },
+                { id: 'esg_carbono', icone: '🌳', label: 'Balanço Social & ESG' },
+                { id: 'consultoria', icone: '💡', label: 'Consultoria Estratégica' },
+                { id: 'greenbelt', icone: '🥋', label: 'Gestão da Qualidade' },
+                { id: 'qualidade_tools', icone: '🛠️', label: 'Ferram. da Qualidade' },
+                { id: 'ceo', icone: '👔', label: 'Simulador CEO' },
+                { id: 'servicos', icone: '🚀', label: 'Hub seviços' },
+              ]
+            },
+            {
+              titulo: "🏛️ Legal & Societário",
+              itens: [
+                { id: 'legalizacao', icone: '⚖️', label: 'Paralegal & Abertura' },
+                { id: 'portaisgov', icone: '🏛️', label: 'MEI / REDESIM' },
+                { id: 'certificados', icone: '🔐', label: 'Certificados Digitais' },
+                { id: 'onboarding', icone: '📝', label: 'Onboarding & Contratos' },
+                { id: 'compliance_leasing', icone: '🤝', label: 'Leasing & Compliance' },
+                { id: 'direito', icone: '⚖️', label: 'Direito & Elisão Fiscal' },
+                { id: 'direito_empresarial', icone: '🏢', label: 'Direito Societário' },
+                { id: 'comex', icone: '🚢', label: 'Comércio Exterior' },
+              ]
+            },
+            {
+              titulo: "💼 Contabilidade Oficial",
+              itens: [
+                { id: 'diario', icone: '📖', label: 'Livro Diário' },
+                { id: 'kardex', icone: '📦', label: 'Ficha Kardex' },
+                { id: 'depreciacao', icone: '🏢', label: 'Imobilizado (CPC 27)' },
+                { id: 'encerramento', icone: '🏁', label: 'Encerramento (ARE)' },
+                { id: 'demonstracoes', icone: '📑', label: 'Balanço & DRE' },
+                { id: 'analise', icone: '🔎', label: 'Auditoria de Balanço' },
+                { id: 'infoprodutos', icone: '🛒', label: 'Contab. Infoprodutos' },
+                { id: 'criptoativos', icone: '⛓️', label: 'Contab. Criptoativos' },
+              ]
+            },
+            {
     titulo: "🧾 Fiscal & Tributário",
     itens: [
       { id: 'notas', icone: '🧾', label: 'Emissor de Notas' },
-      { id: 'nfe', icone: '🛒', label: 'XML Comércio (NF-e)' },
-      { id: 'nf', icone: '🛠️', label: 'NF Serviço (NFS-e)' },
       { id: 'simples', icone: '🏢', label: 'Simples Nacional' },
       { id: 'lalur', icone: '⚖️', label: 'Lucro Real (e-LALUR)' },
       { id: 'eng_tributaria', icone: '🧠', label: 'Engenharia Tributária' },
@@ -1028,7 +1140,7 @@ export default function App() {
             </div>
           ))}
 
-          {!isGestor && configAtiva.modo === 'manual' && configAtiva.pendenciasManuais.length > 0 && (
+        {!isGestor && configAtiva.modo === 'manual' && configAtiva.pendenciasManuais.length > 0 && (
             <div style={{ marginTop: '30px', backgroundColor: 'rgba(245,158,11,0.1)', padding: '16px', borderRadius: '10px', border: '1px solid rgba(245,158,11,0.3)', borderLeft: '4px solid #f59e0b' }}>
               <span style={{ fontSize: '12px', fontWeight: '900', color: '#fbbf24', display: 'block', marginBottom: '8px' }}>🦉 TUTOR AVISA:</span>
               <p style={{ margin: 0, fontSize: '12.5px', color: '#fcd34d', lineHeight: '1.5' }}>Há <strong>{configAtiva.pendenciasManuais.length}</strong> fato(s) gerador(es) na fila. Vá ao Livro Diário!</p>
@@ -1036,39 +1148,82 @@ export default function App() {
           )}
         </aside>
 
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', backgroundColor: '#f1f5f9', position: 'relative' }}>
+        {/* ===================================================================== */}
+        {/* MÁGICA 1: O evento onScroll foi adicionado aqui na tag main           */}
+        {/* ===================================================================== */}
+        <main onScroll={handleScrollMain} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', backgroundColor: '#f1f5f9', position: 'relative' }}>
           
           <div style={{ flex: '1 0 auto' }}>
+            
+            {/* Header Ultra Limpo (Estilo Instagram / Facebook) */}
             {!isGestor && (
-              <div className="no-print" style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #cbd5e1', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px', position: 'sticky', top: 0, zIndex: 1050, boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#f8fafc', padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
-                    <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Entidade Ativa:</span>
-                    <select value={clienteSelecionado?.id || ''} onChange={handleTrocarCliente} style={{ backgroundColor: 'transparent', color: '#0f172a', border: 'none', fontWeight: '800', fontSize: '13.5px', outline: 'none', cursor: 'pointer', maxWidth: '240px' }}>
-                      {clientes.map(c => <option key={c.id} value={c.id}>{c.nome_empresa}</option>)}
-                    </select>
-                  </div>
-                  <button onClick={criarNovaEmpresaParalegal} style={{ backgroundColor: '#10b981', color: 'white', border: 'none', padding: '8px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>+</span> Novo CNPJ
-                  </button>
+              <div className="no-print" style={{ 
+                backgroundColor: '#ffffff', 
+                borderBottom: '1px solid #e2e8f0', 
+                padding: '12px 16px', 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center', 
+                gap: '12px', 
+                position: 'sticky', 
+                top: 0, 
+                zIndex: 1050, 
+                transition: 'transform 0.3s ease-in-out',
+                transform: mostrarSmartHeader ? 'translateY(0)' : 'translateY(-100%)'
+              }}>
+                
+                {/* Lado Esquerdo: Ícone da Entidade + Select Invisível */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, minWidth: 0 }}>
+                  <span style={{ fontSize: '16px' }}>🏢</span>
+                  <select 
+                    value={clienteSelecionado?.id || ''} 
+                    onChange={handleTrocarCliente} 
+                    style={{ 
+                      backgroundColor: 'transparent', 
+                      color: '#0f172a', 
+                      border: 'none', 
+                      fontWeight: '900', 
+                      fontSize: '15px', 
+                      outline: 'none', 
+                      cursor: 'pointer', 
+                      width: '100%', 
+                      textOverflow: 'ellipsis',
+                      appearance: 'none' /* Remove a seta padrão do seletor em alguns telemóveis para ficar mais limpo */
+                    }}
+                  >
+                    {clientes.map(c => <option key={c.id} value={c.id}>{c.nome_empresa}</option>)}
+                  </select>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#f8fafc', padding: '6px 14px', borderRadius: '20px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}>
-                    <span style={{ color: '#475569', fontWeight: '600' }}>Mês Fiscal:</span> 
-                    <strong style={{ color: '#2563eb', fontSize: '14px' }}>{configAtiva.mesAtual}</strong>
-                    <button onClick={avancarMes} style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontSize: '12px', marginLeft: '4px' }} title="Avançar Mês">⏩</button>
-                  </div>
-
-                  <button onClick={toggleModoEmpresa} style={{ padding: '8px 16px', borderRadius: '20px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: configAtiva.modo === 'automatico' ? '#dcfce7' : '#fef3c7', color: configAtiva.modo === 'automatico' ? '#166534' : '#92400e', border: `1px solid ${configAtiva.modo === 'automatico' ? '#bbf7d0' : '#fde68a'}` }}>
-                    {configAtiva.modo === 'automatico' ? '⚙️ Modo Automático' : '✍️ Modo Manual'}
+                {/* Lado Direito: Apenas Ícones de Ação (Sem caixas ou bordas) */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexShrink: 0 }}>
+                  
+                  {/* Ícone Novo */}
+                  <button onClick={criarNovaEmpresaParalegal} title="Adicionar Nova Empresa" style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '18px', padding: 0, display: 'flex' }}>
+                    ➕
                   </button>
-                  <button onClick={handleResetarTreinamento} title="Apagar todos os Lançamentos" style={{ backgroundColor: '#fee2e2', color: '#ef4444', border: '1px solid #fecaca', width: '34px', height: '34px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🗑️</button>
+
+                  {/* Ícone Engrenagem (Auto) ou Lápis (Manual) */}
+                  <button onClick={toggleModoEmpresa} title={configAtiva.modo === 'automatico' ? 'Modo Automático' : 'Modo Manual'} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '18px', padding: 0, display: 'flex' }}>
+                    {configAtiva.modo === 'automatico' ? '⚙️' : '✍️'}
+                  </button>
+                  
+                  {/* Ícone Vassoura (Limpar Lançamentos do Diário) */}
+                  <button onClick={handleResetarTreinamento} title="Limpar Lançamentos do Diário" style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '18px', padding: 0, display: 'flex' }}>
+                    🧹
+                  </button>
+
+                  {/* NOVO: Ícone Lixeira Vermelha (Excluir Empresa Permanentemente) */}
+                  <button onClick={excluirEmpresaParalegal} title="Excluir Empresa Definitivamente" style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '18px', padding: 0, display: 'flex', color: '#ef4444' }}>
+                    🗑️
+                  </button>
+
                 </div>
               </div>
             )}
+           
 
-            <div style={{ padding: '30px', width: '100%',  maxWidth: '1650px', margin: '0 auto', boxSizing: 'border-box' }}>
+            <div style={{ padding: '5px', width: '100%',  maxWidth: '1650px', margin: '0 auto', boxSizing: 'border-box' }}>
               
               {/* ==========================================================
                   PAINEL DO GESTOR (ADMIN) - FORMULÁRIO DE UPLOAD FUNCIONAL
@@ -1293,47 +1448,66 @@ export default function App() {
   return (
     <div className="no-print" style={{ display: 'flex', flexDirection: 'column', gap: '24px', animation: 'fadeIn 0.5s ease-out' }}>
       
-      {/* HEADER: ESTILO "GLASSMORPHISM" E GRADIENTE MODERNO */}
-      <div style={{ background: 'linear-gradient(135deg, #020617 0%, #0f172a 100%)', color: 'white', padding: '32px', borderRadius: '24px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '24px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: '-50%', left: '-10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }}></div>
-        <div style={{ position: 'absolute', bottom: '-50%', right: '-10%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(74,222,128,0.08) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }}></div>
+            {/* HEADER: ESTILO "CLEAN" E CORPORATIVO MINIMALISTA */}
+      <div style={{ backgroundColor: '#ffffff', padding: 'clamp(24px, 4vw, 32px)', borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '24px', position: 'relative', overflow: 'hidden', boxSizing: 'border-box' }}>
+        
+        {/* Detalhe visual de fundo extremamente subtil */}
+        <div style={{ position: 'absolute', top: 0, right: 0, width: '350px', height: '100%', background: 'linear-gradient(90deg, transparent, #f8fafc)', pointerEvents: 'none' }}></div>
 
-        <div style={{ zIndex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-            <span style={{ backgroundColor: '#2563eb', color: '#ffffff', padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', letterSpacing: '0.8px', boxShadow: '0 4px 6px rgba(37, 99, 235, 0.3)' }}>COMMAND CENTER</span>
-            <span style={{ backgroundColor: difB < 0.05 ? 'rgba(74, 222, 128, 0.15)' : 'rgba(248, 113, 113, 0.15)', color: difB < 0.05 ? '#4ade80' : '#f87171', padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px', border: `1px solid ${difB < 0.05 ? 'rgba(74, 222, 128, 0.3)' : 'rgba(248, 113, 113, 0.3)'}` }}>
-              {difB < 0.05 ? <><span style={{width:'8px',height:'8px',borderRadius:'50%',backgroundColor:'#4ade80', boxShadow: '0 0 8px #4ade80'}}></span> Balanço Conciliado</> : '⚠️ Divergência Encontrada'}
+        <div style={{ zIndex: 1, minWidth: 0, flex: '1 1 300px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+            <span style={{ backgroundColor: '#f1f5f9', color: '#475569', padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '800', letterSpacing: '0.5px', border: '1px solid #e2e8f0' }}>
+              COMMAND CENTER
+            </span>
+            <span style={{ 
+              backgroundColor: difB < 0.05 ? '#f0fdf4' : '#fef2f2', 
+              color: difB < 0.05 ? '#16a34a' : '#dc2626', 
+              padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '700', 
+              display: 'flex', alignItems: 'center', gap: '8px', 
+              border: `1px solid ${difB < 0.05 ? '#bbf7d0' : '#fecaca'}` 
+            }}>
+              {difB < 0.05 ? <><span style={{width:'8px',height:'8px',borderRadius:'50%',backgroundColor:'#22c55e'}}></span> Balanço Conciliado</> : '⚠️ Divergência Encontrada'}
             </span>
           </div>
-          <h2 style={{ margin: '0 0 8px 0', fontSize: '32px', fontWeight: '900', letterSpacing: '-0.5px' }}>{clienteSelecionado.nome_empresa}</h2>
-          <div style={{ fontSize: '14px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', backgroundColor: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', borderRadius: '6px', fontWeight: 'bold' }}>{historico.length}</span>
+          
+          <h2 style={{ margin: '0 0 8px 0', fontSize: 'clamp(24px, 3vw, 32px)', fontWeight: '800', letterSpacing: '-0.5px', color: '#0f172a', wordBreak: 'break-word' }}>
+            {clienteSelecionado.nome_empresa}
+          </h2>
+          
+          <div style={{ fontSize: '13px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '8px', wordBreak: 'break-word' }}>
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', backgroundColor: '#eff6ff', color: '#2563eb', borderRadius: '6px', fontWeight: 'bold' }}>
+              {historico.length}
+            </span>
             fatos contábeis escriturados no Diário Geral
           </div>
         </div>
 
-        <div style={{ zIndex: 1, backdropFilter: 'blur(12px)', backgroundColor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '20px 24px', borderRadius: '16px', flex: '1 1 300px', maxWidth: '450px' }}>
-          <div style={{ color: '#94a3b8', fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ zIndex: 1, backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '20px 24px', borderRadius: '16px', flex: '1 1 300px', maxWidth: '450px', boxSizing: 'border-box' }}>
+          <div style={{ color: '#64748b', fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
             <span>Equação Patrimonial (NBC TG)</span>
-            <span style={{ color: '#cbd5e1' }}>Ativo = Passivo + PL</span>
+            <span style={{ color: '#94a3b8' }}>A = P + PL</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold', marginBottom: '2px' }}>Σ Aplicações (Ativo)</span>
-              <span style={{ fontWeight: '900', fontSize: '18px', color: '#ffffff' }}>R$ {formatM(totalAtivo)}</span>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+              <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 'bold', marginBottom: '4px', wordBreak: 'break-word' }}>Σ Aplicações (Ativo)</span>
+              <span style={{ fontWeight: '800', fontSize: 'clamp(16px, 2vw, 20px)', color: '#0f172a', wordBreak: 'break-word' }}>R$ {formatM(totalAtivo)}</span>
             </div>
-            <div style={{ color: '#475569', fontSize: '20px', fontWeight: '300' }}>=</div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold', marginBottom: '2px' }}>Σ Origens (Passivo + PL)</span>
-              <span style={{ fontWeight: '900', fontSize: '18px', color: '#ffffff' }}>
-                <span style={{ color: '#f87171' }}>{formatM(totalPassivo)}</span> 
-                <span style={{ color: '#64748b', margin: '0 4px', fontSize: '14px' }}>+</span> 
-                <span style={{ color: '#4ade80' }}>{formatM(plResultado)}</span>
+            
+            <div style={{ color: '#cbd5e1', fontSize: '20px', fontWeight: '300' }}>=</div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 0 }}>
+              <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 'bold', marginBottom: '4px', wordBreak: 'break-word' }}>Σ Origens (Passivo + PL)</span>
+              <span style={{ fontWeight: '800', fontSize: 'clamp(16px, 2vw, 20px)', color: '#0f172a', wordBreak: 'break-word' }}>
+                <span style={{ color: '#dc2626' }}>{formatM(totalPassivo)}</span> 
+                <span style={{ color: '#cbd5e1', margin: '0 6px', fontSize: '14px' }}>+</span> 
+                <span style={{ color: '#16a34a' }}>{formatM(plResultado)}</span>
               </span>
             </div>
           </div>
         </div>
       </div>
+
 
       {/* GRID DE KPIs ESTILO "FINTECH" */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
@@ -1381,7 +1555,7 @@ export default function App() {
       {/* ============================================================== */}
       {/* NOVO PAINEL: CENTRAL DE OPERAÇÕES (PENDÊNCIAS & HISTÓRICO)     */}
       {/* ============================================================== */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px', marginTop: '8px' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '20px', marginTop: '8px' }}>
         
         {/* COLUNA 1: FILA DE PENDÊNCIAS */}
         <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
@@ -1435,13 +1609,17 @@ export default function App() {
               ultimosLancamentos.map(l => (
                 <div key={l.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', position: 'relative', overflow: 'hidden' }}>
                   <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', backgroundColor: '#3b82f6' }}></div>
-                  <div style={{ paddingLeft: '8px' }}>
-                    <strong style={{ fontSize: '13px', color: '#0f172a', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '220px' }} title={l.historico || l.nomeDebito}>
+                  
+                  {/* flex: 1 e minWidth: 0 garantem que o texto longo ganhe "..." sem empurrar o dinheiro */}
+                  <div style={{ paddingLeft: '8px', paddingRight: '8px', flex: 1, minWidth: 0 }}>
+                    <strong style={{ fontSize: '13px', color: '#0f172a', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={l.historico || l.nomeDebito}>
                       {l.historico ? l.historico.replace(/\[ID:.*\]/, '') : `Lançamento: ${l.nomeDebito}`}
                     </strong>
                     <span style={{ fontSize: '11px', color: '#64748b' }}>{new Date(l.data).toLocaleDateString('pt-BR')} • {l.debito} / {l.credito}</span>
                   </div>
-                  <strong style={{ fontSize: '14px', color: '#16a34a' }}>R$ {formatM(l.valor)}</strong>
+                  
+                  {/* whiteSpace nowrap impede a quebra do R$ para baixo */}
+                  <strong style={{ fontSize: '14px', color: '#16a34a', whiteSpace: 'nowrap' }}>R$ {formatM(l.valor)}</strong>
                 </div>
               ))
             )}
@@ -1503,9 +1681,7 @@ export default function App() {
               {abaAtiva === 'equilibrio' && !isGestor && <SimuladorPontoEquilibrio />}
               {abaAtiva === 'rateio' && !isGestor && <SimuladorRateioCustos />}
               {abaAtiva === 'analise' && !isGestor && <SimuladorAnaliseBalanco />}
-              {abaAtiva === 'nf' && !isGestor && <SimuladorNotaFiscal />}
               {abaAtiva === 'hp12c' && !isGestor && <SimuladorHP12c mostrarToast={mostrarToast} />}
-              {abaAtiva === 'nfe' && !isGestor && <SimuladorNFe />}
               {abaAtiva === 'qualidade_tools' && !isGestor && <SimuladorFerramentasQualidade mostrarToast={mostrarToast} />}
               {abaAtiva === 'depreciacao' && !isGestor && <SimuladorDepreciacao mostrarToast={mostrarToast} registrarFatoGerador={registrarFatoGerador} planoContas={planoContas} />}
               {abaAtiva === 'emprestimo' && !isGestor && <SimuladorEmprestimo mostrarToast={mostrarToast} registrarFatoGerador={registrarFatoGerador} planoContas={planoContas} />}
@@ -1538,6 +1714,7 @@ export default function App() {
               {abaAtiva === 'pdca_realista' && <SimuladorPDCARealista mostrarToast={mostrarToast} />}
               {abaAtiva === 'pmp_10passos' && <SimuladorPMP10Passos mostrarToast={mostrarToast} />}
               {abaAtiva === 'laboratoriorh' && <LaboratorioFolha mostrarToast={mostrarToast} />}
+              {abaAtiva === 'servicos' && <ServicosIniciais mostrarToast={mostrarToast} />}
               {abaAtiva === 'laboratoriolancamentos' && !isGestor && (
   <LaboratorioLancamentos />
 )}
@@ -1607,7 +1784,7 @@ export default function App() {
                   <span style={{ fontSize: '10px', color: '#64748b', fontWeight: '600' }}>ERP Enterprise & Acadêmico</span>
                 </div>
               </div>
-              <div style={{ width: '1px', height: '28px', backgroundColor: '#cbd5e1' }}></div>
+              <div style={{ width: '1px', height: '20px', backgroundColor: '#cbd5e1' }}></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#16a34a' }}></span>
                 <div style={{ fontSize: '12px', color: '#334155' }}>
@@ -1616,48 +1793,75 @@ export default function App() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-              <span style={{ backgroundColor: '#eff6ff', color: '#1e40af', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #bfdbfe' }}>⚖️ NBC TG / SPED</span>
-              <span style={{ backgroundColor: '#f1f5f9', color: '#334155', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', border: '1px solid #e2e8f0', fontWeight: '600' }}>🛡️ Conexão Segura SSL</span>
-              <div style={{ fontSize: '11.5px', color: '#64748b' }}>Utilizador: <strong style={{ color: '#0f172a' }}>{alunoNome}</strong></div>
-            </div>
+           
           </footer>
         </main>
       </div>
 
-      {/* ========================================================
-          WIDGET FLUTUANTE DA CORUJA E ROBÔ (CORRIGIDO)
+   {/* ========================================================
+          WIDGET FLUTUANTE DE IA (NOVO FORMATO "PÍLULA CLEAN")
           ======================================================== */}
       {!isGestor && clienteSelecionado && (
         <>
-          {/* Modal e Botão do Tutor Analítico */}
-          <div className="no-print" style={{ position: 'fixed', bottom: '80px', right: '0px', zIndex: 9998, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '16px' }}>
-            {tutorAberto && (
-              <div style={{ width: '380px', maxHeight: '75vh', overflowY: 'auto', backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #cbd5e1', boxShadow: '0 10px 40px rgba(0,0,0,0.15)', padding: '20px', animation: 'fadeIn 0.3s ease-out' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
+          {/* 1. MODAL DO TUTOR (CORUJA) */}
+          {tutorAberto && (
+            <div className="no-print" style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '20px' }}>
+              <div style={{ width: '100%', maxWidth: '420px', maxHeight: '85vh', overflowY: 'auto', backgroundColor: '#ffffff', borderRadius: '20px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.3)', padding: '24px', animation: 'fadeIn 0.2s ease-out' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '24px' }}>🦉</span>
+                    <span style={{ fontSize: '28px' }}>🦉</span>
                     <div>
-                      <strong style={{ fontSize: '15px', color: '#0f172a', display: 'block' }}>Tutor Analítico</strong>
-                      <span style={{ fontSize: '11px', color: '#64748b' }}>IA de Auditoria Pedagógica</span>
+                      <strong style={{ fontSize: '16px', color: '#0f172a', display: 'block' }}>Tutor Analítico</strong>
+                      <span style={{ fontSize: '12px', color: '#64748b' }}>IA de Auditoria Pedagógica</span>
                     </div>
                   </div>
-                  <button onClick={() => setTutorAberto(false)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', fontSize: '12px', color: '#64748b' }}>✖</button>
+                  <button onClick={() => setTutorAberto(false)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', fontSize: '14px', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✖</button>
                 </div>
                 <AssistenteAuditoria totalAtivo={totalAtivo} totalPassivo={totalPassivo} totalPL={totalPL} resultadoExercicio={resultadoExercicio} saldoCaixa={saldoCaixaCalculado} historico={historico} nomeEmpresa={clienteSelecionado.nome_empresa} pendencias={configAtiva.pendenciasManuais} />
               </div>
-            )}
-            <button 
-              onClick={() => setTutorAberto(!tutorAberto)}
-              style={{ width: '60px', height: '60px', borderRadius: '30px', backgroundColor: '#0f172a', color: 'white', border: '2px solid #38bdf8', boxShadow: '0 4px 15px rgba(15,23,42,0.4)', fontSize: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >
-              {tutorAberto ? '⬇️' : '🦉'}
-            </button>
-          </div>
+            </div>
+          )}
 
-          {/* O Robô Assistente de IA que estava sobreposto */}
-          <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 9999 }}>
-            <AssistenteRobo />
+          {/* 2. MODAL DO ROBÔ */}
+          {roboAberto && (
+            <div className="no-print" style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '20px' }}>
+              <div style={{ width: '100%', maxWidth: '420px', maxHeight: '85vh', overflowY: 'auto', backgroundColor: '#ffffff', borderRadius: '20px', padding: '24px', position: 'relative' }}>
+                <button onClick={() => setRoboAberto(false)} style={{ position: 'absolute', top: '20px', right: '20px', background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', color: '#64748b', zIndex: 10 }}>✖</button>
+                <AssistenteRobo />
+              </div>
+            </div>
+          )}
+
+          {/* 3. PÍLULA FLUTUANTE INFERIOR (Onde os botões vivem) */}
+          <div className="no-print" style={{ 
+            position: 'fixed', bottom: '15px', right: '20px', zIndex: 9998, 
+            display: 'flex', alignItems: 'center', gap: '4px', 
+            backgroundColor: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(10px)',
+            padding: '4px 8px', borderRadius: '40px', border: '1px solid #e2e8f0',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.08)'
+          }}>
+            
+            {/* Ícone da Coruja */}
+            <button 
+              onClick={() => setTutorAberto(true)}
+              title="Tutor Analítico"
+              style={{ background: 'transparent', border: 'none', borderRadius: '50%', width: '32px', height: '32px', fontSize: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+            >
+              🦉
+            </button>
+            
+            {/* Divisória fina */}
+            <div style={{ width: '1px', height: '16px', backgroundColor: '#cbd5e1', margin: '0 2px' }}></div>
+            
+            {/* Ícone do Robô */}
+            <button 
+              onClick={() => setRoboAberto(true)}
+              title="Robô Assistente IA"
+              style={{ background: 'transparent', border: 'none', borderRadius: '50%', width: '32px', height: '32px', fontSize: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+            >
+              🤖
+            </button>
+            
           </div>
         </>
       )}

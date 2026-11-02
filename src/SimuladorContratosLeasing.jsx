@@ -25,18 +25,16 @@ export default function SimuladorContratosLeasing({ mostrarToast, registrarFatoG
 
     let valorPresente = 0;
     
-    // Cálculo do Valor Presente de uma Anuidade (Fórmula VP = PMT * ((1 - (1+i)^-n) / i))
     if (i > 0) {
       valorPresente = pmt * ((1 - Math.pow(1 + i, -n)) / i);
     } else {
-      valorPresente = pmt * n; // Sem juros, o VP é a soma simples
+      valorPresente = pmt * n; 
     }
 
     const valorTotalContrato = pmt * n;
     const jurosEmbutidos = valorTotalContrato - valorPresente;
     const depreciacaoMensal = valorPresente / n;
 
-    // Tabela de Amortização Financeira (Primeiros 12 meses e último para demonstração)
     const tabelaAmortizacao = [];
     let saldoDevedor = valorPresente;
 
@@ -45,7 +43,6 @@ export default function SimuladorContratosLeasing({ mostrarToast, registrarFatoG
       const amortizacaoMes = pmt - jurosMes;
       saldoDevedor -= amortizacaoMes;
       
-      // Guardar apenas o 1º ano e o último mês para não pesar a renderização na tela
       if (mes <= 12 || mes === n) {
         tabelaAmortizacao.push({
           mes,
@@ -81,14 +78,12 @@ export default function SimuladorContratosLeasing({ mostrarToast, registrarFatoG
     }
 
     try {
-      // Reconhecimento Inicial do Contrato de Arrendamento (CPC 06)
-      // Trazemos o contrato a Valor Presente. Ativa-se o Direito de Uso e reconhece o Passivo.
       registrarFatoGerador(
         `Capitalização de Contrato CPC06 - ${params.objetoContrato}`,
         calculos.valorPresente,
         'Compliance/Contratos',
-        ['1.2.03.01'], // Débito: Ativo Imobilizado (Direito de Uso)
-        ['2.1.04.01']  // Crédito: Passivo (Arrendamentos a Pagar)
+        ['1.2.03.01'], 
+        ['2.1.04.01']  
       );
 
       setJaContabilizado(true);
@@ -103,104 +98,103 @@ export default function SimuladorContratosLeasing({ mostrarToast, registrarFatoG
     if (typeof mostrarToast === 'function') mostrarToast('Painel limpo para análise de um novo contrato.', 'sucesso');
   };
 
-  // Estilos Padronizados
-  const inputStyle = { width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', color: '#0f172a', backgroundColor: '#f8fafc', outline: 'none' };
-  const labelStyle = { fontWeight: '700', fontSize: '12px', color: '#475569', display: 'block', marginBottom: '6px' };
-  const cardStyle = { backgroundColor: 'white', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' };
+  const inputStyle = { width: '100%', maxWidth: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', color: '#0f172a', backgroundColor: '#f8fafc', outline: 'none', boxSizing: 'border-box' };
+  const labelStyle = { fontWeight: '700', fontSize: '12px', color: '#475569', display: 'block', marginBottom: '6px', wordBreak: 'break-word' };
+  const cardStyle = { backgroundColor: 'white', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', boxSizing: 'border-box', minWidth: 0 };
 
   return (
-    <div style={{ fontFamily: 'system-ui, -apple-system, sans-serif', color: '#0f172a', boxSizing: 'border-box', animation: 'fadeIn 0.4s' }}>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#ffffff', padding: '16px', borderRadius: '24px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animation: 'fadeIn 0.5s', boxSizing: 'border-box', width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
       
       {/* CABEÇALHO */}
-      <div className="no-print" style={{ backgroundColor: '#0f172a', color: 'white', padding: '24px', borderRadius: '14px 14px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', borderBottom: '4px solid #0d9488' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-            <span style={{ backgroundColor: '#0d9488', color: 'white', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '900', letterSpacing: '0.5px' }}>GESTÃO DE CONTRATOS & COMPLIANCE</span>
-            <span style={{ fontSize: '18px', fontWeight: '800' }}>Arrendamentos (Leasing - CPC 06)</span>
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '15px' }}>
+        <div style={{ minWidth: 0, flex: '1 1 250px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+            <span style={{ backgroundColor: '#0d9488', color: 'white', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '900', letterSpacing: '0.5px' }}>COMPLIANCE</span>
+            <span style={{ fontSize: '17px', fontWeight: '800', wordBreak: 'break-word' }}>Arrendamentos (Leasing - CPC 06)</span>
           </div>
-          <div style={{ fontSize: '13px', color: '#cbd5e1' }}>Avalie contratos longos, calcule o Valor Presente e neutralize riscos de auditoria.</div>
+          <p style={{ margin: 0, color: '#64748b', fontSize: '13px', wordBreak: 'break-word' }}>Avalie contratos longos, calcule o Valor Presente e neutralize riscos de auditoria.</p>
         </div>
         
         {/* NAVEGAÇÃO INTERNA */}
-        <div style={{ display: 'flex', gap: '8px', backgroundColor: 'rgba(255,255,255,0.1)', padding: '6px', borderRadius: '10px', flexWrap: 'wrap' }}>
-          <button onClick={() => setAbaAtiva('parametros')} style={{ padding: '8px 16px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', backgroundColor: abaAtiva === 'parametros' ? '#0d9488' : 'transparent', color: abaAtiva === 'parametros' ? 'white' : '#cbd5e1' }}>⚙️ Setup do Contrato</button>
-          <button onClick={() => setAbaAtiva('tabela')} style={{ padding: '8px 16px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', backgroundColor: abaAtiva === 'tabela' ? '#0d9488' : 'transparent', color: abaAtiva === 'tabela' ? 'white' : '#cbd5e1' }}>📉 Tabela de Amortização</button>
-          <button onClick={() => setAbaAtiva('memoria')} style={{ padding: '8px 16px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', backgroundColor: abaAtiva === 'memoria' ? '#0d9488' : 'transparent', color: abaAtiva === 'memoria' ? 'white' : '#cbd5e1' }}>🧠 Regras de Compliance</button>
-          <button onClick={() => setAbaAtiva('contabilidade')} style={{ padding: '8px 16px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', backgroundColor: abaAtiva === 'contabilidade' ? '#0d9488' : 'transparent', color: abaAtiva === 'contabilidade' ? 'white' : '#cbd5e1' }}>📖 Capitalização (Diário)</button>
+        <div style={{ display: 'flex', gap: '6px', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '12px', border: '1px solid #e2e8f0', flexWrap: 'wrap', boxSizing: 'border-box' }}>
+          <button onClick={() => setAbaAtiva('parametros')} style={{ padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11.5px', cursor: 'pointer', backgroundColor: abaAtiva === 'parametros' ? '#0d9488' : 'transparent', color: abaAtiva === 'parametros' ? 'white' : '#64748b' }}>⚙️ Setup</button>
+          <button onClick={() => setAbaAtiva('tabela')} style={{ padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11.5px', cursor: 'pointer', backgroundColor: abaAtiva === 'tabela' ? '#0d9488' : 'transparent', color: abaAtiva === 'tabela' ? 'white' : '#64748b' }}>📉 Amortização</button>
+          <button onClick={() => setAbaAtiva('memoria')} style={{ padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11.5px', cursor: 'pointer', backgroundColor: abaAtiva === 'memoria' ? '#0d9488' : 'transparent', color: abaAtiva === 'memoria' ? 'white' : '#64748b' }}>🧠 Regras</button>
+          <button onClick={() => setAbaAtiva('contabilidade')} style={{ padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11.5px', cursor: 'pointer', backgroundColor: abaAtiva === 'contabilidade' ? '#0d9488' : 'transparent', color: abaAtiva === 'contabilidade' ? 'white' : '#64748b' }}>📖 Diário</button>
         </div>
       </div>
 
-      <div style={{ backgroundColor: '#f8fafc', padding: '24px', borderRadius: '0 0 14px 14px', border: '1px solid #e2e8f0', borderTop: 'none', minHeight: '600px' }}>
+      <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', minHeight: '500px', boxSizing: 'border-box', width: '100%' }}>
         
         {/* ========================================================
             ABA 1: PARÂMETROS DO CONTRATO
             ======================================================== */}
         {abaAtiva === 'parametros' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px', animation: 'fadeIn 0.3s', boxSizing: 'border-box' }}>
             
             {/* PAINEL DE INPUTS */}
             <div style={cardStyle}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', marginBottom: '20px' }}>
-                <h3 style={{ margin: 0, fontSize: '16px', color: '#0f172a' }}>📄 Detalhes do Acordo Comercial</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', wordBreak: 'break-word' }}>📄 Detalhes do Acordo Comercial</h3>
                 <button onClick={resetarSimulador} style={{ background: 'none', border: 'none', color: '#0d9488', fontWeight: 'bold', cursor: 'pointer', fontSize: '12px' }}>🔄 Limpar Dados</button>
               </div>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', boxSizing: 'border-box' }}>
+                <div style={{ minWidth: 0 }}>
                   <label htmlFor="cObjeto" style={labelStyle}>Objeto do Contrato de Arrendamento:</label>
                   <input id="cObjeto" name="cObjeto" type="text" style={inputStyle} value={params.objetoContrato} onChange={e => {setParams({...params, objetoContrato: e.target.value}); setJaContabilizado(false);}} placeholder="Ex: Aluguel de Sede, Frota de Veículos..." />
                 </div>
                 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                  <div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 130px), 1fr))', gap: '12px', boxSizing: 'border-box' }}>
+                  <div style={{ minWidth: 0 }}>
                     <label htmlFor="cParcela" style={labelStyle}>Valor da Parcela Mensal (R$):</label>
                     <input id="cParcela" name="cParcela" type="number" style={{...inputStyle, borderColor: '#5eead4', backgroundColor: '#f0fdfa'}} value={params.valorParcela} onChange={e => {setParams({...params, valorParcela: e.target.value}); setJaContabilizado(false);}} />
                   </div>
-                  <div>
+                  <div style={{ minWidth: 0 }}>
                     <label htmlFor="cPrazo" style={labelStyle}>Prazo de Duração (Meses):</label>
                     <input id="cPrazo" name="cPrazo" type="number" style={inputStyle} value={params.prazoMeses} onChange={e => {setParams({...params, prazoMeses: e.target.value}); setJaContabilizado(false);}} />
                   </div>
                 </div>
 
-                <div style={{ padding: '16px', backgroundColor: '#fef2f2', borderRadius: '8px', border: '1px solid #fecaca', marginTop: '10px' }}>
+                <div style={{ padding: '14px', backgroundColor: '#fef2f2', borderRadius: '10px', border: '1px solid #fecaca', marginTop: '6px', boxSizing: 'border-box', minWidth: 0 }}>
                   <label htmlFor="cTaxa" style={{ ...labelStyle, color: '#991b1b' }}>Taxa Incremental de Empréstimo (% a.m.):</label>
                   <input id="cTaxa" name="cTaxa" type="number" step="0.1" style={{...inputStyle, borderColor: '#fca5a5'}} value={params.taxaDesconto} onChange={e => {setParams({...params, taxaDesconto: e.target.value}); setJaContabilizado(false);}} />
-                  <span style={{ fontSize: '11px', color: '#991b1b', marginTop: '6px', display: 'block' }}>*Se a empresa fosse pegar esse dinheiro emprestado no banco hoje, qual seria a taxa de juros do mês?</span>
+                  <span style={{ fontSize: '11px', color: '#991b1b', marginTop: '4px', display: 'block', wordBreak: 'break-word' }}>*Taxa de juros anual/mensal implícita ou de oportunidade.</span>
                 </div>
               </div>
             </div>
 
             {/* PAINEL DE RESULTADOS (DIAGNOSTICO CPC 06) */}
             <div style={cardStyle}>
-              <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#0f172a', borderBottom: '2px solid #e2e8f0', paddingBottom: '10px' }}>🔬 Diagnóstico de Conformidade (IFRS 16)</h3>
+              <h3 style={{ margin: '0 0 16px 0', fontSize: '15px', color: '#0f172a', borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', wordBreak: 'break-word' }}>🔬 Diagnóstico de Conformidade (IFRS 16)</h3>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#475569' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', boxSizing: 'border-box' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#475569', flexWrap: 'wrap', gap: '6px' }}>
                   <span>Valor Nominal do Contrato:</span>
-                  <strong style={{ color: '#0f172a' }}>{formatMoeda(calculos.valorTotalContrato)}</strong>
+                  <strong style={{ color: '#0f172a', wordBreak: 'break-word' }}>{formatMoeda(calculos.valorTotalContrato)}</strong>
                 </div>
                 
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#dc2626' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#dc2626', flexWrap: 'wrap', gap: '6px' }}>
                   <span>(-) Juros Embutidos nas Parcelas:</span>
-                  <strong>{formatMoeda(calculos.jurosEmbutidos)}</strong>
+                  <strong style={{ wordBreak: 'break-word' }}>{formatMoeda(calculos.jurosEmbutidos)}</strong>
                 </div>
 
-                <div style={{ backgroundColor: '#0f172a', color: 'white', padding: '16px', borderRadius: '8px', marginTop: '10px' }}>
+                <div style={{ backgroundColor: '#0f172a', color: 'white', padding: '16px', borderRadius: '10px', marginTop: '6px', textAlign: 'center', boxSizing: 'border-box' }}>
                   <div style={{ fontSize: '11px', color: '#cbd5e1', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>VALOR PRESENTE (Ativo de Direito de Uso)</div>
-                  <div style={{ fontSize: '28px', fontWeight: '900', color: '#2dd4bf' }}>
+                  <div style={{ fontSize: '24px', fontWeight: '900', color: '#2dd4bf', wordBreak: 'break-word' }}>
                     {formatMoeda(calculos.valorPresente)}
                   </div>
                 </div>
 
-                <div style={{ backgroundColor: '#f0fdfa', border: '1px solid #ccfbf1', padding: '12px', borderRadius: '8px', marginTop: '10px', borderLeft: '4px solid #0d9488' }}>
-                  <strong style={{ fontSize: '12px', color: '#0f766e', display: 'block', marginBottom: '4px' }}>Impacto Operacional Mensal Projetado:</strong>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', color: '#115e59', marginTop: '6px' }}>
+                <div style={{ backgroundColor: '#f0fdfa', border: '1px solid #ccfbf1', padding: '12px', borderRadius: '10px', marginTop: '6px', borderLeft: '4px solid #0d9488', boxSizing: 'border-box' }}>
+                  <strong style={{ fontSize: '12px', color: '#0f766e', display: 'block', marginBottom: '6px' }}>Impacto Operacional Mensal Projetado:</strong>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#115e59', marginTop: '4px', flexWrap: 'wrap', gap: '4px' }}>
                     <span>Despesa com Depreciação:</span>
-                    <strong>{formatMoeda(calculos.depreciacaoMensal)} / mês</strong>
+                    <strong style={{ wordBreak: 'break-word' }}>{formatMoeda(calculos.depreciacaoMensal)} / mês</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', color: '#991b1b', marginTop: '6px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#991b1b', marginTop: '4px', flexWrap: 'wrap', gap: '4px' }}>
                     <span>Despesa com Juros (Mês 1):</span>
-                    <strong>{formatMoeda(calculos.tabelaAmortizacao[0]?.juros)} / mês</strong>
+                    <strong style={{ wordBreak: 'break-word' }}>{formatMoeda(calculos.tabelaAmortizacao[0]?.juros)} / mês</strong>
                   </div>
                 </div>
               </div>
@@ -209,43 +203,43 @@ export default function SimuladorContratosLeasing({ mostrarToast, registrarFatoG
         )}
 
         {/* ========================================================
-            ABA 2: TABELA DE AMORTIZAÇÃO (CRONOGRAMA DO PASSIVO)
+            ABA 2: TABELA DE AMORTIZAÇÃO
             ======================================================== */}
         {abaAtiva === 'tabela' && (
-          <div style={{ animation: 'fadeIn 0.3s' }}>
-            <h2 style={{ margin: '0 0 20px 0', fontSize: '22px', color: '#0f172a' }}>📉 Tabela de Amortização do Passivo (PRICE)</h2>
-            <p style={{ fontSize: '13.5px', color: '#475569', marginBottom: '24px' }}>A cada parcela paga de {formatMoeda(params.valorParcela)}, uma parte é Despesa Financeira (Juros) que vai para a DRE, e a outra parte reduz o Passivo (Amortização). Abaixo, os 12 primeiros meses da operação.</p>
+          <div style={{ animation: 'fadeIn 0.3s', boxSizing: 'border-box' }}>
+            <h2 style={{ margin: '0 0 10px 0', fontSize: '20px', color: '#0f172a', wordBreak: 'break-word' }}>📉 Tabela de Amortização do Passivo (PRICE)</h2>
+            <p style={{ fontSize: '13.5px', color: '#475569', marginBottom: '20px', wordBreak: 'break-word' }}>A cada parcela paga de {formatMoeda(params.valorParcela)}, uma parte é Despesa Financeira (Juros) na DRE, e a outra reduz o Passivo. Abaixo, os 12 primeiros meses.</p>
             
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'right', backgroundColor: 'white', borderRadius: '8px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
+            <div style={{ overflowX: 'auto', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px', textAlign: 'right', minWidth: '550px' }}>
                 <thead>
                   <tr style={{ backgroundColor: '#0f172a', color: 'white' }}>
-                    <th style={{ padding: '14px', textAlign: 'center' }}>Mês</th>
-                    <th style={{ padding: '14px' }}>Parcela Paga (R$)</th>
-                    <th style={{ padding: '14px', color: '#fca5a5' }}>Despesa Juros (DRE)</th>
-                    <th style={{ padding: '14px', color: '#6ee7b7' }}>Amortização (Baixa Passivo)</th>
-                    <th style={{ padding: '14px' }}>Saldo Devedor (Balanço)</th>
+                    <th style={{ padding: '12px 14px', textAlign: 'center' }}>Mês</th>
+                    <th style={{ padding: '12px 14px' }}>Parcela Paga (R$)</th>
+                    <th style={{ padding: '12px 14px', color: '#fca5a5' }}>Despesa Juros (DRE)</th>
+                    <th style={{ padding: '12px 14px', color: '#6ee7b7' }}>Amortização (Passivo)</th>
+                    <th style={{ padding: '12px 14px' }}>Saldo Devedor (Balanço)</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '2px solid #cbd5e1' }}>
-                    <td style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold' }}>0</td>
-                    <td style={{ padding: '12px' }}>—</td>
-                    <td style={{ padding: '12px' }}>—</td>
-                    <td style={{ padding: '12px' }}>—</td>
-                    <td style={{ padding: '12px', fontWeight: '900', color: '#0f172a' }}>{formatMoeda(calculos.valorPresente)}</td>
+                    <td style={{ padding: '10px 14px', textAlign: 'center', fontWeight: 'bold' }}>0</td>
+                    <td style={{ padding: '10px 14px' }}>—</td>
+                    <td style={{ padding: '10px 14px' }}>—</td>
+                    <td style={{ padding: '10px 14px' }}>—</td>
+                    <td style={{ padding: '10px 14px', fontWeight: '900', color: '#0f172a' }}>{formatMoeda(calculos.valorPresente)}</td>
                   </tr>
                   {calculos.tabelaAmortizacao.map((p) => (
                     <React.Fragment key={p.mes}>
                       {p.mes === params.prazoMeses && params.prazoMeses > 12 && (
-                        <tr style={{ backgroundColor: '#f8fafc' }}><td colSpan="5" style={{ padding: '10px', textAlign: 'center', color: '#94a3b8', fontStyle: 'italic' }}>... salto no tempo (Mês 13 ao Mês {params.prazoMeses - 1}) ...</td></tr>
+                        <tr style={{ backgroundColor: '#f8fafc' }}><td colSpan="5" style={{ padding: '10px', textAlign: 'center', color: '#94a3b8', fontStyle: 'italic' }}>... salto no tempo ...</td></tr>
                       )}
                       <tr style={{ borderBottom: '1px dashed #e2e8f0' }}>
-                        <td style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold' }}>{p.mes}</td>
-                        <td style={{ padding: '12px', color: '#475569', fontWeight: 'bold' }}>{formatMoeda(p.pmt)}</td>
-                        <td style={{ padding: '12px', color: '#dc2626' }}>{formatMoeda(p.juros)}</td>
-                        <td style={{ padding: '12px', color: '#16a34a' }}>{formatMoeda(p.amortizacao)}</td>
-                        <td style={{ padding: '12px', fontWeight: 'bold', color: '#0f766e' }}>{formatMoeda(p.saldoFinal)}</td>
+                        <td style={{ padding: '10px 14px', textAlign: 'center', fontWeight: 'bold' }}>{p.mes}</td>
+                        <td style={{ padding: '10px 14px', color: '#475569', fontWeight: 'bold' }}>{formatMoeda(p.pmt)}</td>
+                        <td style={{ padding: '10px 14px', color: '#dc2626' }}>{formatMoeda(p.juros)}</td>
+                        <td style={{ padding: '10px 14px', color: '#16a34a' }}>{formatMoeda(p.amortizacao)}</td>
+                        <td style={{ padding: '10px 14px', fontWeight: 'bold', color: '#0f766e' }}>{formatMoeda(p.saldoFinal)}</td>
                       </tr>
                     </React.Fragment>
                   ))}
@@ -259,30 +253,29 @@ export default function SimuladorContratosLeasing({ mostrarToast, registrarFatoG
             ABA 3: MEMÓRIA DE CÁLCULO E REGRAS (COMPLIANCE)
             ======================================================== */}
         {abaAtiva === 'memoria' && (
-          <div style={{ animation: 'fadeIn 0.3s' }}>
-            <h2 style={{ margin: '0 0 20px 0', fontSize: '22px', color: '#0f172a' }}>🧠 Auditoria de Contratos e a Norma CPC 06 (R2)</h2>
+          <div style={{ animation: 'fadeIn 0.3s', boxSizing: 'border-box' }}>
+            <h2 style={{ margin: '0 0 16px 0', fontSize: '20px', color: '#0f172a', wordBreak: 'break-word' }}>🧠 Auditoria de Contratos e a Norma CPC 06 (R2)</h2>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px', boxSizing: 'border-box' }}>
               
               <div style={cardStyle}>
-                <h4 style={{ margin: '0 0 12px 0', color: '#0d9488', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}><span>🏢</span> O Fim do "Fora do Balanço"</h4>
-                <p style={{ margin: 0, fontSize: '13.5px', color: '#475569', lineHeight: '1.6' }}>
-                  No passado, assinar um contrato de aluguel de R$ 1 Milhão por 5 anos não aparecia nas dívidas do Balanço. Apenas a mensalidade pingava na DRE. O IFRS 16 (CPC 06) corrigiu isso: a empresa agora é obrigada a reconhecer o direito de usar o galpão/frota como um <strong>Ativo</strong> e a obrigação de pagar os 5 anos como uma <strong>Dívida (Passivo)</strong>.
+                <h4 style={{ margin: '0 0 10px 0', color: '#0d9488', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px', wordBreak: 'break-word' }}><span>🏢</span> O Fim do "Fora do Balanço"</h4>
+                <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: '1.6', wordBreak: 'break-word' }}>
+                  No passado, assinar um contrato de aluguel por 5 anos não aparecia nas dívidas do Balanço. O IFRS 16 (CPC 06) corrigiu isso: a empresa agora é obrigada a reconhecer o direito de usar o galpão/frota como um <strong>Ativo</strong> e a obrigação de pagar os 5 anos como uma <strong>Dívida (Passivo)</strong>.
                 </p>
               </div>
 
               <div style={cardStyle}>
-                <h4 style={{ margin: '0 0 12px 0', color: '#0d9488', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}><span>⏱️</span> O Valor do Dinheiro no Tempo</h4>
-                <p style={{ margin: 0, fontSize: '13.5px', color: '#475569', lineHeight: '1.6' }}>
-                  Não podemos simplesmente multiplicar R$ {formatNum(params.valorParcela)} por {params.prazoMeses} meses e registrar R$ {formatNum(calculos.valorTotalContrato)} no Balanço. R$ 100 pagos daqui a 5 anos valem menos que R$ 100 hoje.<br/><br/>
-                  Por isso, descontamos todo o contrato a uma taxa de {params.taxaDesconto}% a.m., expurgando os <strong>R$ {formatNum(calculos.jurosEmbutidos)}</strong> de juros embutidos, chegando ao Valor Presente (VP) de <strong>R$ {formatNum(calculos.valorPresente)}</strong>.
+                <h4 style={{ margin: '0 0 10px 0', color: '#0d9488', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px', wordBreak: 'break-word' }}><span>⏱️</span> O Valor do Dinheiro no Tempo</h4>
+                <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: '1.6', wordBreak: 'break-word' }}>
+                  Não podemos simplesmente multiplicar a parcela pelo prazo e registrar o valor bruto no Balanço. Descontamos todo o contrato a uma taxa de {params.taxaDesconto}% a.m., expurgando os <strong>R$ {formatNum(calculos.jurosEmbutidos)}</strong> de juros embutidos, chegando ao Valor Presente (VP) de <strong>R$ {formatNum(calculos.valorPresente)}</strong>.
                 </p>
               </div>
 
               <div style={{ ...cardStyle, borderLeft: '4px solid #0ea5e9', backgroundColor: '#f0f9ff' }}>
-                <h4 style={{ margin: '0 0 12px 0', color: '#0369a1', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}><span>📊</span> Impacto na DRE (EBITDA)</h4>
-                <p style={{ margin: 0, fontSize: '13.5px', color: '#0c4a6e', lineHeight: '1.6' }}>
-                  A adoção do CPC 06 melhora artificialmente o EBITDA da empresa. O que antes era uma "Despesa de Aluguel" (operacional) agora é desmembrado em <strong>Depreciação</strong> (amortização do Direito de Uso) e <strong>Despesa Financeira</strong> (Juros). Como ambas as despesas ficam "abaixo" do EBITDA na DRE, o lucro operacional da empresa dispara.
+                <h4 style={{ margin: '0 0 10px 0', color: '#0369a1', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px', wordBreak: 'break-word' }}><span>📊</span> Impacto na DRE (EBITDA)</h4>
+                <p style={{ margin: 0, fontSize: '13px', color: '#0c4a6e', lineHeight: '1.6', wordBreak: 'break-word' }}>
+                  A adoção do CPC 06 melhora artificialmente o EBITDA. O que antes era "Despesa de Aluguel" (operacional) agora é desmembrado em <strong>Depreciação</strong> e <strong>Despesa Financeira</strong> (Juros), elevando o lucro operacional.
                 </p>
               </div>
 
@@ -294,56 +287,58 @@ export default function SimuladorContratosLeasing({ mostrarToast, registrarFatoG
             ABA 4: CONTABILIZAÇÃO (CAPITALIZAÇÃO DO CONTRATO)
             ======================================================== */}
         {abaAtiva === 'contabilidade' && (
-          <div style={{ animation: 'fadeIn 0.3s' }}>
-            <h2 style={{ margin: '0 0 10px 0', fontSize: '22px', color: '#0f172a' }}>📖 Capitalização e Reconhecimento Inicial</h2>
-            <p style={{ fontSize: '14px', color: '#475569', marginBottom: '24px' }}>
+          <div style={{ animation: 'fadeIn 0.3s', boxSizing: 'border-box' }}>
+            <h2 style={{ margin: '0 0 8px 0', fontSize: '20px', color: '#0f172a', wordBreak: 'break-word' }}>📖 Capitalização e Reconhecimento Inicial</h2>
+            <p style={{ fontSize: '13.5px', color: '#475569', marginBottom: '20px', wordBreak: 'break-word' }}>
               Para assinar a conformidade deste contrato, precisamos reconhecer o <strong>Ativo de Direito de Uso</strong> e o <strong>Passivo de Arrendamento</strong> no momento da assinatura.
             </p>
             
-            <div style={{ backgroundColor: '#0f172a', padding: '24px', borderRadius: '12px', color: 'white', border: '1px solid #334155', boxShadow: '0 10px 20px rgba(0,0,0,0.15)' }}>
-              <div style={{ fontSize: '13px', color: '#cbd5e1', textTransform: 'uppercase', fontWeight: 'bold', marginBottom: '16px', letterSpacing: '1px' }}>
+            <div style={{ backgroundColor: '#0f172a', padding: '20px', borderRadius: '16px', color: 'white', border: '1px solid #334155', boxShadow: '0 10px 20px rgba(0,0,0,0.15)', boxSizing: 'border-box', overflowX: 'hidden' }}>
+              <div style={{ fontSize: '12px', color: '#cbd5e1', textTransform: 'uppercase', fontWeight: 'bold', marginBottom: '14px', letterSpacing: '0.5px' }}>
                 Lançamento Contábil (Ativação CPC 06)
               </div>
               
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', textAlign: 'left' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #334155', color: '#94a3b8' }}>
-                    <th style={{ padding: '10px 0' }}>Conta Contábil (Plano de Contas)</th>
-                    <th style={{ padding: '10px 0', textAlign: 'right' }}>Débito</th>
-                    <th style={{ padding: '10px 0', textAlign: 'right' }}>Crédito</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td style={{ padding: '14px 0' }}>
-                      <span style={{ backgroundColor: '#3b82f6', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', marginRight: '8px' }}>ATIVO IMOB.</span>
-                      <strong>1.2.03.01 - Máquinas/Instalações (Direito de Uso)</strong>
-                    </td>
-                    <td style={{ padding: '14px 0', textAlign: 'right', color: '#4ade80', fontWeight: 'bold', fontSize: '16px' }}>{formatMoeda(calculos.valorPresente)}</td>
-                    <td style={{ padding: '14px 0', textAlign: 'right' }}>—</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '14px 0', paddingLeft: '20px' }}>
-                      <span style={{ backgroundColor: '#f59e0b', color: '#0f172a', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', marginRight: '8px' }}>PASSIVO</span>
-                      <strong>2.1.04.01 - Empréstimos e Arrendamentos a Pagar</strong>
-                    </td>
-                    <td style={{ padding: '14px 0', textAlign: 'right' }}>—</td>
-                    <td style={{ padding: '14px 0', textAlign: 'right', color: '#f87171', fontWeight: 'bold', fontSize: '16px' }}>{formatMoeda(calculos.valorPresente)}</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div style={{ overflowX: 'auto', boxSizing: 'border-box' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px', textAlign: 'left', minWidth: '450px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid #334155', color: '#94a3b8' }}>
+                      <th style={{ padding: '8px 0' }}>Conta Contábil (Plano de Contas)</th>
+                      <th style={{ padding: '8px 0', textAlign: 'right' }}>Débito</th>
+                      <th style={{ padding: '8px 0', textAlign: 'right' }}>Crédito</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style={{ padding: '12px 0', wordBreak: 'break-word' }}>
+                        <span style={{ backgroundColor: '#3b82f6', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '10.5px', marginRight: '6px' }}>ATIVO</span>
+                        <strong>1.2.03.01 - Ativo Imobilizado (Direito de Uso)</strong>
+                      </td>
+                      <td style={{ padding: '12px 0', textAlign: 'right', color: '#4ade80', fontWeight: 'bold', fontSize: '15px' }}>{formatMoeda(calculos.valorPresente)}</td>
+                      <td style={{ padding: '12px 0', textAlign: 'right' }}>—</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '12px 0', paddingLeft: '16px', wordBreak: 'break-word' }}>
+                        <span style={{ backgroundColor: '#f59e0b', color: '#0f172a', padding: '2px 6px', borderRadius: '4px', fontSize: '10.5px', marginRight: '6px' }}>PASSIVO</span>
+                        <strong>2.1.04.01 - Arrendamentos a Pagar</strong>
+                      </td>
+                      <td style={{ padding: '12px 0', textAlign: 'right' }}>—</td>
+                      <td style={{ padding: '12px 0', textAlign: 'right', color: '#f87171', fontWeight: 'bold', fontSize: '15px' }}>{formatMoeda(calculos.valorPresente)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
-              <div style={{ marginTop: '20px', borderTop: '2px solid #334155', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontWeight: '900', fontSize: '16px' }}>Validação do Balanço:</span>
-                <span style={{ color: '#38bdf8', fontWeight: '900', fontSize: '15px' }}>Ativo e Passivo alinhados. Impacto zero no Caixa neste momento.</span>
+              <div style={{ marginTop: '16px', borderTop: '2px solid #334155', paddingTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                <span style={{ fontWeight: '900', fontSize: '14.5px' }}>Validação do Balanço:</span>
+                <span style={{ color: '#38bdf8', fontWeight: '900', fontSize: '13.5px', wordBreak: 'break-word' }}>Ativo e Passivo alinhados. Impacto zero no Caixa neste momento.</span>
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '24px', flexWrap: 'wrap', gap: '16px' }}>
-              <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', padding: '16px', borderRadius: '8px', borderLeft: '4px solid #16a34a', maxWidth: '600px' }}>
-                <strong style={{ fontSize: '14px', color: '#166534', display: 'block', marginBottom: '8px' }}>E as parcelas futuras?</strong>
-                <p style={{ margin: 0, fontSize: '13px', color: '#15803d', lineHeight: '1.6' }}>
-                  Mês a mês, quando a empresa pagar os {formatMoeda(params.valorParcela)}, uma parte vai baixar a dívida que acabamos de registrar no Passivo, e a outra parte será reconhecida como Despesa com Juros na DRE. O Ativo sofrerá Depreciação normal de {formatMoeda(calculos.depreciacaoMensal)} mensais.
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', flexWrap: 'wrap', gap: '16px', boxSizing: 'border-box' }}>
+              <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', padding: '14px', borderRadius: '10px', borderLeft: '4px solid #16a34a', flex: '1 1 300px', boxSizing: 'border-box' }}>
+                <strong style={{ fontSize: '13.5px', color: '#166534', display: 'block', marginBottom: '6px' }}>E as parcelas futuras?</strong>
+                <p style={{ margin: 0, fontSize: '12.5px', color: '#15803d', lineHeight: '1.5', wordBreak: 'break-word' }}>
+                  Mês a mês, ao pagar a parcela, parte baixa a dívida no Passivo e parte vai para a DRE como Juros. O Ativo sofre depreciação linear de {formatMoeda(calculos.depreciacaoMensal)}.
                 </p>
               </div>
 
@@ -352,10 +347,10 @@ export default function SimuladorContratosLeasing({ mostrarToast, registrarFatoG
                 disabled={jaContabilizado}
                 style={{ 
                   backgroundColor: jaContabilizado ? '#166534' : '#0d9488', 
-                  color: 'white', border: 'none', padding: '16px 24px', borderRadius: '10px', 
-                  fontWeight: '900', fontSize: '15px', cursor: jaContabilizado ? 'not-allowed' : 'pointer',
+                  color: 'white', border: 'none', padding: '14px 22px', borderRadius: '10px', 
+                  fontWeight: '900', fontSize: '14px', cursor: jaContabilizado ? 'not-allowed' : 'pointer',
                   boxShadow: jaContabilizado ? 'none' : '0 4px 12px rgba(13, 148, 136, 0.3)',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s', width: '100%', maxWidth: '360px', boxSizing: 'border-box'
                 }}
               >
                 {jaContabilizado ? '✓ Contrato Capitalizado no ERP' : '📝 Assinar Contrato e Capitalizar no Balanço'}
@@ -365,6 +360,9 @@ export default function SimuladorContratosLeasing({ mostrarToast, registrarFatoG
         )}
 
       </div>
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
     </div>
   );
 }

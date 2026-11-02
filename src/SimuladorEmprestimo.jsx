@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 export default function SimuladorEmprestimo({ mostrarToast, registrarFatoGerador, planoContas = [] }) {
   const formatMoeda = (valor) => Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -10,13 +10,12 @@ export default function SimuladorEmprestimo({ mostrarToast, registrarFatoGerador
   const [prazoMesesStr, setPrazoMesesStr] = useState('24'); 
   const [sistemaAmortizacao, setSistemaAmortizacao] = useState('price'); 
 
-  // Motor Matemático Anti-Crash (useMemo recalcula apenas quando os inputs mudam e evita loops)
+  // Motor Matemático Anti-Crash (useMemo)
   const { totais, cronograma } = useMemo(() => {
     const C = parseFloat(valorLiberadoStr) || 0;
     const i = (parseFloat(taxaJurosMensalStr) || 0) / 100;
     let n = parseInt(prazoMesesStr, 10) || 0;
 
-    // Trava de segurança contra tela branca (máximo 40 anos para não estourar a memória)
     if (n > 480) n = 480;
 
     const fallback = {
@@ -58,7 +57,6 @@ export default function SimuladorEmprestimo({ mostrarToast, registrarFatoGerador
       };
 
     } else {
-      // SAC
       const amortConstante = C / n;
 
       for (let mes = 1; mes <= n; mes++) {
@@ -86,9 +84,6 @@ export default function SimuladorEmprestimo({ mostrarToast, registrarFatoGerador
     }
   }, [valorLiberadoStr, taxaJurosMensalStr, prazoMesesStr, sistemaAmortizacao]);
 
-  // ==========================================================
-  // INTEGRAÇÃO CONTÁBIL (MOTOR DO DIÁRIO)
-  // ==========================================================
   const handleContratarEmprestimo = () => {
     if (typeof registrarFatoGerador !== 'function') return;
     const C = parseFloat(valorLiberadoStr) || 0;
@@ -100,20 +95,17 @@ export default function SimuladorEmprestimo({ mostrarToast, registrarFatoGerador
     const idEmprestimoLP = contasSafe.find(c => c.codigo_contabil === '2.2.01.01' || ((c.nome_conta || '').toLowerCase().includes('financiamentos') && (c.grupo || '').includes('Não Circulante')))?.id || idEmprestimoCP;
     const idJurosTranscorrerCP = contasSafe.find(c => (c.nome_conta || '').toLowerCase().includes('juros a transcorrer') && (c.grupo || '').includes('Circulante'))?.id || idEmprestimoCP;
 
-    // Lançamento 1: Entrada do principal no Banco vs Empréstimo a Pagar CP
     registrarFatoGerador(`Liberação de Empréstimo (${bancoNome}) - CP`, totais.curtoPrazoPrincipal + totais.curtoPrazoJuros, 'Financiamentos', [idBanco], [idEmprestimoCP]);
 
-    // Lançamento 2: Redutora de Juros CP
     if (totais.curtoPrazoJuros > 0) {
       registrarFatoGerador(`Juros a Transcorrer (CP) - ${bancoNome}`, totais.curtoPrazoJuros, 'Financiamentos', [idJurosTranscorrerCP], [idBanco]);
     }
 
-    // Lançamento 3: Longo Prazo
     if (totais.longoPrazoPrincipal > 0) {
       registrarFatoGerador(`Apropriação de Empréstimo (${bancoNome}) - LP`, totais.longoPrazoPrincipal, 'Financiamentos', [idBanco], [idEmprestimoLP]);
     }
 
-    if (mostrarToast) mostrarToast('Contrato formalizado no Livro Diário!', 'sucesso');
+    if (typeof mostrarToast === 'function') mostrarToast('Contrato formalizado no Livro Diário!', 'sucesso');
   };
 
   const handlePagarParcela = () => {
@@ -126,204 +118,167 @@ export default function SimuladorEmprestimo({ mostrarToast, registrarFatoGerador
     const idDespesaJuros = contasSafe.find(c => c.codigo_contabil === '5.2.03.01' || (c.nome_conta || '').toLowerCase().includes('despesas financeiras'))?.id;
     const idJurosTranscorrerCP = contasSafe.find(c => (c.nome_conta || '').toLowerCase().includes('juros a transcorrer') && (c.grupo || '').includes('Circulante'))?.id || idEmprestimoCP;
 
-    // Amortização
     registrarFatoGerador(`Pagamento de Parcela (${bancoNome}) - Amortização`, totais.primeiroMesAmortizacao, 'Financiamentos', [idEmprestimoCP], [idBanco]);
 
-    // Apropriação da Despesa Financeira
     if (totais.primeiroMesJuros > 0) {
       registrarFatoGerador(`Despesa Financeira Juros (${bancoNome})`, totais.primeiroMesJuros, 'Financiamentos', [idDespesaJuros], [idJurosTranscorrerCP]);
     }
 
-    if (mostrarToast) mostrarToast('Pagamento e Juros contabilizados no Diário!', 'sucesso');
+    if (typeof mostrarToast === 'function') mostrarToast('Pagamento e Juros contabilizados no Diário!', 'sucesso');
   };
 
+  const inputStyle = { width: '100%', maxWidth: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', color: '#0f172a', backgroundColor: '#f8fafc', outline: 'none', boxSizing: 'border-box' };
+  const labelStyle = { fontWeight: '700', fontSize: '12px', color: '#475569', display: 'block', marginBottom: '6px', wordBreak: 'break-word' };
+  const cardStyle = { backgroundColor: 'white', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', boxSizing: 'border-box', minWidth: 0 };
+
   return (
-    <div style={{ backgroundColor: '#ffffff', padding: '25px', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animation: 'fadeIn 0.5s' }}>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#ffffff', padding: '16px', borderRadius: '24px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', fontFamily: 'system-ui, -apple-system, sans-serif', color: '#0f172a', boxSizing: 'border-box', width: '100%', maxWidth: '100%', overflowX: 'hidden', animation: 'fadeIn 0.5s' }}>
       
       {/* CABEÇALHO */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', gap: '15px' }}>
-        <div>
-          <h2 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '28px' }}>🏦</span> Simulador de Empréstimos & Financiamentos Bancários
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '15px', boxSizing: 'border-box' }}>
+        <div style={{ minWidth: 0, flex: '1 1 250px' }}>
+          <h2 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px', wordBreak: 'break-word' }}>
+            <span style={{ fontSize: '24px' }}>🏦</span> Simulador de Empréstimos & Financiamentos Bancários
           </h2>
-          <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '13px' }}>
+          <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '13px', wordBreak: 'break-word' }}>
             Captação de recursos, juros a transcorrer e segregação entre Curto Prazo (PC) e Longo Prazo (PNC).
           </p>
         </div>
 
-        <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '10px', border: '1px solid #e2e8f0', gap: '4px' }}>
+        <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '12px', border: '1px solid #e2e8f0', flexWrap: 'wrap', gap: '4px', boxSizing: 'border-box' }}>
           <button 
             onClick={() => setSistemaAmortizacao('price')}
             style={{ 
-              padding: '8px 14px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', transition: 'all 0.2s',
+              padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11.5px', cursor: 'pointer', transition: 'all 0.2s',
               backgroundColor: sistemaAmortizacao === 'price' ? '#2563eb' : 'transparent', 
               color: sistemaAmortizacao === 'price' ? 'white' : '#64748b'
             }}
           >
-            Tabela Price (Parcelas Fixas)
+            Tabela Price
           </button>
           <button 
             onClick={() => setSistemaAmortizacao('sac')}
             style={{ 
-              padding: '8px 14px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', transition: 'all 0.2s',
+              padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11.5px', cursor: 'pointer', transition: 'all 0.2s',
               backgroundColor: sistemaAmortizacao === 'sac' ? '#2563eb' : 'transparent', 
               color: sistemaAmortizacao === 'sac' ? 'white' : '#64748b'
             }}
           >
-            Tabela SAC (Amortização Constante)
+            Tabela SAC
           </button>
         </div>
       </div>
 
       {/* DASHBOARDS DE SEGREGAÇÃO CONTÁBIL */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '15px', marginBottom: '25px' }}>
-        <div style={{ backgroundColor: '#f8fafc', padding: '18px', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: '4px solid #16a34a' }}>
-          <span style={{ color: '#166534', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Recurso Liberado (Banco)</span>
-          <strong style={{ display: 'block', color: '#15803d', fontSize: '24px', marginTop: '4px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px', marginBottom: '20px', boxSizing: 'border-box' }}>
+        <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', borderLeft: '4px solid #16a34a', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#166534', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Recurso Liberado (Banco)</span>
+          <strong style={{ display: 'block', color: '#15803d', fontSize: '22px', marginTop: '4px', wordBreak: 'break-word' }}>
             {formatMoeda(parseFloat(valorLiberadoStr) || 0)}
           </strong>
-          <span style={{ fontSize: '11px', color: '#64748b' }}>Entrada no Ativo Circulante</span>
+          <span style={{ fontSize: '11px', color: '#64748b', wordBreak: 'break-word' }}>Entrada no Ativo Circulante</span>
         </div>
 
-        <div style={{ backgroundColor: '#eff6ff', padding: '18px', borderRadius: '12px', border: '1px solid #bfdbfe', borderLeft: '4px solid #2563eb' }}>
-          <span style={{ color: '#1d4ed8', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Passivo Circulante (Até 12 meses)</span>
-          <strong style={{ display: 'block', color: '#1e40af', fontSize: '24px', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#eff6ff', padding: '16px', borderRadius: '16px', border: '1px solid #bfdbfe', borderLeft: '4px solid #2563eb', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#1d4ed8', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Passivo Circulante (&lt;= 12m)</span>
+          <strong style={{ display: 'block', color: '#1e40af', fontSize: '22px', marginTop: '4px', wordBreak: 'break-word' }}>
             {formatMoeda(totais.curtoPrazoPrincipal + totais.curtoPrazoJuros)}
           </strong>
-          <span style={{ fontSize: '11px', color: '#2563eb' }}>
+          <span style={{ fontSize: '11px', color: '#2563eb', wordBreak: 'break-word' }}>
             Principal: {formatMoeda(totais.curtoPrazoPrincipal)}
           </span>
         </div>
 
-        <div style={{ backgroundColor: '#f8fafc', padding: '18px', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: '4px solid #64748b' }}>
-          <span style={{ color: '#475569', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Não Circulante (Após 12 meses)</span>
-          <strong style={{ display: 'block', color: '#0f172a', fontSize: '24px', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', borderLeft: '4px solid #64748b', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#475569', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Não Circulante (&gt; 12m)</span>
+          <strong style={{ display: 'block', color: '#0f172a', fontSize: '22px', marginTop: '4px', wordBreak: 'break-word' }}>
             {formatMoeda(totais.longoPrazoPrincipal + totais.longoPrazoJuros)}
           </strong>
-          <span style={{ fontSize: '11px', color: '#64748b' }}>
-            {parseInt(prazoMesesStr, 10) > 12 ? 'Obrigações de Longo Prazo' : 'Inexistente (Prazo <= 12m)'}
+          <span style={{ fontSize: '11px', color: '#64748b', wordBreak: 'break-word' }}>
+            {parseInt(prazoMesesStr, 10) > 12 ? 'Longo Prazo' : 'Inexistente'}
           </span>
         </div>
 
-        <div style={{ backgroundColor: '#fff5f5', padding: '18px', borderRadius: '12px', border: '1px solid #fecaca', borderLeft: '4px solid #ef4444' }}>
-          <span style={{ color: '#991b1b', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Juros a Transcorrer (Redutora)</span>
-          <strong style={{ display: 'block', color: '#dc2626', fontSize: '24px', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#fff5f5', padding: '16px', borderRadius: '16px', border: '1px solid #fecaca', borderLeft: '4px solid #ef4444', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#991b1b', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Juros a Transcorrer (Redutora)</span>
+          <strong style={{ display: 'block', color: '#dc2626', fontSize: '22px', marginTop: '4px', wordBreak: 'break-word' }}>
             {formatMoeda(totais.totalJuros)}
           </strong>
-          <span style={{ fontSize: '11px', color: '#991b1b' }}>Encargos a vencer</span>
+          <span style={{ fontSize: '11px', color: '#991b1b', wordBreak: 'break-word' }}>Encargos a vencer</span>
         </div>
       </div>
 
       {/* ÁREA DE CONFIGURAÇÃO E MAPA CONTÁBIL */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginBottom: '25px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px', marginBottom: '20px', boxSizing: 'border-box' }}>
         
-        {/* PARÂMETROS DO CONTRATO (COM ID, NAME, HTMLFOR - SEM AVISOS) */}
-        <div style={{ flex: '1 1 340px', backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px' }}>
+        {/* PARÂMETROS DO CONTRATO */}
+        <div style={cardStyle}>
+          <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px', wordBreak: 'break-word' }}>
             Condições da Operação
           </h3>
 
-          <label htmlFor="bancoNome" style={{ display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-            Instituição Financeira Concedente:
-            <input 
-              id="bancoNome" name="bancoNome" autoComplete="off"
-              type="text" 
-              value={bancoNome} 
-              onChange={e => setBancoNome(e.target.value)} 
-              style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
-            />
-          </label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '14px', boxSizing: 'border-box' }}>
+            <div style={{ minWidth: 0 }}>
+              <label htmlFor="bancoNome" style={labelStyle}>Instituição Financeira Concedente:</label>
+              <input id="bancoNome" name="bancoNome" autoComplete="off" type="text" value={bancoNome} onChange={e => setBancoNome(e.target.value)} style={inputStyle} />
+            </div>
 
-          <label htmlFor="valorLiberado" style={{ display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#0f172a' }}>
-            Valor Liberado em Conta Corrente (R$):
-            <input 
-              id="valorLiberado" name="valorLiberado" autoComplete="off"
-              type="text" 
-              value={valorLiberadoStr} 
-              onChange={e => setValorLiberadoStr(e.target.value.replace(/[^0-9.]/g, ''))} 
-              style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
-            />
-          </label>
+            <div style={{ minWidth: 0 }}>
+              <label htmlFor="valorLiberado" style={labelStyle}>Valor Liberado em Conta (R$):</label>
+              <input id="valorLiberado" name="valorLiberado" autoComplete="off" type="text" value={valorLiberadoStr} onChange={e => setValorLiberadoStr(e.target.value.replace(/[^0-9.]/g, ''))} style={inputStyle} />
+            </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <label htmlFor="taxaJuros" style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-              Taxa de Juros (% a.m.):
-              <input 
-                id="taxaJuros" name="taxaJuros" autoComplete="off"
-                type="text" 
-                value={taxaJurosMensalStr} 
-                onChange={e => setTaxaJurosMensalStr(e.target.value.replace(/[^0-9.]/g, ''))} 
-                style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
-              />
-            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 130px), 1fr))', gap: '10px', boxSizing: 'border-box' }}>
+              <div style={{ minWidth: 0 }}>
+                <label htmlFor="taxaJuros" style={labelStyle}>Taxa de Juros (% a.m.):</label>
+                <input id="taxaJuros" name="taxaJuros" autoComplete="off" type="text" value={taxaJurosMensalStr} onChange={e => setTaxaJurosMensalStr(e.target.value.replace(/[^0-9.]/g, ''))} style={inputStyle} />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <label htmlFor="prazoMeses" style={labelStyle}>Prazo (Meses):</label>
+                <input id="prazoMeses" name="prazoMeses" autoComplete="off" type="text" value={prazoMesesStr} onChange={e => setPrazoMesesStr(e.target.value.replace(/[^0-9]/g, ''))} style={inputStyle} />
+              </div>
+            </div>
 
-            <label htmlFor="prazoMeses" style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-              Prazo Total (Meses):
-              <input 
-                id="prazoMeses" name="prazoMeses" autoComplete="off"
-                type="text" 
-                value={prazoMesesStr} 
-                onChange={e => setPrazoMesesStr(e.target.value.replace(/[^0-9]/g, ''))} 
-                style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
-              />
-            </label>
-          </div>
-
-          <div style={{ backgroundColor: 'white', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', color: '#64748b' }}>
-            📌 <strong>Regra Contábil da Segregação:</strong> As parcelas que vencem até o término do exercício social seguinte (ou até 12 meses da data do balanço) são alocadas no <strong>Passivo Circulante</strong>. As parcelas posteriores a 12 meses são registradas no <strong>Passivo Não Circulante</strong>.
+            <div style={{ backgroundColor: 'white', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '11.5px', color: '#64748b', lineHeight: '1.4', boxSizing: 'border-box', wordBreak: 'break-word' }}>
+              📌 <strong>Regra Contábil da Segregação:</strong> Parcelas que vencem em até 12 meses vão para o <strong>Passivo Circulante</strong>. As posteriores vão para o <strong>Passivo Não Circulante</strong>.
+            </div>
           </div>
         </div>
 
-        {/* MAPA DE LANÇAMENTOS NO LIVRO DIÁRIO (INTEGRADOS) */}
-        <div style={{ flex: '1 1 400px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        {/* MAPA DE LANÇAMENTOS NO LIVRO DIÁRIO */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0, boxSizing: 'border-box' }}>
           
-          <div style={{ backgroundColor: '#eff6ff', borderRadius: '12px', border: '1px solid #bfdbfe', padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div style={{ backgroundColor: '#eff6ff', borderRadius: '16px', border: '1px solid #bfdbfe', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxSizing: 'border-box', minWidth: 0 }}>
             <div>
-              <h3 style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h3 style={{ margin: '0 0 6px 0', fontSize: '13.5px', color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '6px', wordBreak: 'break-word' }}>
                 <span>🧭</span> 1. Registro Inicial da Captação
               </h3>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '11px', fontFamily: 'monospace' }}>
-                <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '6px', borderLeft: '4px solid #2563eb' }}>
-                  <div style={{ color: '#059669', fontWeight: 'bold' }}>D: Banco Conta Movimento (Ativo Circulante) ..... {formatMoeda(parseFloat(valorLiberadoStr) || 0)}</div>
-                  <div style={{ color: '#059669', fontWeight: 'bold', marginTop: '4px' }}>D: Juros a Transcorrer - CP (Passivo Redutora) .. {formatMoeda(totais.curtoPrazoJuros)}</div>
-                  {totais.longoPrazoJuros > 0 && (
-                    <div style={{ color: '#059669', fontWeight: 'bold' }}>D: Juros a Transcorrer - LP (Passivo Redutora) .. {formatMoeda(totais.longoPrazoJuros)}</div>
-                  )}
-                  <div style={{ color: '#dc2626', fontWeight: 'bold', marginTop: '6px' }}>C: Empréstimos a Pagar - CP (Passivo Circulante) {formatMoeda(totais.curtoPrazoPrincipal + totais.curtoPrazoJuros)}</div>
-                  {totais.longoPrazoPrincipal > 0 && (
-                    <div style={{ color: '#dc2626', fontWeight: 'bold' }}>C: Empréstimos a Pagar - LP (Passivo Não Circ.) {formatMoeda(totais.longoPrazoPrincipal + totais.longoPrazoJuros)}</div>
-                  )}
-                </div>
+              <div style={{ fontSize: '11px', fontFamily: 'monospace', boxSizing: 'border-box', wordBreak: 'break-word' }}>
+                <div style={{ color: '#059669', fontWeight: 'bold', wordBreak: 'break-word' }}>D: Banco Conta Movimento (Ativo) ... {formatMoeda(parseFloat(valorLiberadoStr) || 0)}</div>
+                <div style={{ color: '#059669', fontWeight: 'bold', wordBreak: 'break-word' }}>D: Juros a Transcorrer - CP (Redutora) . {formatMoeda(totais.curtoPrazoJuros)}</div>
+                {totais.longoPrazoJuros > 0 && <div style={{ color: '#059669', fontWeight: 'bold', wordBreak: 'break-word' }}>D: Juros a Transcorrer - LP (Redutora) . {formatMoeda(totais.longoPrazoJuros)}</div>}
+                <div style={{ color: '#dc2626', fontWeight: 'bold', marginTop: '4px', wordBreak: 'break-word' }}>C: Empréstimos a Pagar - CP ......... {formatMoeda(totais.curtoPrazoPrincipal + totais.curtoPrazoJuros)}</div>
+                {totais.longoPrazoPrincipal > 0 && <div style={{ color: '#dc2626', fontWeight: 'bold', wordBreak: 'break-word' }}>C: Empréstimos a Pagar - LP ......... {formatMoeda(totais.longoPrazoPrincipal + totais.longoPrazoJuros)}</div>}
               </div>
             </div>
-            
-            <button onClick={handleContratarEmprestimo} style={{ marginTop: '12px', backgroundColor: '#2563eb', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+            <button onClick={handleContratarEmprestimo} style={{ marginTop: '12px', backgroundColor: '#2563eb', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxSizing: 'border-box', width: '100%', fontSize: '12.5px' }}>
               Contratar e Escriturar Captação 📥
             </button>
           </div>
 
-          <div style={{ backgroundColor: '#f0fdf4', borderRadius: '12px', border: '1px solid #86efac', padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div style={{ backgroundColor: '#f0fdf4', borderRadius: '16px', border: '1px solid #86efac', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxSizing: 'border-box', minWidth: 0 }}>
             <div>
-              <h3 style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#166534', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h3 style={{ margin: '0 0 6px 0', fontSize: '13.5px', color: '#166534', display: 'flex', alignItems: 'center', gap: '6px', wordBreak: 'break-word' }}>
                 <span>🧭</span> 2. Pagamento e Apropriação da 1ª Parcela
               </h3>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '11px', fontFamily: 'monospace' }}>
-                <div style={{ padding: '8px', backgroundColor: 'white', borderRadius: '6px', borderLeft: '3px solid #16a34a' }}>
-                  <span style={{ fontWeight: 'bold', color: '#166534', display: 'block' }}>Amortização / Baixa da Parcela:</span>
-                  <div>D: Empréstimos a Pagar (Passivo Circulante) .. {formatMoeda(totais.primeiroMesAmortizacao)}</div>
-                  <div>C: Banco Conta Movimento (Ativo Circulante) ... {formatMoeda(totais.parcelaInicial)}</div>
-                </div>
-                <div style={{ padding: '8px', backgroundColor: 'white', borderRadius: '6px', borderLeft: '3px solid #16a34a' }}>
-                  <span style={{ fontWeight: 'bold', color: '#166534', display: 'block' }}>Reconhecimento da Despesa Financeira:</span>
-                  <div>D: Despesas c/ Juros Passivos (DRE) ........... {formatMoeda(totais.primeiroMesJuros)}</div>
-                  <div>C: Juros a Transcorrer - CP (Passivo Redutora) {formatMoeda(totais.primeiroMesJuros)}</div>
-                </div>
+              <div style={{ fontSize: '11px', fontFamily: 'monospace', boxSizing: 'border-box', wordBreak: 'break-word' }}>
+                <div style={{ color: '#166534', fontWeight: 'bold', wordBreak: 'break-word' }}>D: Empréstimos a Pagar (Amortização) .. {formatMoeda(totais.primeiroMesAmortizacao)}</div>
+                <div style={{ color: '#166534', fontWeight: 'bold', wordBreak: 'break-word' }}>D: Desp. c/ Juros Passivos (DRE) ...... {formatMoeda(totais.primeiroMesJuros)}</div>
+                <div style={{ color: '#dc2626', fontWeight: 'bold', marginTop: '4px', wordBreak: 'break-word' }}>C: Banco Conta Movimento (Parcela) .... {formatMoeda(totais.parcelaInicial)}</div>
+                <div style={{ color: '#dc2626', fontWeight: 'bold', wordBreak: 'break-word' }}>C: Juros a Transcorrer - CP (Baixa) ... {formatMoeda(totais.primeiroMesJuros)}</div>
               </div>
             </div>
-
-            <button onClick={handlePagarParcela} style={{ marginTop: '12px', backgroundColor: '#16a34a', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+            <button onClick={handlePagarParcela} style={{ marginTop: '12px', backgroundColor: '#16a34a', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxSizing: 'border-box', width: '100%', fontSize: '12.5px' }}>
               Pagar e Apropriar Juros (DRE) 📉
             </button>
           </div>
@@ -333,33 +288,33 @@ export default function SimuladorEmprestimo({ mostrarToast, registrarFatoGerador
       </div>
 
       {/* TABELA DE CRONOGRAMA DE VENCIMENTOS */}
-      <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', overflow: 'hidden' }}>
-        <div style={{ backgroundColor: '#1e293b', color: 'white', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ margin: 0, fontSize: '14px' }}>Cronograma de Amortização & Classificação Contábil</h3>
-          <span style={{ fontSize: '11px', color: '#94a3b8' }}>{cronograma.length} parcelas</span>
+      <div style={{ border: '1px solid #cbd5e1', borderRadius: '16px', overflow: 'hidden', backgroundColor: 'white', boxSizing: 'border-box' }}>
+        <div style={{ backgroundColor: '#1e293b', color: 'white', padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px', boxSizing: 'border-box' }}>
+          <h3 style={{ margin: 0, fontSize: '15px', wordBreak: 'break-word' }}>Cronograma de Amortização & Classificação Contábil</h3>
+          <span style={{ fontSize: '11.5px', color: '#94a3b8' }}>{cronograma.length} parcelas</span>
         </div>
 
-        <div style={{ overflowX: 'auto', maxHeight: '350px' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'right' }}>
+        <div style={{ overflowX: 'auto', maxHeight: '350px', boxSizing: 'border-box' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px', textAlign: 'right', minWidth: '600px' }}>
             <thead style={{ backgroundColor: '#f8fafc', color: '#475569', position: 'sticky', top: 0 }}>
               <tr>
-                <th style={{ padding: '10px', textAlign: 'center' }}>Mês</th>
-                <th style={{ padding: '10px', textAlign: 'center' }}>Classificação</th>
-                <th style={{ padding: '10px' }}>Parcela Total</th>
-                <th style={{ padding: '10px', color: '#166534' }}>Amortização (Principal)</th>
-                <th style={{ padding: '10px', color: '#dc2626' }}>Juros (Despesa)</th>
-                <th style={{ padding: '10px', color: '#1e40af' }}>Saldo Devedor</th>
+                <th style={{ padding: '10px 14px', textAlign: 'center' }}>Mês</th>
+                <th style={{ padding: '10px 14px', textAlign: 'center' }}>Classificação</th>
+                <th style={{ padding: '10px 14px' }}>Parcela Total</th>
+                <th style={{ padding: '10px 14px', color: '#166534' }}>Amortização</th>
+                <th style={{ padding: '10px 14px', color: '#dc2626' }}>Juros (DRE)</th>
+                <th style={{ padding: '10px 14px', color: '#1e40af' }}>Saldo Devedor</th>
               </tr>
             </thead>
             <tbody>
               {cronograma.map(row => (
                 <tr key={row.mes} style={{ borderBottom: '1px solid #f1f5f9', backgroundColor: row.mes <= 12 ? 'white' : '#f8fafc' }}>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', fontWeight: 'bold' }}>{row.mes}º</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>
+                  <td style={{ padding: '10px 14px', textAlign: 'center', fontWeight: 'bold', whiteSpace: 'nowrap' }}>{row.mes}º</td>
+                  <td style={{ padding: '10px 14px', textAlign: 'center', whiteSpace: 'nowrap' }}>
                     <span style={{ 
-                      fontSize: '10px', 
+                      fontSize: '10.5px', 
                       fontWeight: 'bold', 
-                      padding: '2px 8px', 
+                      padding: '3px 8px', 
                       borderRadius: '12px',
                       backgroundColor: row.mes <= 12 ? '#eff6ff' : '#f1f5f9',
                       color: row.mes <= 12 ? '#1d4ed8' : '#475569',
@@ -368,10 +323,10 @@ export default function SimuladorEmprestimo({ mostrarToast, registrarFatoGerador
                       {row.classificacao}
                     </span>
                   </td>
-                  <td style={{ padding: '8px 10px', fontWeight: 'bold' }}>{formatMoeda(row.parcela)}</td>
-                  <td style={{ padding: '8px 10px', color: '#166534' }}>{formatMoeda(row.amortizacao)}</td>
-                  <td style={{ padding: '8px 10px', color: '#dc2626' }}>{formatMoeda(row.juros)}</td>
-                  <td style={{ padding: '8px 10px', fontWeight: 'bold', color: '#1e40af' }}>{formatMoeda(row.saldoDevedor)}</td>
+                  <td style={{ padding: '10px 14px', fontWeight: 'bold', whiteSpace: 'nowrap' }}>{formatMoeda(row.parcela)}</td>
+                  <td style={{ padding: '10px 14px', color: '#166534', whiteSpace: 'nowrap' }}>{formatMoeda(row.amortizacao)}</td>
+                  <td style={{ padding: '10px 14px', color: '#dc2626', whiteSpace: 'nowrap' }}>{formatMoeda(row.juros)}</td>
+                  <td style={{ padding: '10px 14px', fontWeight: 'bold', color: '#1e40af', whiteSpace: 'nowrap' }}>{formatMoeda(row.saldoDevedor)}</td>
                 </tr>
               ))}
             </tbody>

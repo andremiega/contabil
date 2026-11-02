@@ -203,3 +203,40 @@ body.menu-mobile-ativo {
 .app-content footer {
   margin-top: auto !important; /* Força o rodapé a colar na base do ecrã */
 }
+/* ========================================================
+   7. REGRAS MÓVEIS (ATÉ 900px)
+   ======================================================== */
+@media (max-width: 900px) {
+  .app-container {
+    flex-direction: column !important;
+  }
+
+  .app-sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 270px !important;
+    height: 100vh !important;
+    background-color: #0f172a !important;
+    z-index: 1300;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* CORREÇÃO: Adicionado padding-bottom extra (ex: 90px) para garantir que 
+       o último botão do menu fique visível e acessível no scroll em telas mobile */
+    padding: 10px 8px 90px 8px !important; 
+  }
+
+  .app-sidebar.mobile-open {
+    transform: translateX(0) !important;
+  }
+
+  .app-content {
+    width: 100% !important;
+    padding: 12px !important;
+  }
+
+  .module-screen-container > div > div:last-child {
+    min-height: auto !important;
+  }
+}

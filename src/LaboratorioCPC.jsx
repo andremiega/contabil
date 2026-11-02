@@ -63,60 +63,61 @@ export default function LaboratorioCPC() {
   };
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', padding: '24px', borderRadius: '24px', animation: 'fadeIn 0.5s ease-out', minHeight: '85vh', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '24px', animation: 'fadeIn 0.5s ease-out', minHeight: '85vh', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
-      <div style={{ background: 'linear-gradient(135deg, #1f2937 0%, #000000 100%)', color: 'white', padding: '24px 32px', borderRadius: '20px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
+      {/* HEADER EXPLICATIVO */}
+      <div style={{ background: 'linear-gradient(135deg, #1f2937 0%, #000000 100%)', color: 'white', padding: '24px', borderRadius: '20px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
+        <div style={{ flex: '1 1 280px' }}>
           <span style={{ backgroundColor: '#4b5563', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '900', letterSpacing: '1px' }}>CERTIFICAÇÃO IFRS & AUDITORIA</span>
-          <h2 style={{ margin: '8px 0', fontSize: '28px', fontWeight: '900' }}>Auditor de Compliance (CPC) 📚</h2>
+          <h2 style={{ margin: '8px 0', fontSize: '24px', fontWeight: '900' }}>Auditor de Compliance (CPC) 📚</h2>
           <p style={{ margin: 0, color: '#9ca3af', fontSize: '14px', maxWidth: '650px' }}>Para cada cenário complexo da empresa, indique a norma contábil aplicável (CPC) e o tratamento oficial (IFRS) para evitar multas da CVM.</p>
         </div>
-        <div style={{ textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.1)', padding: '16px', borderRadius: '16px' }}>
+        <div style={{ flex: '1 1 auto', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.1)', padding: '16px', borderRadius: '16px' }}>
           <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 'bold' }}>Casos Auditados</div>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#4ade80' }}>{historicoCPC.length} / 16</div>
+          <div style={{ fontSize: '28px', fontWeight: '900', color: '#4ade80' }}>{historicoCPC.length} <span style={{fontSize:'14px'}}>/ 16</span></div>
         </div>
-      </div>
-
-      <div style={{ backgroundColor: '#e2e8f0', borderRadius: '10px', height: '8px' }}>
-        <div style={{ width: `${(historicoCPC.length / desafios.length) * 100}%`, backgroundColor: '#1f2937', height: '100%', transition: 'width 0.5s' }}></div>
       </div>
 
       {!concluido ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', flex: 1 }}>
-          <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', padding: '24px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '20px' }}>
+        /* GRELHA INTELIGENTE: Adapta-se perfeitamente a telemóveis e tablets */
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '24px', flex: 1 }}>
+          
+          {/* PAINEL ESQUERDO: CENÁRIO E PERGUNTAS */}
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', padding: '20px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
               <span style={{ fontSize: '24px', padding: '10px', backgroundColor: '#f3f4f6', borderRadius: '12px' }}>🚨</span>
               <div>
                 <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}>Cenário Corporativo {indiceDesafio + 1}:</div>
-                <h3 style={{ margin: 0, color: '#111827', fontSize: '18px', lineHeight: '1.4' }}>"{desafioAtual.caso}"</h3>
+                <h3 style={{ margin: 0, color: '#111827', fontSize: '16px', lineHeight: '1.4' }}>"{desafioAtual.caso}"</h3>
               </div>
             </div>
 
             {etapaAtual === 0 ? (
               <div>
-                <div style={{ marginBottom: '16px', fontSize: '14px', fontWeight: 'bold', color: '#374151' }}>PASSO 1: Qual Pronunciamento Contábil governa esta regra?</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
+                <div style={{ marginBottom: '14px', fontSize: '13px', fontWeight: 'bold', color: '#374151' }}>PASSO 1: Qual Pronunciamento Contábil governa esta regra?</div>
+                {/* Lista em 1 coluna vertical para garantir 100% de legibilidade em qualquer ecrã */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {opcoesCPC.map(cpc => (
                     <button 
                       key={cpc.cod} onClick={() => handleSelecaoCPC(cpc.cod)}
-                      style={{ padding: '14px', backgroundColor: '#f9fafb', border: '1px solid #d1d5db', borderRadius: '10px', textAlign: 'left', cursor: 'pointer', display: 'flex', gap: '10px', alignItems: 'center' }}
-                      onMouseOver={e => e.currentTarget.style.borderColor = '#111827'}
-                      onMouseOut={e => e.currentTarget.style.borderColor = '#d1d5db'}
+                      style={{ padding: '12px 14px', backgroundColor: '#f9fafb', border: '1px solid #d1d5db', borderRadius: '10px', textAlign: 'left', cursor: 'pointer', display: 'flex', gap: '12px', alignItems: 'center', width: '100%' }}
+                      onMouseOver={e => { e.currentTarget.style.borderColor = '#111827'; e.currentTarget.style.backgroundColor = '#f3f4f6'; }}
+                      onMouseOut={e => { e.currentTarget.style.borderColor = '#d1d5db'; e.currentTarget.style.backgroundColor = '#f9fafb'; }}
                     >
-                      <strong style={{ backgroundColor: '#e5e7eb', padding: '4px 8px', borderRadius: '6px' }}>{cpc.cod}</strong>
-                      {cpc.nome}
+                      <strong style={{ backgroundColor: '#e5e7eb', padding: '4px 8px', borderRadius: '6px', fontSize: '12px', flexShrink: 0 }}>{cpc.cod}</strong>
+                      <span style={{ fontSize: '13px', color: '#1f2937', fontWeight: '600' }}>{cpc.nome}</span>
                     </button>
                   ))}
                 </div>
               </div>
             ) : (
               <div>
-                <div style={{ marginBottom: '16px', fontSize: '14px', fontWeight: 'bold', color: '#374151' }}>PASSO 2: Qual o tratamento exigido pelo {desafioAtual.cpc_correto}?</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ marginBottom: '14px', fontSize: '13px', fontWeight: 'bold', color: '#374151' }}>PASSO 2: Qual o tratamento exigido pelo {desafioAtual.cpc_correto}?</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {desafioAtual.regras.map((regra, idx) => (
                     <button 
                       key={idx} onClick={() => handleSelecaoRegra(regra)}
-                      style={{ padding: '20px', backgroundColor: '#f3f4f6', border: '2px solid #d1d5db', borderRadius: '12px', fontSize: '14px', fontWeight: 'bold', color: '#1f2937', cursor: 'pointer' }}
+                      style={{ padding: '16px', backgroundColor: '#f3f4f6', border: '2px solid #d1d5db', borderRadius: '12px', fontSize: '13px', fontWeight: 'bold', color: '#1f2937', cursor: 'pointer', textAlign: 'left', width: '100%' }}
                       onMouseOver={e => { e.currentTarget.style.borderColor = '#4ade80'; e.currentTarget.style.backgroundColor = '#f0fdf4'; }}
                       onMouseOut={e => { e.currentTarget.style.borderColor = '#d1d5db'; e.currentTarget.style.backgroundColor = '#f3f4f6'; }}
                     >
@@ -128,34 +129,40 @@ export default function LaboratorioCPC() {
             )}
 
             {feedback && (
-              <div style={{ marginTop: '20px', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: feedback.tipo === 'sucesso' ? '#dcfce7' : '#fee2e2', border: `1px solid ${feedback.tipo === 'sucesso' ? '#86efac' : '#fca5a5'}`, color: feedback.tipo === 'sucesso' ? '#166534' : '#991b1b' }}>
+              <div style={{ marginTop: '16px', padding: '14px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: feedback.tipo === 'sucesso' ? '#dcfce7' : '#fee2e2', border: `1px solid ${feedback.tipo === 'sucesso' ? '#86efac' : '#fca5a5'}`, color: feedback.tipo === 'sucesso' ? '#166534' : '#991b1b' }}>
                 <span style={{ fontSize: '20px' }}>{feedback.tipo === 'sucesso' ? '✅' : '🚨'}</span>
-                <span style={{ fontWeight: '600', fontSize: '14px' }}>{feedback.msg}</span>
+                <span style={{ fontWeight: '600', fontSize: '13px' }}>{feedback.msg}</span>
               </div>
             )}
           </div>
 
-          <div style={{ backgroundColor: '#111827', borderRadius: '20px', padding: '24px', border: '1px solid #374151', overflowY: 'auto' }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#4ade80', display: 'flex', alignItems: 'center', gap: '8px' }}>📑 Relatório de Auditoria (Aprovados)</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {historicoCPC.map((h, i) => (
-                <div key={i} style={{ backgroundColor: '#1f2937', padding: '16px', borderRadius: '10px', borderLeft: '4px solid #4ade80' }}>
-                  <div style={{ color: '#9ca3af', fontSize: '11px', marginBottom: '8px' }}>Cenário: {h.caso}</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <span style={{ color: '#f3f4f6', fontWeight: 'bold' }}>Norma: {h.cpc_correto}</span>
-                    <span style={{ color: '#4ade80', fontSize: '13px' }}>Ação: {h.regra_correta}</span>
+          {/* PAINEL DIREITO: RELATÓRIO DE AUDITORIA */}
+          <div style={{ backgroundColor: '#111827', borderRadius: '20px', padding: '20px', border: '1px solid #374151', maxHeight: '600px', overflowY: 'auto', color: 'white' }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '15px', color: '#4ade80', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #374151', paddingBottom: '12px' }}>📑 Relatório de Auditoria</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {historicoCPC.length === 0 ? (
+                <span style={{ color: '#6b7280', fontStyle: 'italic', fontSize: '12px' }}>Nenhum caso auditado ainda...</span>
+              ) : (
+                historicoCPC.map((h, i) => (
+                  <div key={i} style={{ backgroundColor: '#1f2937', padding: '12px', borderRadius: '10px', borderLeft: '4px solid #4ade80', fontSize: '12px' }}>
+                    <div style={{ color: '#9ca3af', marginBottom: '6px' }}>Cenário: {h.caso}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ color: '#f3f4f6', fontWeight: 'bold' }}>Norma: {h.cpc_correto}</span>
+                      <span style={{ color: '#4ade80' }}>Ação: {h.regra_correta}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
       ) : (
-        <div style={{ textAlign: 'center', padding: '60px', backgroundColor: '#ffffff', borderRadius: '20px', border: '2px dashed #111827' }}>
-          <span style={{ fontSize: '72px', marginBottom: '20px' }}>🏅</span>
-          <h2 style={{ color: '#111827', fontSize: '36px', fontWeight: '900' }}>Especialista IFRS/CPC!</h2>
-          <p style={{ color: '#4b5563', fontSize: '16px', maxWidth: '600px', margin: '0 auto' }}>Você resolveu cenários complexos do mundo corporativo aplicando perfeitamente as normas contábeis brasileiras e internacionais.</p>
-          <button onClick={() => { setIndiceDesafio(0); setEtapaAtual(0); setHistoricoCPC([]); }} style={{ marginTop: '30px', padding: '16px 36px', backgroundColor: '#111827', color: 'white', borderRadius: '12px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>Nova Auditoria</button>
+        /* TELA DE CONCLUSÃO */
+        <div style={{ textAlign: 'center', padding: '40px 20px', backgroundColor: '#ffffff', borderRadius: '20px', border: '2px dashed #111827', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          <span style={{ fontSize: '60px', marginBottom: '16px', display: 'block' }}>🏅</span>
+          <h2 style={{ color: '#111827', fontSize: '28px', fontWeight: '900' }}>Especialista IFRS/CPC!</h2>
+          <p style={{ color: '#4b5563', fontSize: '15px', maxWidth: '600px', margin: '0 auto 20px auto' }}>Você resolveu cenários complexos do mundo corporativo aplicando perfeitamente as normas contábeis brasileiras e internacionais.</p>
+          <button onClick={() => { setIndiceDesafio(0); setEtapaAtual(0); setHistoricoCPC([]); }} style={{ padding: '14px 32px', backgroundColor: '#111827', color: 'white', borderRadius: '12px', border: 'none', fontWeight: 'bold', cursor: 'pointer', width: '100%', maxWidth: '300px' }}>Nova Auditoria</button>
         </div>
       )}
     </div>

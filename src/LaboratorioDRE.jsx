@@ -55,75 +55,76 @@ export default function LaboratorioDRE() {
   };
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', padding: '24px', borderRadius: '24px', animation: 'fadeIn 0.5s ease-out', minHeight: '85vh', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '24px', animation: 'fadeIn 0.5s ease-out', minHeight: '85vh', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
       {/* HEADER DA DRE */}
-      <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)', color: 'white', padding: '24px 32px', borderRadius: '20px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
-        <div>
+      <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)', color: 'white', padding: '24px', borderRadius: '20px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
+        <div style={{ flex: '1 1 280px' }}>
           <span style={{ backgroundColor: '#3b82f6', color: '#ffffff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '900', letterSpacing: '1px' }}>LABORATÓRIO DE RESULTADOS</span>
-          <h2 style={{ margin: '8px 0', fontSize: '28px', fontWeight: '900' }}>Demonstração do Resultado (DRE) 📊</h2>
+          <h2 style={{ margin: '8px 0', fontSize: '24px', fontWeight: '900' }}>Demonstração do Resultado (DRE) 📊</h2>
           <p style={{ margin: 0, color: '#bfdbfe', fontSize: '14px', maxWidth: '650px' }}>
             A DRE é uma cascata rigorosa governada pelo <strong>Regime de Competência</strong>. Encaixe os blocos financeiros na ordem exata para revelar se a operação deu Lucro ou Prejuízo.
           </p>
         </div>
-        <div style={{ textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.1)', padding: '16px', borderRadius: '16px', backdropFilter: 'blur(4px)' }}>
+        <div style={{ flex: '1 1 auto', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.1)', padding: '16px', borderRadius: '16px', backdropFilter: 'blur(4px)' }}>
           <div style={{ fontSize: '11px', color: '#93c5fd', fontWeight: 'bold', textTransform: 'uppercase' }}>Blocos Alocados</div>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#ffffff' }}>{historicoDRE.length} <span style={{fontSize:'16px'}}>/ 9</span></div>
+          <div style={{ fontSize: '28px', fontWeight: '900', color: '#ffffff' }}>{historicoDRE.length} <span style={{fontSize:'14px'}}>/ 9</span></div>
         </div>
       </div>
 
       {!concluido ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(350px, 1fr) 1.5fr', gap: '24px', flex: 1 }}>
+        /* GRELHA INTELIGENTE: Adapta-se perfeitamente a telemóveis e tablets */
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '24px', flex: 1 }}>
           
           {/* PAINEL ESQUERDO: BLOCO A CLASSIFICAR */}
-          <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', padding: '24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', padding: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column' }}>
             
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
               <span style={{ fontSize: '24px', padding: '10px', backgroundColor: '#eff6ff', borderRadius: '12px' }}>🧩</span>
               <div>
                 <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Encaixe o Bloco {indiceDesafio + 1}:</div>
-                <h3 style={{ margin: 0, color: '#0f172a', fontSize: '20px' }}>{desafioAtual.nome}</h3>
+                <h3 style={{ margin: 0, color: '#0f172a', fontSize: '18px' }}>{desafioAtual.nome}</h3>
               </div>
             </div>
 
-            <div style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px', color: '#f8fafc', marginBottom: '20px', textAlign: 'center' }}>
-              <span style={{ fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Valor do Fato Contábil</span>
-              <div style={{ fontSize: '32px', fontWeight: '900', color: desafioAtual.sinal === '+' ? '#4ade80' : '#f87171' }}>
+            <div style={{ backgroundColor: '#1e293b', padding: '16px', borderRadius: '12px', color: '#f8fafc', marginBottom: '16px', textAlign: 'center' }}>
+              <span style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold', display: 'block', marginBottom: '6px' }}>Valor do Fato Contábil</span>
+              <div style={{ fontSize: '24px', fontWeight: '900', color: desafioAtual.sinal === '+' ? '#4ade80' : '#f87171' }}>
                 {desafioAtual.sinal} {formatarValor(desafioAtual.valor)}
               </div>
             </div>
 
-            <div style={{ backgroundColor: '#fffbeb', padding: '16px', borderRadius: '12px', color: '#92400e', fontSize: '13.5px', fontStyle: 'italic', marginBottom: '24px', borderLeft: '4px solid #f59e0b' }}>
+            <div style={{ backgroundColor: '#fffbeb', padding: '14px', borderRadius: '12px', color: '#92400e', fontSize: '13px', fontStyle: 'italic', marginBottom: '20px', borderLeft: '4px solid #f59e0b' }}>
               <strong style={{ display: 'block', marginBottom: '4px', fontStyle: 'normal' }}>🦉 Dica do Controller:</strong> {desafioAtual.dica}
             </div>
 
             {/* BOTÕES DE ENCAIXE */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
-              <div style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold', color: '#0f172a', textAlign: 'center' }}>Em qual degrau da DRE este valor entra?</div>
+              <div style={{ marginBottom: '6px', fontSize: '13px', fontWeight: 'bold', color: '#0f172a', textAlign: 'center' }}>Em qual degrau da DRE este valor entra?</div>
               
-              <button onClick={() => handleSelecao('receita_bruta')} className="btn-degrau btn-receita">1. Receita Bruta (Faturamento Máximo)</button>
-              <button onClick={() => handleSelecao('deducoes')} className="btn-degrau btn-deducao">2. Deduções (Impostos sobre Venda e Devoluções)</button>
-              <button onClick={() => handleSelecao('custos')} className="btn-degrau btn-custo">3. Custos (O valor de compra do que foi vendido)</button>
-              <button onClick={() => handleSelecao('despesas_operacionais')} className="btn-degrau btn-despesa">4. Despesas Operacionais (Administrativo/Vendas)</button>
-              <button onClick={() => handleSelecao('receitas_operacionais')} className="btn-degrau btn-receita-op">5. Outras Receitas Operacionais (Ganhos extras)</button>
-              <button onClick={() => handleSelecao('impostos_lucro')} className="btn-degrau btn-imposto">6. Impostos sobre o Lucro (IRPJ / CSLL)</button>
+              <button onClick={() => handleSelecao('receita_bruta')} className="btn-degrau btn-receita">1. Receita Bruta (Faturamento)</button>
+              <button onClick={() => handleSelecao('deducoes')} className="btn-degrau btn-deducao">2. Deduções (Impostos / Devoluções)</button>
+              <button onClick={() => handleSelecao('custos')} className="btn-degrau btn-custo">3. Custos (CMV - Valor de compra)</button>
+              <button onClick={() => handleSelecao('despesas_operacionais')} className="btn-degrau btn-despesa">4. Despesas Operacionais (Admin/Vendas)</button>
+              <button onClick={() => handleSelecao('receitas_operacionais')} className="btn-degrau btn-receita-op">5. Outras Receitas Operacionais</button>
+              <button onClick={() => handleSelecao('impostos_lucro')} className="btn-degrau btn-imposto">6. Impostos sobre o Lucro (IRPJ/CSLL)</button>
             </div>
 
             {feedback && (
-              <div style={{ marginTop: '20px', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: feedback.tipo === 'sucesso' ? '#dcfce7' : '#fee2e2', border: `1px solid ${feedback.tipo === 'sucesso' ? '#86efac' : '#fca5a5'}`, color: feedback.tipo === 'sucesso' ? '#166534' : '#991b1b', animation: 'fadeIn 0.3s' }}>
+              <div style={{ marginTop: '16px', padding: '14px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: feedback.tipo === 'sucesso' ? '#dcfce7' : '#fee2e2', border: `1px solid ${feedback.tipo === 'sucesso' ? '#86efac' : '#fca5a5'}`, color: feedback.tipo === 'sucesso' ? '#166534' : '#991b1b', animation: 'fadeIn 0.3s' }}>
                 <span style={{ fontSize: '20px' }}>{feedback.tipo === 'sucesso' ? '✅' : '🚨'}</span>
-                <span style={{ fontWeight: '600', fontSize: '14px' }}>{feedback.msg}</span>
+                <span style={{ fontWeight: '600', fontSize: '13px' }}>{feedback.msg}</span>
               </div>
             )}
           </div>
 
           {/* PAINEL DIREITO: A CASCATA DA DRE */}
-          <div style={{ backgroundColor: '#0f172a', borderRadius: '20px', padding: '24px', border: '1px solid #1e293b', boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.5)', color: '#e2e8f0', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
-              <span style={{ fontSize: '20px' }}>📉</span> Cascata da DRE em Tempo Real
+          <div style={{ backgroundColor: '#0f172a', borderRadius: '20px', padding: '20px', border: '1px solid #1e293b', boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.5)', color: '#e2e8f0', display: 'flex', flexDirection: 'column', maxHeight: '600px', overflowY: 'auto' }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '15px', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
+              <span style={{ fontSize: '18px' }}>📉</span> Cascata da DRE em Tempo Real
             </h3>
             
-            <div style={{ display: 'flex', flexDirection: 'column', fontSize: '13px', fontFamily: 'monospace' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', fontSize: '12px', fontFamily: 'monospace' }}>
               
               {/* NÍVEL 1: RECEITA BRUTA */}
               <div className="dre-linha titulo">(=) Receita Bruta de Vendas</div>
@@ -139,7 +140,7 @@ export default function LaboratorioDRE() {
               </div>
 
               {/* SUBTOTAL: RECEITA LÍQUIDA */}
-              <div className="dre-linha destaque">(=) Receita Líquida de Vendas <span style={{ float: 'right', color: '#4ade80' }}>{formatarValor(receitaLiquida)}</span></div>
+              <div className="dre-linha destaque">(=) Receita Líquida <span style={{ float: 'right', color: '#4ade80' }}>{formatarValor(receitaLiquida)}</span></div>
 
               {/* NÍVEL 3: CUSTOS */}
               <div className="dre-linha">(-) Custo da Mercadoria Vendida (CMV)</div>
@@ -148,10 +149,10 @@ export default function LaboratorioDRE() {
               </div>
 
               {/* SUBTOTAL: LUCRO BRUTO */}
-              <div className="dre-linha destaque">(=) Lucro Bruto Operacional <span style={{ float: 'right', color: lucroBruto >= 0 ? '#4ade80' : '#f87171' }}>{formatarValor(lucroBruto)}</span></div>
+              <div className="dre-linha destaque">(=) Lucro Bruto <span style={{ float: 'right', color: lucroBruto >= 0 ? '#4ade80' : '#f87171' }}>{formatarValor(lucroBruto)}</span></div>
 
               {/* NÍVEL 4: DESPESAS E RECEITAS OPERACIONAIS */}
-              <div className="dre-linha">(-) Despesas Operacionais (Vendas / Admin)</div>
+              <div className="dre-linha">(-) Despesas Operacionais</div>
               <div className="dre-valores">
                 {historicoDRE.filter(h => h.etapa === 'despesas_operacionais').map(h => <div key={h.id} className="dre-item negativo">{h.nome}: - {formatarValor(h.valor)}</div>)}
               </div>
@@ -162,7 +163,7 @@ export default function LaboratorioDRE() {
               </div>
 
               {/* SUBTOTAL: LAIR */}
-              <div className="dre-linha destaque">(=) Resultado Antes dos Impostos (LAIR) <span style={{ float: 'right', color: resultadoAntesIR >= 0 ? '#4ade80' : '#f87171' }}>{formatarValor(resultadoAntesIR)}</span></div>
+              <div className="dre-linha destaque">(=) Resultado Antes IR (LAIR) <span style={{ float: 'right', color: resultadoAntesIR >= 0 ? '#4ade80' : '#f87171' }}>{formatarValor(resultadoAntesIR)}</span></div>
 
               {/* NÍVEL 5: IMPOSTOS SOBRE LUCRO */}
               <div className="dre-linha">(-) Provisão para IRPJ e CSLL</div>
@@ -172,8 +173,8 @@ export default function LaboratorioDRE() {
 
               {/* FINAL: LUCRO LÍQUIDO */}
               <div className="dre-linha super-destaque" style={{ backgroundColor: lucroLiquido >= 0 ? 'rgba(74, 222, 128, 0.15)' : 'rgba(248, 113, 113, 0.15)', borderColor: lucroLiquido >= 0 ? '#4ade80' : '#f87171' }}>
-                (=) Resultado Líquido do Exercício
-                <span style={{ float: 'right', color: lucroLiquido >= 0 ? '#4ade80' : '#f87171', fontSize: '20px' }}>{formatarValor(lucroLiquido)}</span>
+                (=) Resultado Líquido
+                <span style={{ float: 'right', color: lucroLiquido >= 0 ? '#4ade80' : '#f87171', fontSize: '16px' }}>{formatarValor(lucroLiquido)}</span>
               </div>
 
             </div>
@@ -181,18 +182,18 @@ export default function LaboratorioDRE() {
         </div>
       ) : (
         /* TELA DE CONCLUSÃO */
-        <div style={{ textAlign: 'center', padding: '60px 40px', backgroundColor: '#ffffff', borderRadius: '20px', border: '2px dashed #3b82f6', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ fontSize: '72px', marginBottom: '20px' }}>💼</span>
-          <h2 style={{ color: '#1e3a8a', margin: '0 0 16px 0', fontSize: '36px', fontWeight: '900' }}>Controller Financeiro Aprovado!</h2>
-          <p style={{ color: '#475569', fontSize: '16px', maxWidth: '600px', lineHeight: '1.6' }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px', backgroundColor: '#ffffff', borderRadius: '20px', border: '2px dashed #3b82f6', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          <span style={{ fontSize: '60px', marginBottom: '16px', display: 'block' }}>💼</span>
+          <h2 style={{ color: '#1e3a8a', margin: '0 0 16px 0', fontSize: '28px', fontWeight: '900' }}>Controller Financeiro Aprovado!</h2>
+          <p style={{ color: '#475569', fontSize: '15px', maxWidth: '600px', lineHeight: '1.6', marginBottom: '20px' }}>
             Dominou a cascata da DRE. Entendeu perfeitamente que o <strong>Lucro Bruto</strong> é o que sobra após pagar o fornecedor, e que o <strong>Lucro Líquido</strong> é o que sobra no final de tudo para distribuir aos sócios.
           </p>
-          <div style={{ backgroundColor: lucroLiquido >= 0 ? '#dcfce7' : '#fee2e2', padding: '16px 32px', borderRadius: '12px', color: lucroLiquido >= 0 ? '#166534' : '#991b1b', marginTop: '20px', fontWeight: 'bold', fontSize: '20px', border: `1px solid ${lucroLiquido >= 0 ? '#4ade80' : '#f87171'}` }}>
+          <div style={{ backgroundColor: lucroLiquido >= 0 ? '#dcfce7' : '#fee2e2', padding: '14px 24px', borderRadius: '12px', color: lucroLiquido >= 0 ? '#166534' : '#991b1b', marginBottom: '20px', fontWeight: 'bold', fontSize: '18px', border: `1px solid ${lucroLiquido >= 0 ? '#4ade80' : '#f87171'}` }}>
             {lucroLiquido >= 0 ? 'LUCRO APURADO: ' : 'PREJUÍZO APURADO: '} {formatarValor(lucroLiquido)}
           </div>
           <button 
             onClick={() => { setIndiceDesafio(0); setHistoricoDRE([]); }}
-            style={{ marginTop: '30px', padding: '16px 36px', backgroundColor: '#1e3a8a', color: 'white', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 15px rgba(30,58,138,0.4)' }}
+            style={{ padding: '14px 32px', backgroundColor: '#1e3a8a', color: 'white', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 15px rgba(30,58,138,0.4)', width: '100%', maxWidth: '300px' }}
           >
             Refazer a DRE
           </button>
@@ -202,7 +203,7 @@ export default function LaboratorioDRE() {
       <style>{`
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
-        .btn-degrau { padding: 14px; border-radius: 10px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer; transition: all 0.2s; text-align: left; font-weight: bold; font-size: 13px; color: #334155; }
+        .btn-degrau { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer; transition: all 0.2s; text-align: left; font-weight: bold; font-size: 12px; color: #334155; }
         .btn-degrau:hover { transform: translateX(4px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .btn-receita:hover { border-color: #3b82f6; background: #eff6ff; }
         .btn-deducao:hover { border-color: #f59e0b; background: #fffbeb; }
@@ -212,17 +213,17 @@ export default function LaboratorioDRE() {
         .btn-imposto:hover { border-color: #8b5cf6; background: #faf5ff; }
 
         /* Estilos da Cascata DRE */
-        .dre-linha { padding: 8px 0; color: #94a3b8; font-weight: bold; font-size: 14px; margin-top: 8px; }
-        .dre-linha.titulo { color: #f8fafc; font-size: 15px; border-bottom: 1px solid #334155; padding-bottom: 4px; }
-        .dre-linha.destaque { color: #f8fafc; border-top: 1px dashed #334155; border-bottom: 1px solid #334155; padding: 12px 0; background: rgba(255,255,255,0.02); }
-        .dre-linha.super-destaque { margin-top: 20px; padding: 16px; border-radius: 8px; border: 1px solid transparent; font-size: 16px; font-weight: 900; color: white; }
+        .dre-linha { padding: 6px 0; color: #94a3b8; font-weight: bold; font-size: 13px; margin-top: 6px; }
+        .dre-linha.titulo { color: #f8fafc; font-size: 14px; border-bottom: 1px solid #334155; padding-bottom: 4px; }
+        .dre-linha.destaque { color: #f8fafc; border-top: 1px dashed #334155; border-bottom: 1px solid #334155; padding: 10px 0; background: rgba(255,255,255,0.02); }
+        .dre-linha.super-destaque { margin-top: 16px; padding: 14px; border-radius: 8px; border: 1px solid transparent; font-size: 15px; font-weight: 900; color: white; }
         
-        .dre-valores { padding-left: 16px; display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
-        .dre-item { font-size: 12px; padding: 4px 8px; border-radius: 4px; background: rgba(0,0,0,0.2); border-left: 2px solid; }
+        .dre-valores { padding-left: 12px; display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+        .dre-item { font-size: 11px; padding: 4px 8px; border-radius: 4px; background: rgba(0,0,0,0.2); border-left: 2px solid; }
         .dre-item.positivo { color: #a7f3d0; border-color: #4ade80; }
         .dre-item.negativo { color: #fecaca; border-color: #f87171; }
         
-        .dre-subtotal { text-align: right; font-weight: bold; color: #4ade80; padding: 8px 0; font-size: 15px; }
+        .dre-subtotal { text-align: right; font-weight: bold; color: #4ade80; padding: 6px 0; font-size: 14px; }
       `}</style>
     </div>
   );

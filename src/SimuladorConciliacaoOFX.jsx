@@ -71,7 +71,6 @@ export default function SimuladorConciliacaoOFX({ mostrarToast, registrarFatoGer
 
     const cSafe = planoContas || [];
     
-    // Busca segura pelas contas no Plano de Contas
     const contaBanco = cSafe.find(c => 
       c.codigo_contabil === '1.1.01.02' || 
       (c.nome_conta || '').toLowerCase().includes('banco')
@@ -91,7 +90,6 @@ export default function SimuladorConciliacaoOFX({ mostrarToast, registrarFatoGer
     const valorAbs = Math.abs(itemOfx.valor);
 
     if (itemOfx.valor < 0) {
-      // Saída (Tarifa): Débito na Despesa, Crédito no Banco
       registrarFatoGerador(
         `Ajuste OFX: ${itemOfx.descricao}`, 
         valorAbs, 
@@ -100,7 +98,6 @@ export default function SimuladorConciliacaoOFX({ mostrarToast, registrarFatoGer
         [contaBanco?.id]
       );
     } else {
-      // Entrada (Rendimento): Débito no Banco, Crédito na Receita
       registrarFatoGerador(
         `Ajuste OFX: ${itemOfx.descricao}`, 
         valorAbs, 
@@ -110,7 +107,6 @@ export default function SimuladorConciliacaoOFX({ mostrarToast, registrarFatoGer
       );
     }
 
-    // Marca como conciliado no extrato local
     setExtratoOfx(prev => prev.map(l => l.id === itemOfx.id ? { ...l, conciliado: true } : l));
 
     if (mostrarToast) {
@@ -120,48 +116,52 @@ export default function SimuladorConciliacaoOFX({ mostrarToast, registrarFatoGer
 
   const itensExibidos = extratoOfx.filter(item => filtroStatus === 'todos' || !item.conciliado);
 
+  const inputStyle = { width: '100%', maxWidth: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', color: '#0f172a', backgroundColor: '#f8fafc', outline: 'none', boxSizing: 'border-box' };
+  const labelStyle = { fontWeight: '700', fontSize: '12px', color: '#475569', display: 'block', marginBottom: '6px', wordBreak: 'break-word' };
+  const cardStyle = { backgroundColor: 'white', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', boxSizing: 'border-box', minWidth: 0 };
+
   return (
-    <div style={{ backgroundColor: '#ffffff', padding: '25px', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animation: 'fadeIn 0.5s' }}>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#ffffff', padding: '16px', borderRadius: '24px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animation: 'fadeIn 0.5s', boxSizing: 'border-box', width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
       
       {/* CABEÇALHO */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', gap: '15px' }}>
-        <div>
-          <h2 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '28px' }}>📑</span> Conciliação Bancária OFX & Ajustes
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '15px' }}>
+        <div style={{ minWidth: 0, flex: '1 1 250px' }}>
+          <h2 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px', wordBreak: 'break-word' }}>
+            <span style={{ fontSize: '24px' }}>📑</span> Conciliação Bancária OFX & Ajustes
           </h2>
           <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '13px' }}>
             Cruzamento do Extrato Bancário com o Livro Diário, identificação de divergências e escrituração por partidas dobradas.
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', boxSizing: 'border-box' }}>
           <button 
             onClick={() => setMostrarExplicacao(!mostrarExplicacao)}
-            style={{ backgroundColor: '#f1f5f9', color: '#1e293b', border: '1px solid #cbd5e1', padding: '8px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
+            style={{ backgroundColor: '#f1f5f9', color: '#1e293b', border: '1px solid #cbd5e1', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
           >
             {mostrarExplicacao ? '📖 Ocultar Explicação' : '💡 Como Funciona'}
           </button>
 
-          <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '10px', border: '1px solid #e2e8f0', gap: '4px' }}>
+          <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '10px', border: '1px solid #e2e8f0', gap: '4px', boxSizing: 'border-box' }}>
             <button 
               onClick={() => setFiltroStatus('pendentes')}
-              style={{ padding: '8px 14px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', backgroundColor: filtroStatus === 'pendentes' ? '#2563eb' : 'transparent', color: filtroStatus === 'pendentes' ? 'white' : '#64748b' }}
+              style={{ padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11.5px', cursor: 'pointer', backgroundColor: filtroStatus === 'pendentes' ? '#2563eb' : 'transparent', color: filtroStatus === 'pendentes' ? 'white' : '#64748b' }}
             >
               🔴 Pendentes ({extratoOfx.filter(i => !i.conciliado).length})
             </button>
             <button 
               onClick={() => setFiltroStatus('todos')}
-              style={{ padding: '8px 14px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', backgroundColor: filtroStatus === 'todos' ? '#0f172a' : 'transparent', color: filtroStatus === 'todos' ? 'white' : '#64748b' }}
+              style={{ padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11.5px', cursor: 'pointer', backgroundColor: filtroStatus === 'todos' ? '#0f172a' : 'transparent', color: filtroStatus === 'todos' ? 'white' : '#64748b' }}
             >
-              📋 Extrato Completo
+              📋 Completo
             </button>
           </div>
         </div>
       </div>
 
       {mostrarExplicacao && (
-        <div style={{ backgroundColor: '#eff6ff', borderRadius: '12px', border: '1px solid #bfdbfe', padding: '20px', marginBottom: '25px' }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '15px', color: '#1e3a8a' }}>📘 Guia Prático de Conciliação Bancária</h3>
+        <div style={{ backgroundColor: '#eff6ff', borderRadius: '12px', border: '1px solid #bfdbfe', padding: '16px', marginBottom: '20px', boxSizing: 'border-box', wordBreak: 'break-word' }}>
+          <h3 style={{ margin: '0 0 8px 0', fontSize: '14.5px', color: '#1e3a8a' }}>📘 Guia Prático de Conciliação Bancária</h3>
           <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: '#1e40af', lineHeight: '1.6' }}>
             O extrato OFX traz a realidade do banco. Ao identificar tarifas ou rendimentos não escriturados, clique em <em>"Conciliar & Lançar no Diário"</em> para gerar automaticamente as partidas dobradas.
           </p>
@@ -175,74 +175,74 @@ export default function SimuladorConciliacaoOFX({ mostrarToast, registrarFatoGer
       )}
 
       {/* DASHBOARDS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', marginBottom: '25px' }}>
-        <div style={{ backgroundColor: '#f8fafc', padding: '18px', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: '4px solid #2563eb' }}>
-          <span style={{ color: '#1d4ed8', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Saldo Final no Extrato (OFX)</span>
-          <strong style={{ display: 'block', color: '#1e40af', fontSize: '24px', marginTop: '4px' }}>{formatMoeda(saldoExtratoBanco)}</strong>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px', marginBottom: '20px', boxSizing: 'border-box' }}>
+        <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', borderLeft: '4px solid #2563eb', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#1d4ed8', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Saldo Final no Extrato (OFX)</span>
+          <strong style={{ display: 'block', color: '#1e40af', fontSize: '20px', marginTop: '4px', wordBreak: 'break-word' }}>{formatMoeda(saldoExtratoBanco)}</strong>
         </div>
 
-        <div style={{ backgroundColor: '#f0fdf4', padding: '18px', borderRadius: '12px', border: '1px solid #86efac', borderLeft: '4px solid #16a34a' }}>
-          <span style={{ color: '#166534', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Itens Já Conciliados</span>
-          <strong style={{ display: 'block', color: '#15803d', fontSize: '24px', marginTop: '4px' }}>{extratoOfx.filter(i => i.conciliado).length} de {extratoOfx.length}</strong>
+        <div style={{ backgroundColor: '#f0fdf4', padding: '16px', borderRadius: '16px', border: '1px solid #86efac', borderLeft: '4px solid #16a34a', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#166534', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Itens Já Conciliados</span>
+          <strong style={{ display: 'block', color: '#15803d', fontSize: '20px', marginTop: '4px', wordBreak: 'break-word' }}>{extratoOfx.filter(i => i.conciliado).length} de {extratoOfx.length}</strong>
         </div>
 
-        <div style={{ backgroundColor: '#fff5f5', padding: '18px', borderRadius: '12px', border: '1px solid #fecaca', borderLeft: '4px solid #ef4444' }}>
-          <span style={{ color: '#991b1b', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Divergências Pendentes</span>
-          <strong style={{ display: 'block', color: '#dc2626', fontSize: '24px', marginTop: '4px' }}>{extratoOfx.filter(i => !i.conciliado).length} itens</strong>
+        <div style={{ backgroundColor: '#fff5f5', padding: '16px', borderRadius: '16px', border: '1px solid #fecaca', borderLeft: '4px solid #ef4444', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#991b1b', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Divergências Pendentes</span>
+          <strong style={{ display: 'block', color: '#dc2626', fontSize: '20px', marginTop: '4px', wordBreak: 'break-word' }}>{extratoOfx.filter(i => !i.conciliado).length} itens</strong>
         </div>
       </div>
 
-      {/* FORMULÁRIO COM ACESSIBILIDADE BLINDADA */}
-      <form onSubmit={handleAdicionarMovimento} style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '25px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px' }}>
+      {/* FORMULÁRIO */}
+      <form onSubmit={handleAdicionarMovimento} style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '14px', boxSizing: 'border-box', minWidth: 0 }}>
+        <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px', wordBreak: 'break-word' }}>
           Inserir Movimentação no Extrato OFX
         </h3>
 
-        <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-          <label htmlFor="ofxData" style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-            Data:
-            <input id="ofxData" name="ofxData" autoComplete="off" type="date" value={novaData} onChange={e => setNovaData(e.target.value)} style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1' }} required />
-          </label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '12px', boxSizing: 'border-box' }}>
+          <div style={{ minWidth: 0 }}>
+            <label htmlFor="ofxData" style={labelStyle}>Data:</label>
+            <input id="ofxData" name="ofxData" autoComplete="off" type="date" value={novaData} onChange={e => setNovaData(e.target.value)} style={inputStyle} required />
+          </div>
 
-          <label htmlFor="ofxTipo" style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-            Tipo de Movimento:
-            <select id="ofxTipo" name="ofxTipo" autoComplete="off" value={novoTipo} onChange={e => setNovoTipo(e.target.value)} style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: 'white', fontWeight: 'bold' }}>
-              <option value="debito">Débito (Saída / Pagamento / Tarifa)</option>
-              <option value="credito">Crédito (Entrada / Recebimento / Rendimento)</option>
+          <div style={{ minWidth: 0 }}>
+            <label htmlFor="ofxTipo" style={labelStyle}>Tipo de Movimento:</label>
+            <select id="ofxTipo" name="ofxTipo" autoComplete="off" value={novoTipo} onChange={e => setNovoTipo(e.target.value)} style={{ ...inputStyle, backgroundColor: 'white', fontWeight: 'bold' }}>
+              <option value="debito">Débito (Saída / Tarifa)</option>
+              <option value="credito">Crédito (Entrada / Recebimento)</option>
             </select>
-          </label>
+          </div>
 
-          <label htmlFor="ofxValor" style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#0f172a' }}>
-            Valor (R$):
-            <input id="ofxValor" name="ofxValor" autoComplete="off" type="text" value={novoValorStr} onChange={e => setNovoValorStr(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="Ex: 150.00" style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1' }} required />
-          </label>
+          <div style={{ minWidth: 0 }}>
+            <label htmlFor="ofxValor" style={{ ...labelStyle, color: '#0f172a' }}>Valor (R$):</label>
+            <input id="ofxValor" name="ofxValor" autoComplete="off" type="text" value={novoValorStr} onChange={e => setNovoValorStr(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="Ex: 150.00" style={inputStyle} required />
+          </div>
         </div>
 
-        <label htmlFor="ofxDescricao" style={{ display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-          Histórico / Descrição no Banco:
-          <input id="ofxDescricao" name="ofxDescricao" autoComplete="off" type="text" value={novaDescricao} onChange={e => setNovaDescricao(e.target.value)} placeholder="Ex: Tarifa de TED, Juros sobre Capital..." style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1' }} required />
-        </label>
+        <div style={{ minWidth: 0 }}>
+          <label htmlFor="ofxDescricao" style={labelStyle}>Histórico / Descrição no Banco:</label>
+          <input id="ofxDescricao" name="ofxDescricao" autoComplete="off" type="text" value={novaDescricao} onChange={e => setNovaDescricao(e.target.value)} placeholder="Ex: Tarifa de TED, Juros sobre Capital..." style={inputStyle} required />
+        </div>
 
-        <button type="submit" style={{ backgroundColor: '#0f172a', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>
+        <button type="submit" style={{ backgroundColor: '#0f172a', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13.5px', boxSizing: 'border-box' }}>
           Adicionar Movimento ao Extrato 📥
         </button>
       </form>
 
       {/* TABELA */}
-      <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', overflow: 'hidden' }}>
+      <div style={{ border: '1px solid #cbd5e1', borderRadius: '16px', overflow: 'hidden', boxSizing: 'border-box' }}>
         <div style={{ backgroundColor: '#1e293b', color: 'white', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ margin: 0, fontSize: '14px' }}>Extrato Bancário (Movimentações OFX)</h3>
+          <h3 style={{ margin: 0, fontSize: '14px', wordBreak: 'break-word' }}>Extrato Bancário (Movimentações OFX)</h3>
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
+        <div style={{ overflowX: 'auto', backgroundColor: 'white', boxSizing: 'border-box' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px', textAlign: 'left', minWidth: '500px' }}>
             <thead style={{ backgroundColor: '#f8fafc', color: '#475569' }}>
               <tr>
-                <th style={{ padding: '10px' }}>Data</th>
-                <th style={{ padding: '10px' }}>Histórico / Descrição no Banco</th>
-                <th style={{ padding: '10px', textAlign: 'right' }}>Valor (R$)</th>
-                <th style={{ padding: '10px', textAlign: 'center' }}>Status</th>
-                <th style={{ padding: '10px', textAlign: 'center' }}>Ação Contábil</th>
+                <th style={{ padding: '10px 14px' }}>Data</th>
+                <th style={{ padding: '10px 14px' }}>Histórico / Descrição no Banco</th>
+                <th style={{ padding: '10px 14px', textAlign: 'right' }}>Valor (R$)</th>
+                <th style={{ padding: '10px 14px', textAlign: 'center' }}>Status</th>
+                <th style={{ padding: '10px 14px', textAlign: 'center' }}>Ação Contábil</th>
               </tr>
             </thead>
             <tbody>
@@ -251,23 +251,23 @@ export default function SimuladorConciliacaoOFX({ mostrarToast, registrarFatoGer
               ) : (
                 itensExibidos.map(item => (
                   <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9', backgroundColor: item.conciliado ? '#f8fafc' : 'white' }}>
-                    <td style={{ padding: '10px' }}>{new Date(item.data).toLocaleDateString('pt-BR')}</td>
-                    <td style={{ padding: '10px', fontWeight: 'bold', color: '#0f172a' }}>{item.descricao}</td>
-                    <td style={{ padding: '10px', textAlign: 'right', fontWeight: 'bold', color: item.valor >= 0 ? '#16a34a' : '#dc2626' }}>
+                    <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>{new Date(item.data).toLocaleDateString('pt-BR')}</td>
+                    <td style={{ padding: '10px 14px', fontWeight: 'bold', color: '#0f172a', wordBreak: 'break-word' }}>{item.descricao}</td>
+                    <td style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 'bold', color: item.valor >= 0 ? '#16a34a' : '#dc2626', whiteSpace: 'nowrap' }}>
                       {item.valor >= 0 ? `+${formatMoeda(item.valor)}` : formatMoeda(item.valor)}
                     </td>
-                    <td style={{ padding: '10px', textAlign: 'center' }}>
-                      <span style={{ fontSize: '10px', fontWeight: 'bold', padding: '3px 10px', borderRadius: '12px', backgroundColor: item.conciliado ? '#f0fdf4' : '#fff5f5', color: item.conciliado ? '#166534' : '#991b1b', border: `1px solid ${item.conciliado ? '#86efac' : '#fecaca'}` }}>
+                    <td style={{ padding: '10px 14px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontSize: '10.5px', fontWeight: 'bold', padding: '3px 10px', borderRadius: '12px', backgroundColor: item.conciliado ? '#f0fdf4' : '#fff5f5', color: item.conciliado ? '#166534' : '#991b1b', border: `1px solid ${item.conciliado ? '#86efac' : '#fecaca'}` }}>
                         {item.conciliado ? '✅ Conciliado' : '⏳ Pendente'}
                       </span>
                     </td>
-                    <td style={{ padding: '10px', textAlign: 'center' }}>
+                    <td style={{ padding: '10px 14px', textAlign: 'center', whiteSpace: 'nowrap' }}>
                       {!item.conciliado ? (
                         <button 
                           onClick={() => handleConciliarEGerarFato(item)}
                           style={{ backgroundColor: '#2563eb', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
                         >
-                          Conciliar & Lançar no Diário ⚙️
+                          Conciliar & Lançar ⚙️
                         </button>
                       ) : (
                         <span style={{ fontSize: '11px', color: '#64748b' }}>Escriturado</span>

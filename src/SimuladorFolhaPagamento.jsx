@@ -16,26 +16,26 @@ export default function SimuladorFolhaPagamento({ mostrarToast, registrarFatoGer
   const [domingosFeriadosStr, setDomingosFeriadosStr] = useState('5');
 
   // 3. Comissões e Prêmios
-  const [comissoesStr, setComissoesStr] = useState('1500.00'); // Incide INSS, FGTS e IRRF
-  const [premiosStr, setPremiosStr] = useState('800.00');       // Lei 13.467/2017: Não integra salário de contribuição previdenciária
+  const [comissoesStr, setComissoesStr] = useState('1500.00'); 
+  const [premiosStr, setPremiosStr] = useState('800.00');       
 
   // 4. Módulo de Férias e Abono Pecuniário
   const [incluirFerias, setIncluirFerias] = useState(false);
   const [diasFeriasGozadasStr, setDiasFeriasGozadasStr] = useState('20');
-  const [venderAbono10Dias, setVenderAbono10Dias] = useState(true); // Venda de 10 dias (isento de INSS/FGTS)
+  const [venderAbono10Dias, setVenderAbono10Dias] = useState(true); 
 
   // 5. Módulo de 13º Salário
-  const [modalidade13, setModalidade13] = useState('nenhum'); // 'nenhum', 'primeira_parcela' (50% sem desconto), 'segunda_parcela' (integral c/ desconto da 1ª), 'provisao_mensal' (1/12)
+  const [modalidade13, setModalidade13] = useState('nenhum'); 
 
   // 6. Adicional Especial e Faltas
-  const [tipoAdicional, setTipoAdicional] = useState('nenhum'); // 'nenhum', 'periculosidade' (30%), 'insalubridade_min' (10%), 'insalubridade_med' (20%), 'insalubridade_max' (40%)
+  const [tipoAdicional, setTipoAdicional] = useState('nenhum'); 
   const [salarioMinimo] = useState(1412.00);
   const [optanteVT, setOptanteVT] = useState(true);
   const [valorGastoVTStr, setValorGastoVTStr] = useState('280.00');
   const [diasFaltaStr, setDiasFaltaStr] = useState('0');
 
   // 7. Enquadramento da Empresa
-  const [regimeEmpresa, setRegimeEmpresa] = useState('lucro_real_presumido'); // 'lucro_real_presumido' ou 'simples_anexo123'
+  const [regimeEmpresa, setRegimeEmpresa] = useState('lucro_real_presumido'); 
 
   // Estados dos Resultados
   const [proventos, setProventos] = useState({
@@ -52,7 +52,6 @@ export default function SimuladorFolhaPagamento({ mostrarToast, registrarFatoGer
     fgtsMensal: 0, inssPatronal: 0, ratAjustado: 0, terceirosSistemaS: 0, custoTotalPatronal: 0, custoTotalGeral: 0
   });
 
-  // Tabela Progressiva do INSS
   const calcularInssProgressivo = (baseInss) => {
     const teto = 7786.02;
     const base = Math.min(baseInss, teto);
@@ -64,7 +63,6 @@ export default function SimuladorFolhaPagamento({ mostrarToast, registrarFatoGer
     return inss;
   };
 
-  // Tabela Progressiva do IRRF
   const calcularIrrfProgressivo = (baseIrrf) => {
     if (baseIrrf <= 2259.20) return 0;
     if (baseIrrf <= 2826.65) return (baseIrrf * 0.075) - 169.44;
@@ -149,13 +147,9 @@ export default function SimuladorFolhaPagamento({ mostrarToast, registrarFatoGer
 
   }, [salarioBaseStr, horasExtras50Str, horasExtras100Str, diasUteisMesStr, domingosFeriadosStr, comissoesStr, premiosStr, incluirFerias, diasFeriasGozadasStr, venderAbono10Dias, modalidade13, tipoAdicional, dependentesStr, optanteVT, valorGastoVTStr, diasFaltaStr, regimeEmpresa]);
 
-  // ==========================================================
-  // FUNÇÃO DE INTEGRAÇÃO COM O LIVRO DIÁRIO
-  // ==========================================================
   const fecharFolha = () => {
     if (typeof registrarFatoGerador !== 'function') return;
 
-    // Busca rápida dos IDs das contas no plano de contas do banco
     const idDespSalario = planoContas.find(c => c.codigo_contabil === '5.2.01.01' || c.nome_conta.toLowerCase().includes('despesas com salário'))?.id;
     const idSalarioPagar = planoContas.find(c => c.codigo_contabil === '2.1.02.01' || c.nome_conta.toLowerCase().includes('salários a pagar'))?.id;
     const idInssRecolher = planoContas.find(c => c.nome_conta.toLowerCase().includes('inss a recolher'))?.id;
@@ -164,16 +158,14 @@ export default function SimuladorFolhaPagamento({ mostrarToast, registrarFatoGer
 
     const mesAtualFormatado = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 
-    // Fato Gerador 1: Apropriação do Salário e Descontos (INSS/IRRF)
     registrarFatoGerador(
       `Apropriação da Folha de Pagamento de ${mesAtualFormatado} - ${nomeEmpregado}`,
       descontos.salarioLiquido,
       'RH / Folha',
-      [idDespSalario], // Débito na DRE
-      [idSalarioPagar] // Crédito no Passivo
+      [idDespSalario], 
+      [idSalarioPagar] 
     );
 
-    // Fato Gerador 2: Retenção de INSS do Empregado
     if (descontos.inssEmpregado > 0) {
       registrarFatoGerador(
         `Retenção de INSS s/ Folha de Pagamento - ${nomeEmpregado}`,
@@ -184,7 +176,6 @@ export default function SimuladorFolhaPagamento({ mostrarToast, registrarFatoGer
       );
     }
 
-    // Fato Gerador 3: FGTS Patronal
     if (encargosEmpresa.fgtsMensal > 0) {
       registrarFatoGerador(
         `Apropriação de FGTS Patronal s/ Folha (8%) - ${nomeEmpregado}`,
@@ -195,14 +186,13 @@ export default function SimuladorFolhaPagamento({ mostrarToast, registrarFatoGer
       );
     }
 
-    // Fato Gerador 4: INSS Patronal (Se Lucro Presumido/Real)
     if (encargosEmpresa.inssPatronal > 0) {
       const inssTotalPatronal = encargosEmpresa.inssPatronal + encargosEmpresa.ratAjustado + encargosEmpresa.terceirosSistemaS;
       registrarFatoGerador(
-        `Apropriação de Encargos Previdenciários Patronais (INSS/RAT/Terceiros) - ${nomeEmpregado}`,
+        `Apropriação de Encargos Previdenciários Patronais - ${nomeEmpregado}`,
         inssTotalPatronal,
         'RH / Folha',
-        [idDespSalario], // Sugestão simplificada: agrupar em despesa com pessoal
+        [idDespSalario], 
         [idInssRecolher]
       );
     }
@@ -210,188 +200,228 @@ export default function SimuladorFolhaPagamento({ mostrarToast, registrarFatoGer
     if (mostrarToast) mostrarToast('Folha fechada! Fatos geradores enviados para o Livro Diário.', 'sucesso');
   };
 
+  const inputStyle = { width: '100%', maxWidth: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', color: '#0f172a', backgroundColor: '#f8fafc', outline: 'none', boxSizing: 'border-box' };
+  const labelStyle = { fontWeight: '700', fontSize: '12px', color: '#475569', display: 'block', marginBottom: '6px', wordBreak: 'break-word' };
+  const cardStyle = { backgroundColor: 'white', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', boxSizing: 'border-box', minWidth: 0 };
+
   return (
-    <div style={{ backgroundColor: '#ffffff', padding: '25px', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animation: 'fadeIn 0.5s' }}>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#ffffff', padding: '16px', borderRadius: '24px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', fontFamily: 'system-ui, -apple-system, sans-serif', color: '#0f172a', boxSizing: 'border-box', width: '100%', maxWidth: '100%', overflowX: 'hidden', animation: 'fadeIn 0.5s' }}>
       
       {/* CABEÇALHO */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', gap: '15px' }}>
-        <div>
-          <h2 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '28px' }}>💼</span> Folha de Pagamento Completa (DP & Encargos)
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '15px', boxSizing: 'border-box' }}>
+        <div style={{ minWidth: 0, flex: '1 1 250px' }}>
+          <h2 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px', wordBreak: 'break-word' }}>
+            <span style={{ fontSize: '24px' }}>💼</span> Folha de Pagamento Completa (DP & Encargos)
           </h2>
-          <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '13px' }}>
+          <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '13px', wordBreak: 'break-word' }}>
             Férias com 1/3, Abono Pecuniário, 13º Salário, Comissões com DSR, Prêmios e Encargos Patronais.
           </p>
         </div>
 
         {/* REGIME TRIBUTÁRIO DA EMPRESA */}
-        <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '10px', border: '1px solid #e2e8f0', gap: '4px' }}>
+        <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '12px', border: '1px solid #e2e8f0', gap: '4px', flexWrap: 'wrap', boxSizing: 'border-box' }}>
           <button 
             onClick={() => setRegimeEmpresa('lucro_real_presumido')}
-            style={{ padding: '8px 14px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', transition: 'all 0.2s', backgroundColor: regimeEmpresa === 'lucro_real_presumido' ? '#0f172a' : 'transparent', color: regimeEmpresa === 'lucro_real_presumido' ? 'white' : '#64748b' }}
+            style={{ padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11.5px', cursor: 'pointer', transition: 'all 0.2s', backgroundColor: regimeEmpresa === 'lucro_real_presumido' ? '#0f172a' : 'transparent', color: regimeEmpresa === 'lucro_real_presumido' ? 'white' : '#64748b' }}
           >
-            🏢 Regime Geral (27,8% Patronal + FGTS)
+            🏢 Regime Geral (27,8% + FGTS)
           </button>
           <button 
             onClick={() => setRegimeEmpresa('simples_anexo123')}
-            style={{ padding: '8px 14px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', transition: 'all 0.2s', backgroundColor: regimeEmpresa === 'simples_anexo123' ? '#2563eb' : 'transparent', color: regimeEmpresa === 'simples_anexo123' ? 'white' : '#64748b' }}
+            style={{ padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11.5px', cursor: 'pointer', transition: 'all 0.2s', backgroundColor: regimeEmpresa === 'simples_anexo123' ? '#2563eb' : 'transparent', color: regimeEmpresa === 'simples_anexo123' ? 'white' : '#64748b' }}
           >
-            🏪 Simples Nacional (Isento Patronal)
+            🏪 Simples (Isento Patronal)
           </button>
         </div>
       </div>
 
       {/* DASHBOARDS PRINCIPAIS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '15px', marginBottom: '25px' }}>
-        <div style={{ backgroundColor: '#f8fafc', padding: '18px', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: '4px solid #0f172a' }}>
-          <span style={{ color: '#64748b', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Remuneração Bruta Global</span>
-          <strong style={{ display: 'block', color: '#0f172a', fontSize: '24px', marginTop: '4px' }}>{formatMoeda(proventos.totalBruto)}</strong>
-          <span style={{ fontSize: '11px', color: '#64748b' }}>Base INSS: {formatMoeda(proventos.basePrevidenciaria)}</span>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px', marginBottom: '20px', boxSizing: 'border-box' }}>
+        <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', borderLeft: '4px solid #0f172a', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#64748b', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Remuneração Bruta Global</span>
+          <strong style={{ display: 'block', color: '#0f172a', fontSize: '22px', marginTop: '4px', wordBreak: 'break-word' }}>{formatMoeda(proventos.totalBruto)}</strong>
+          <span style={{ fontSize: '11px', color: '#64748b', wordBreak: 'break-word' }}>Base INSS: {formatMoeda(proventos.basePrevidenciaria)}</span>
         </div>
 
-        <div style={{ backgroundColor: '#fff5f5', padding: '18px', borderRadius: '12px', border: '1px solid #fecaca', borderLeft: '4px solid #ef4444' }}>
-          <span style={{ color: '#991b1b', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Total de Descontos</span>
-          <strong style={{ display: 'block', color: '#dc2626', fontSize: '24px', marginTop: '4px' }}>{formatMoeda(descontos.totalDescontos)}</strong>
-          <span style={{ fontSize: '11px', color: '#991b1b' }}>INSS + IRRF + VT + Faltas</span>
+        <div style={{ backgroundColor: '#fff5f5', padding: '16px', borderRadius: '16px', border: '1px solid #fecaca', borderLeft: '4px solid #ef4444', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#991b1b', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Total de Descontos</span>
+          <strong style={{ display: 'block', color: '#dc2626', fontSize: '22px', marginTop: '4px', wordBreak: 'break-word' }}>{formatMoeda(descontos.totalDescontos)}</strong>
+          <span style={{ fontSize: '11px', color: '#991b1b', wordBreak: 'break-word' }}>INSS + IRRF + VT + Faltas</span>
         </div>
 
-        <div style={{ backgroundColor: '#f0fdf4', padding: '18px', borderRadius: '12px', border: '1px solid #86efac', borderLeft: '4px solid #16a34a' }}>
-          <span style={{ color: '#166534', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Salário Líquido (A Pagar)</span>
-          <strong style={{ display: 'block', color: '#15803d', fontSize: '24px', marginTop: '4px' }}>{formatMoeda(descontos.salarioLiquido)}</strong>
-          <span style={{ fontSize: '11px', color: '#166534' }}>Crédito em conta do empregado</span>
+        <div style={{ backgroundColor: '#f0fdf4', padding: '16px', borderRadius: '16px', border: '1px solid #86efac', borderLeft: '4px solid #16a34a', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#166534', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Salário Líquido (A Pagar)</span>
+          <strong style={{ display: 'block', color: '#15803d', fontSize: '22px', marginTop: '4px', wordBreak: 'break-word' }}>{formatMoeda(descontos.salarioLiquido)}</strong>
+          <span style={{ fontSize: '11px', color: '#166534', wordBreak: 'break-word' }}>Crédito em conta</span>
         </div>
 
-        <div style={{ backgroundColor: '#eff6ff', padding: '18px', borderRadius: '12px', border: '1px solid #bfdbfe', borderLeft: '4px solid #2563eb' }}>
-          <span style={{ color: '#1d4ed8', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Custo Total da Empresa</span>
-          <strong style={{ display: 'block', color: '#1e40af', fontSize: '24px', marginTop: '4px' }}>{formatMoeda(encargosEmpresa.custoTotalGeral)}</strong>
-          <span style={{ fontSize: '11px', color: '#2563eb' }}>Inclui {formatMoeda(encargosEmpresa.custoTotalPatronal)} de tributos</span>
+        <div style={{ backgroundColor: '#eff6ff', padding: '16px', borderRadius: '16px', border: '1px solid #bfdbfe', borderLeft: '4px solid #2563eb', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#1d4ed8', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Custo Total da Empresa</span>
+          <strong style={{ display: 'block', color: '#1e40af', fontSize: '22px', marginTop: '4px', wordBreak: 'break-word' }}>{formatMoeda(encargosEmpresa.custoTotalGeral)}</strong>
+          <span style={{ fontSize: '11px', color: '#2563eb', wordBreak: 'break-word' }}>Inclui encargos</span>
         </div>
       </div>
 
       {/* ÁREA DE CONFIGURAÇÃO MODULAR */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginBottom: '25px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px', marginBottom: '20px', boxSizing: 'border-box' }}>
         
         {/* COLUNA 1: DADOS FIXOS, VARIÁVEIS E COMISSÕES */}
-        <div style={{ flex: '1 1 340px', backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px' }}>Salário, Comissões & Prêmios</h3>
+        <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px', boxSizing: 'border-box', minWidth: 0 }}>
+          <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px', wordBreak: 'break-word' }}>Salário, Comissões & Prêmios</h3>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#0f172a' }}>
-              Salário Base Contratual (R$):
-              <input type="text" value={salarioBaseStr} onChange={e => setSalarioBaseStr(e.target.value.replace(/[^0-9.]/g, ''))} style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} />
-            </label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 130px), 1fr))', gap: '10px', boxSizing: 'border-box' }}>
+            <div style={{ minWidth: 0 }}>
+              <label style={labelStyle}>Salário Base (R$):</label>
+              <input type="text" value={salarioBaseStr} onChange={e => setSalarioBaseStr(e.target.value.replace(/[^0-9.]/g, ''))} style={inputStyle} />
+            </div>
 
-            <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-              Dependentes IRRF:
-              <input type="text" value={dependentesStr} onChange={e => setDependentesStr(e.target.value.replace(/[^0-9]/g, ''))} style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} />
-            </label>
+            <div style={{ minWidth: 0 }}>
+              <label style={labelStyle}>Dependentes IRRF:</label>
+              <input type="text" value={dependentesStr} onChange={e => setDependentesStr(e.target.value.replace(/[^0-9]/g, ''))} style={inputStyle} />
+            </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#059669' }}>
-              Comissões de Vendas (R$):
-              <input type="text" value={comissoesStr} onChange={e => setComissoesStr(e.target.value.replace(/[^0-9.]/g, ''))} style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #a7f3d0', backgroundColor: '#ecfdf5', fontSize: '13px' }} />
-              <span style={{ fontSize: '10px', color: '#065f46', marginTop: '2px' }}>Gera DSR reflexo e INSS</span>
-            </label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 130px), 1fr))', gap: '10px', boxSizing: 'border-box' }}>
+            <div style={{ backgroundColor: '#ecfdf5', padding: '12px', borderRadius: '10px', border: '1px solid #a7f3d0', boxSizing: 'border-box', minWidth: 0 }}>
+              <label style={{ ...labelStyle, color: '#059669' }}>Comissões (R$):</label>
+              <input type="text" value={comissoesStr} onChange={e => setComissoesStr(e.target.value.replace(/[^0-9.]/g, ''))} style={{ ...inputStyle, backgroundColor: 'white' }} />
+              <span style={{ fontSize: '10.5px', color: '#065f46', marginTop: '4px', display: 'block', wordBreak: 'break-word' }}>Gera DSR reflexo e INSS</span>
+            </div>
 
-            <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#2563eb' }}>
-              Prêmios / Gratificações (R$):
-              <input type="text" value={premiosStr} onChange={e => setPremiosStr(e.target.value.replace(/[^0-9.]/g, ''))} style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #bfdbfe', backgroundColor: '#eff6ff', fontSize: '13px' }} />
-              <span style={{ fontSize: '10px', color: '#1e40af', marginTop: '2px' }}>Isento de INSS e FGTS (CLT)</span>
-            </label>
+            <div style={{ backgroundColor: '#eff6ff', padding: '12px', borderRadius: '10px', border: '1px solid #bfdbfe', boxSizing: 'border-box', minWidth: 0 }}>
+              <label style={{ ...labelStyle, color: '#2563eb' }}>Prêmios (R$):</label>
+              <input type="text" value={premiosStr} onChange={e => setPremiosStr(e.target.value.replace(/[^0-9.]/g, ''))} style={{ ...inputStyle, backgroundColor: 'white' }} />
+              <span style={{ fontSize: '10.5px', color: '#1e40af', marginTop: '4px', display: 'block', wordBreak: 'break-word' }}>Isento de INSS e FGTS</span>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px', borderTop: '1px solid #e2e8f0', paddingTop: '10px' }}>
-            <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-              Horas Extras 50% (Qtd):
-              <input type="text" value={horasExtras50Str} onChange={e => setHorasExtras50Str(e.target.value.replace(/[^0-9.]/g, ''))} style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} />
-            </label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 130px), 1fr))', gap: '10px', borderTop: '1px solid #e2e8f0', paddingTop: '10px', boxSizing: 'border-box' }}>
+            <div style={{ minWidth: 0 }}>
+              <label style={labelStyle}>Horas Extras 50% (Qtd):</label>
+              <input type="text" value={horasExtras50Str} onChange={e => setHorasExtras50Str(e.target.value.replace(/[^0-9.]/g, ''))} style={inputStyle} />
+            </div>
 
-            <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-              Faltas (Dias):
-              <input type="text" value={diasFaltaStr} onChange={e => setDiasFaltaStr(e.target.value.replace(/[^0-9]/g, ''))} style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #fca5a5', backgroundColor: '#fff5f5', fontSize: '13px' }} />
-            </label>
+            <div style={{ minWidth: 0 }}>
+              <label style={labelStyle}>Faltas (Dias):</label>
+              <input type="text" value={diasFaltaStr} onChange={e => setDiasFaltaStr(e.target.value.replace(/[^0-9]/g, ''))} style={{ ...inputStyle, borderColor: '#fca5a5', backgroundColor: '#fff5f5' }} />
+            </div>
           </div>
         </div>
 
         {/* COLUNA 2: FÉRIAS COM 1/3, ABONO E 13º SALÁRIO */}
-        <div style={{ flex: '1 1 340px', backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '15px', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px' }}>Férias, Abono & 13º</h3>
+        <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px', boxSizing: 'border-box', minWidth: 0 }}>
+          <h3 style={{ margin: '0 0 4px 0', fontSize: '15px', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px', wordBreak: 'break-word' }}>Férias, Abono & 13º</h3>
 
-          <div style={{ backgroundColor: 'white', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 'bold', color: '#0f172a', cursor: 'pointer' }}>
-              <input type="checkbox" checked={incluirFerias} onChange={e => setIncluirFerias(e.target.checked)} />
+          <div style={{ backgroundColor: 'white', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '10px', boxSizing: 'border-box' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12.5px', fontWeight: 'bold', color: '#0f172a', cursor: 'pointer', wordBreak: 'break-word' }}>
+              <input type="checkbox" checked={incluirFerias} onChange={e => setIncluirFerias(e.target.checked)} style={{ flexShrink: 0 }} />
               Gozar Férias no Mês Atual (+ 1/3)
             </label>
             {incluirFerias && (
-              <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
-                <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '11px', fontWeight: 'bold', color: '#475569' }}>Dias Gozados:<input type="text" value={diasFeriasGozadasStr} onChange={e => setDiasFeriasGozadasStr(e.target.value.replace(/[^0-9]/g, ''))} style={{ padding: '6px', marginTop: '2px', borderRadius: '4px', border: '1px solid #cbd5e1' }} /></label>
-                <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#0f172a', cursor: 'pointer', marginTop: '16px' }}><input type="checkbox" checked={venderAbono10Dias} onChange={e => setVenderAbono10Dias(e.target.checked)} /> Vender 10 dias (Abono)</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 120px), 1fr))', gap: '10px', marginTop: '4px', boxSizing: 'border-box' }}>
+                <div style={{ minWidth: 0 }}>
+                  <label style={{ ...labelStyle, fontSize: '11px' }}>Dias Gozados:</label>
+                  <input type="text" value={diasFeriasGozadasStr} onChange={e => setDiasFeriasGozadasStr(e.target.value.replace(/[^0-9]/g, ''))} style={inputStyle} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+                  <label style={{ fontSize: '11.5px', color: '#0f172a', cursor: 'pointer', wordBreak: 'break-word' }}>
+                    <input type="checkbox" checked={venderAbono10Dias} onChange={e => setVenderAbono10Dias(e.target.checked)} style={{ marginRight: '6px' }} />
+                    Vender 10 dias (Abono)
+                  </label>
+                </div>
               </div>
             )}
           </div>
 
-          <div style={{ backgroundColor: 'white', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#0f172a' }}>Modalidade do 13º Salário:</label>
-            <select value={modalidade13} onChange={e => setModalidade13(e.target.value)} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '12px', backgroundColor: '#f8fafc' }}>
+          <div style={{ backgroundColor: 'white', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px', boxSizing: 'border-box', minWidth: 0 }}>
+            <label style={{ fontSize: '12.5px', fontWeight: 'bold', color: '#0f172a' }}>Modalidade do 13º Salário:</label>
+            <select value={modalidade13} onChange={e => setModalidade13(e.target.value)} style={{ ...inputStyle, backgroundColor: '#f8fafc' }}>
               <option value="nenhum">Nenhum pagamento no mês</option>
-              <option value="primeira_parcela">1ª Parcela (50% Adiantamento - sem descontos)</option>
-              <option value="segunda_parcela">2ª Parcela (Quitação com dedução da 1ª e encargos)</option>
-              <option value="provisao_mensal">Apenas Provisão Contábil Mensal (1/12)</option>
+              <option value="primeira_parcela">1ª Parcela (50% Adiantamento)</option>
+              <option value="segunda_parcela">2ª Parcela (Quitação c/ dedução)</option>
+              <option value="provisao_mensal">Provisão Contábil Mensal (1/12)</option>
             </select>
           </div>
         </div>
 
         {/* COLUNA 3: HOLERITE COMPLETO */}
-        <div style={{ flex: '1 1 420px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          
-          <div style={{ backgroundColor: 'white', border: '1px solid #0f172a', borderRadius: '12px', padding: '18px', boxShadow: '0 4px 10px rgba(0,0,0,0.03)' }}>
-            <div style={{ borderBottom: '1px solid #0f172a', paddingBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <strong style={{ fontSize: '14px', color: '#0f172a', display: 'block' }}>DEMONSTRATIVO DE PAGAMENTO</strong>
-                <span style={{ fontSize: '11px', color: '#64748b' }}>{nomeEmpregado}</span>
-              </div>
-              <span style={{ backgroundColor: '#0f172a', color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '3px 8px', borderRadius: '4px' }}>FOLHA</span>
+        <div style={{ backgroundColor: 'white', border: '1px solid #0f172a', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', boxSizing: 'border-box', minWidth: 0 }}>
+          <div style={{ borderBottom: '1px solid #0f172a', paddingBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+            <div style={{ minWidth: 0 }}>
+              <strong style={{ fontSize: '13.5px', color: '#0f172a', display: 'block', wordBreak: 'break-word' }}>DEMONSTRATIVO DE PAGAMENTO</strong>
+              <span style={{ fontSize: '11px', color: '#64748b', wordBreak: 'break-word' }}>{nomeEmpregado}</span>
             </div>
+            <span style={{ backgroundColor: '#0f172a', color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '3px 8px', borderRadius: '4px' }}>FOLHA</span>
+          </div>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', marginTop: '8px' }}>
+          <div style={{ overflowX: 'auto', boxSizing: 'border-box', marginTop: '10px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left', minWidth: '320px' }}>
               <thead>
                 <tr style={{ backgroundColor: '#f1f5f9', color: '#475569' }}>
-                  <th style={{ padding: '6px', textAlign: 'left' }}>Evento</th>
-                  <th style={{ padding: '6px', textAlign: 'right', color: '#16a34a' }}>Proventos</th>
-                  <th style={{ padding: '6px', textAlign: 'right', color: '#dc2626' }}>Descontos</th>
+                  <th style={{ padding: '8px' }}>Evento</th>
+                  <th style={{ padding: '8px', textAlign: 'right', color: '#16a34a' }}>Proventos</th>
+                  <th style={{ padding: '8px', textAlign: 'right', color: '#dc2626' }}>Descontos</th>
                 </tr>
               </thead>
               <tbody>
-                <tr style={{ borderBottom: '1px solid #f1f5f9' }}><td style={{ padding: '5px 6px' }}>001 - Dias Trabalhados</td><td style={{ padding: '5px 6px', textAlign: 'right', color: '#16a34a' }}>{formatMoeda(proventos.salarioEfetivo)}</td><td style={{ padding: '5px 6px', textAlign: 'right' }}>-</td></tr>
-                {proventos.valorComissao > 0 && <tr style={{ borderBottom: '1px solid #f1f5f9' }}><td style={{ padding: '5px 6px' }}>005 - Comissões de Vendas</td><td style={{ padding: '5px 6px', textAlign: 'right', color: '#16a34a' }}>{formatMoeda(proventos.valorComissao)}</td><td style={{ padding: '5px 6px', textAlign: 'right' }}>-</td></tr>}
+                <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '6px 8px', wordBreak: 'break-word' }}>001 - Dias Trabalhados</td>
+                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#16a34a', whiteSpace: 'nowrap' }}>{formatMoeda(proventos.salarioEfetivo)}</td>
+                  <td style={{ padding: '6px 8px', textAlign: 'right', whiteSpace: 'nowrap' }}>—</td>
+                </tr>
+                {proventos.valorComissao > 0 && (
+                  <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '6px 8px', wordBreak: 'break-word' }}>005 - Comissões de Vendas</td>
+                    <td style={{ padding: '6px 8px', textAlign: 'right', color: '#16a34a', whiteSpace: 'nowrap' }}>{formatMoeda(proventos.valorComissao)}</td>
+                    <td style={{ padding: '6px 8px', textAlign: 'right', whiteSpace: 'nowrap' }}>—</td>
+                  </tr>
+                )}
                 {incluirFerias && proventos.valorFeriasGozadas > 0 && (
                   <>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}><td style={{ padding: '5px 6px' }}>010 - Férias Gozadas</td><td style={{ padding: '5px 6px', textAlign: 'right', color: '#16a34a' }}>{formatMoeda(proventos.valorFeriasGozadas)}</td><td style={{ padding: '5px 6px', textAlign: 'right' }}>-</td></tr>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}><td style={{ padding: '5px 6px' }}>011 - 1/3 de Férias</td><td style={{ padding: '5px 6px', textAlign: 'right', color: '#16a34a' }}>{formatMoeda(proventos.tercoConstitucional)}</td><td style={{ padding: '5px 6px', textAlign: 'right' }}>-</td></tr>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '6px 8px', wordBreak: 'break-word' }}>010 - Férias Gozadas</td>
+                      <td style={{ padding: '6px 8px', textAlign: 'right', color: '#16a34a', whiteSpace: 'nowrap' }}>{formatMoeda(proventos.valorFeriasGozadas)}</td>
+                      <td style={{ padding: '6px 8px', textAlign: 'right', whiteSpace: 'nowrap' }}>—</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '6px 8px', wordBreak: 'break-word' }}>011 - 1/3 de Férias</td>
+                      <td style={{ padding: '6px 8px', textAlign: 'right', color: '#16a34a', whiteSpace: 'nowrap' }}>{formatMoeda(proventos.tercoConstitucional)}</td>
+                      <td style={{ padding: '6px 8px', textAlign: 'right', whiteSpace: 'nowrap' }}>—</td>
+                    </tr>
                   </>
                 )}
-                <tr style={{ borderBottom: '1px solid #f1f5f9' }}><td style={{ padding: '5px 6px' }}>501 - INSS Empregado</td><td style={{ padding: '5px 6px', textAlign: 'right' }}>-</td><td style={{ padding: '5px 6px', textAlign: 'right', color: '#dc2626' }}>{formatMoeda(descontos.inssEmpregado)}</td></tr>
-                {descontos.irrfEmpregado > 0 && <tr style={{ borderBottom: '1px solid #f1f5f9' }}><td style={{ padding: '5px 6px' }}>505 - IRRF s/ Salário</td><td style={{ padding: '5px 6px', textAlign: 'right' }}>-</td><td style={{ padding: '5px 6px', textAlign: 'right', color: '#dc2626' }}>{formatMoeda(descontos.irrfEmpregado)}</td></tr>}
+                <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '6px 8px', wordBreak: 'break-word' }}>501 - INSS Empregado</td>
+                  <td style={{ padding: '6px 8px', textAlign: 'right', whiteSpace: 'nowrap' }}>—</td>
+                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#dc2626', whiteSpace: 'nowrap' }}>{formatMoeda(descontos.inssEmpregado)}</td>
+                </tr>
+                {descontos.irrfEmpregado > 0 && (
+                  <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '6px 8px', wordBreak: 'break-word' }}>505 - IRRF s/ Salário</td>
+                    <td style={{ padding: '6px 8px', textAlign: 'right', whiteSpace: 'nowrap' }}>—</td>
+                    <td style={{ padding: '6px 8px', textAlign: 'right', color: '#dc2626', whiteSpace: 'nowrap' }}>{formatMoeda(descontos.irrfEmpregado)}</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </div>
+
       </div>
 
-      {/* BOTÃO DE INTEGRAÇÃO CONTÁBIL (O SISTEMA NERVOSO) */}
-      <div style={{ backgroundColor: '#eff6ff', borderRadius: '12px', border: '1px solid #2563eb', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
-        <div>
-          <h3 style={{ margin: '0 0 6px 0', fontSize: '18px', color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+      {/* BOTÃO DE INTEGRAÇÃO CONTÁBIL */}
+      <div style={{ backgroundColor: '#eff6ff', borderRadius: '16px', border: '1px solid #2563eb', padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', boxSizing: 'border-box' }}>
+        <div style={{ minWidth: 0, flex: '1 1 280px' }}>
+          <h3 style={{ margin: '0 0 6px 0', fontSize: '16px', color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '8px', wordBreak: 'break-word' }}>
             <span>🚀</span> Integração Contábil (Fim do Mês)
           </h3>
-          <p style={{ margin: 0, fontSize: '13px', color: '#3b82f6', maxWidth: '600px' }}>
-            Ao fechar a folha, o sistema envia os Fatos Geradores para o Livro Diário. Se estiver em Modo Manual, eles irão para a fila de pendências do Tutor Analítico.
+          <p style={{ margin: 0, fontSize: '13px', color: '#3b82f6', maxWidth: '600px', wordBreak: 'break-word' }}>
+            Ao fechar a folha, o sistema envia os Fatos Geradores para o Livro Diário. Se estiver em Modo Manual, eles irão para a fila de pendências.
           </p>
         </div>
         <button 
           onClick={fecharFolha}
-          style={{ backgroundColor: '#2563eb', color: 'white', border: 'none', padding: '14px 24px', borderRadius: '8px', fontSize: '14px', fontWeight: '900', cursor: 'pointer', boxShadow: '0 4px 15px rgba(37,99,235,0.3)', transition: 'transform 0.1s' }}
+          style={{ backgroundColor: '#2563eb', color: 'white', border: 'none', padding: '14px 22px', borderRadius: '10px', fontSize: '13.5px', fontWeight: '900', cursor: 'pointer', boxShadow: '0 4px 15px rgba(37,99,235,0.3)', transition: 'transform 0.1s', width: '100%', maxWidth: '340px', boxSizing: 'border-box' }}
           onMouseDown={e => e.currentTarget.style.transform = 'scale(0.96)'}
           onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
         >
@@ -399,6 +429,9 @@ export default function SimuladorFolhaPagamento({ mostrarToast, registrarFatoGer
         </button>
       </div>
 
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
     </div>
   );
 }

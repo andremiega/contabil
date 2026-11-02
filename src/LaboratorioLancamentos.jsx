@@ -72,17 +72,18 @@ export default function LaboratorioLancamentos() {
   };
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', padding: '24px', borderRadius: '24px', animation: 'fadeIn 0.5s ease-out', minHeight: '85vh', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '24px', animation: 'fadeIn 0.5s ease-out', minHeight: '85vh', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
-      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #3b82f6 100%)', color: 'white', padding: '24px 32px', borderRadius: '20px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
+      {/* HEADER */}
+      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #3b82f6 100%)', color: 'white', padding: '24px', borderRadius: '20px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ flex: '1 1 280px' }}>
           <span style={{ backgroundColor: '#1e3a8a', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '900', letterSpacing: '1px' }}>MÓDULO DE ESCRITURAÇÃO</span>
-          <h2 style={{ margin: '8px 0', fontSize: '28px', fontWeight: '900' }}>Partidas Dobradas (Débito & Crédito) ⚖️</h2>
+          <h2 style={{ margin: '8px 0', fontSize: '24px', fontWeight: '900' }}>Partidas Dobradas (Débito & Crédito) ⚖️</h2>
           <p style={{ margin: 0, color: '#bfdbfe', fontSize: '14px', maxWidth: '650px' }}>Para todo recurso aplicado (Débito), existe uma origem correspondente (Crédito). Faça os lançamentos no Livro Diário.</p>
         </div>
-        <div style={{ textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.1)', padding: '16px', borderRadius: '16px', backdropFilter: 'blur(4px)' }}>
+        <div style={{ flex: '1 1 auto', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.1)', padding: '16px', borderRadius: '16px', backdropFilter: 'blur(4px)' }}>
           <div style={{ fontSize: '11px', color: '#93c5fd', fontWeight: 'bold' }}>Fatos Lançados</div>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#ffffff' }}>{historico.length} / 16</div>
+          <div style={{ fontSize: '28px', fontWeight: '900', color: '#ffffff' }}>{historico.length} / 16</div>
         </div>
       </div>
 
@@ -91,29 +92,32 @@ export default function LaboratorioLancamentos() {
       </div>
 
       {!concluido ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(400px, 1fr) 1fr', gap: '24px', flex: 1 }}>
-          <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', padding: '24px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '20px' }}>
+        /* GRELHA INTELIGENTE: Adapta-se perfeitamente a telemóveis e tablets */
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '24px', flex: 1 }}>
+          
+          {/* COLUNA ESQUERDA: PERGUNTA E BOTÕES */}
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', padding: '20px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
               <span style={{ fontSize: '24px', padding: '10px', backgroundColor: '#eff6ff', borderRadius: '12px' }}>📝</span>
               <div>
                 <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}>Fato Contábil {indiceDesafio + 1}:</div>
-                <h3 style={{ margin: 0, color: '#0f172a', fontSize: '18px' }}>{desafioAtual.fato}</h3>
+                <h3 style={{ margin: 0, color: '#0f172a', fontSize: '16px' }}>{desafioAtual.fato}</h3>
               </div>
             </div>
 
-            <div style={{ backgroundColor: '#fffbeb', padding: '16px', borderRadius: '12px', color: '#92400e', fontSize: '13.5px', marginBottom: '20px', borderLeft: '4px solid #f59e0b' }}>
+            <div style={{ backgroundColor: '#fffbeb', padding: '14px', borderRadius: '12px', color: '#92400e', fontSize: '13px', marginBottom: '16px', borderLeft: '4px solid #f59e0b' }}>
               <strong style={{ display: 'block' }}>🦉 Dica de Ouro:</strong> {desafioAtual.dica}
             </div>
 
-            <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 'bold', color: '#0f172a', textAlign: 'center' }}>
+            <div style={{ marginBottom: '14px', fontSize: '14px', fontWeight: 'bold', color: '#0f172a', textAlign: 'center' }}>
               {etapaAtual === 0 ? 'Passo 1: Qual conta recebe o DÉBITO (Aplicação)?' : 'Passo 2: Qual conta recebe o CRÉDITO (Origem)?'}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
               {contasDisponiveis.map(conta => (
                 <button 
                   key={conta.id} onClick={() => handleSelecao(conta.id)}
-                  style={{ padding: '12px', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '10px', fontSize: '13px', fontWeight: 'bold', color: '#334155', cursor: 'pointer', textAlign: 'left' }}
+                  style={{ padding: '10px', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold', color: '#334155', cursor: 'pointer', textAlign: 'left' }}
                   onMouseOver={e => e.currentTarget.style.borderColor = etapaAtual === 0 ? '#3b82f6' : '#f59e0b'}
                   onMouseOut={e => e.currentTarget.style.borderColor = '#cbd5e1'}
                 >
@@ -124,37 +128,42 @@ export default function LaboratorioLancamentos() {
             </div>
 
             {feedback && (
-              <div style={{ marginTop: '20px', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: feedback.tipo === 'sucesso' ? '#dcfce7' : '#fee2e2', border: `1px solid ${feedback.tipo === 'sucesso' ? '#86efac' : '#fca5a5'}`, color: feedback.tipo === 'sucesso' ? '#166534' : '#991b1b', animation: 'fadeIn 0.3s' }}>
+              <div style={{ marginTop: '16px', padding: '14px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: feedback.tipo === 'sucesso' ? '#dcfce7' : '#fee2e2', border: `1px solid ${feedback.tipo === 'sucesso' ? '#86efac' : '#fca5a5'}`, color: feedback.tipo === 'sucesso' ? '#166534' : '#991b1b', animation: 'fadeIn 0.3s' }}>
                 <span style={{ fontSize: '20px' }}>{feedback.tipo === 'sucesso' ? '✅' : '🚨'}</span>
-                <span style={{ fontWeight: '600', fontSize: '14px' }}>{feedback.msg}</span>
+                <span style={{ fontWeight: '600', fontSize: '13px' }}>{feedback.msg}</span>
               </div>
             )}
           </div>
 
-          <div style={{ backgroundColor: '#0f172a', borderRadius: '20px', padding: '24px', border: '1px solid #1e293b', display: 'flex', flexDirection: 'column', maxHeight: '700px', overflowY: 'auto' }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '8px' }}>📖 Livro Diário Oficial</h3>
+          {/* COLUNA DIREITA: LIVRO DIÁRIO */}
+          <div style={{ backgroundColor: '#0f172a', borderRadius: '20px', padding: '20px', border: '1px solid #1e293b', display: 'flex', flexDirection: 'column', maxHeight: '600px', overflowY: 'auto' }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '15px', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '8px' }}>📖 Livro Diário Oficial</h3>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {historico.map((h, i) => (
-                <div key={i} style={{ backgroundColor: '#1e293b', padding: '16px', borderRadius: '10px', borderLeft: '3px solid #38bdf8' }}>
-                  <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '8px' }}>Fato {h.id}: {h.fato}</div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#4ade80', fontFamily: 'monospace', fontSize: '14px' }}>
-                    <span>D - {h.debitoNome}</span> <span>R$ {h.valor}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {historico.length === 0 ? (
+                <div style={{ color: '#64748b', fontSize: '13px', textAlign: 'center', padding: '30px' }}>Nenhum lançamento efetuado ainda.</div>
+              ) : (
+                historico.map((h, i) => (
+                  <div key={i} style={{ backgroundColor: '#1e293b', padding: '14px', borderRadius: '10px', borderLeft: '3px solid #38bdf8' }}>
+                    <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '6px' }}>Fato {h.id}: {h.fato}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#4ade80', fontFamily: 'monospace', fontSize: '13px', flexWrap: 'wrap' }}>
+                      <span>D - {h.debitoNome}</span> <span>R$ {h.valor}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#f87171', fontFamily: 'monospace', fontSize: '13px', marginLeft: '12px', flexWrap: 'wrap' }}>
+                      <span>C - {h.creditoNome}</span> <span>R$ {h.valor}</span>
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#f87171', fontFamily: 'monospace', fontSize: '14px', marginLeft: '20px' }}>
-                    <span>C - {h.creditoNome}</span> <span>R$ {h.valor}</span>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
       ) : (
-        <div style={{ textAlign: 'center', padding: '60px', backgroundColor: '#ffffff', borderRadius: '20px', border: '2px dashed #3b82f6', flex: 1 }}>
-          <span style={{ fontSize: '72px', marginBottom: '20px' }}>🎓</span>
-          <h2 style={{ color: '#1e3a8a', fontSize: '36px', fontWeight: '900' }}>Mestre das Partidas Dobradas!</h2>
-          <p style={{ color: '#475569', fontSize: '16px', maxWidth: '600px', margin: '0 auto' }}>Você provou que entende o coração da contabilidade. Sabe perfeitamente que o Ativo aumenta a Débito e o Passivo aumenta a Crédito!</p>
-          <button onClick={() => { setIndiceDesafio(0); setEtapaAtual(0); setSelecao({debito:null,credito:null}); setHistorico([]); }} style={{ marginTop: '30px', padding: '16px 36px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '12px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>Refazer Exercícios</button>
+        <div style={{ textAlign: 'center', padding: '40px 20px', backgroundColor: '#ffffff', borderRadius: '20px', border: '2px dashed #3b82f6', flex: 1 }}>
+          <span style={{ fontSize: '60px', marginBottom: '16px', display: 'block' }}>🎓</span>
+          <h2 style={{ color: '#1e3a8a', fontSize: '28px', fontWeight: '900' }}>Mestre das Partidas Dobradas!</h2>
+          <p style={{ color: '#475569', fontSize: '15px', maxWidth: '600px', margin: '0 auto 20px auto' }}>Você provou que entende o coração da contabilidade. Sabe perfeitamente que o Ativo aumenta a Débito e o Passivo aumenta a Crédito!</p>
+          <button onClick={() => { setIndiceDesafio(0); setEtapaAtual(0); setSelecao({debito:null,credito:null}); setHistorico([]); }} style={{ padding: '14px 28px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '12px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>Refazer Exercícios</button>
         </div>
       )}
     </div>

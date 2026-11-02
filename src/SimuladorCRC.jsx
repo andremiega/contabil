@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 export default function SimuladorCRC() {
   const formatMoeda = (valor) => Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-  // Navegação: 'fichas', 'exercicios', 'decore', 'pepc', 'contratos', 'anuidade'
+  // Navegação: 'exercicios', 'fichas', 'decore', 'pepc', 'contratos', 'anuidade'
   const [secaoAtiva, setSecaoAtiva] = useState('exercicios');
 
   // ==========================================
@@ -11,7 +11,6 @@ export default function SimuladorCRC() {
   // ==========================================
   const [contadorNome] = useState('Andre Lopes da Silva');
   const [registroCrc] = useState('CRC-SP 1SP345890/O-2');
-  const [categoriaProfissional] = useState('Contador Pleno & Responsável Técnico');
 
   // ==========================================
   // 2. BANCO DE 30 QUESTÕES DO EXAME CFC
@@ -557,143 +556,82 @@ export default function SimuladorCRC() {
   const aproveitamentoPerc = questoesExame.length > 0 ? (totalAcertos / questoesExame.length) * 100 : 0;
 
   return (
-    <div style={{ backgroundColor: '#ffffff', padding: '25px', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animation: 'fadeIn 0.5s' }}>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '24px', animation: 'fadeIn 0.5s ease-out', minHeight: '85vh', display: 'flex', flexDirection: 'column', gap: '20px', boxSizing: 'border-box', width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
       
-      {/* CABEÇALHO */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', gap: '15px' }}>
-        <div>
-          <h2 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '28px' }}>📜</span> Módulo CFC / CRC & Exame de Suficiência (30 Questões)
-          </h2>
-          <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '13px' }}>
-            Fichas Normativas, Simulado Completo de 30 Questões, DECORE Eletrônica, PEPC (NBC PG 12) e Contratos.
+      {/* HEADER EXPLICATIVO */}
+      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: 'white', padding: '24px', borderRadius: '20px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px', boxSizing: 'border-box' }}>
+        <div style={{ flex: '1 1 280px', minWidth: 0 }}>
+          <span style={{ backgroundColor: '#3b82f6', color: '#ffffff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '900', letterSpacing: '1px' }}>EXAME DE SUFICIÊNCIA & CRC</span>
+          <h2 style={{ margin: '8px 0', fontSize: '24px', fontWeight: '900', wordBreak: 'break-word' }}>Módulo CFC / CRC & Gabarito 📜</h2>
+          <p style={{ margin: 0, color: '#94a3b8', fontSize: '14px', maxWidth: '650px' }}>
+            Simulador completo de 30 questões comentadas, emissão de DECORE eletrônica homologada, controle de PEPC e contratos profissionais.
           </p>
         </div>
-
-        {/* NAVEGAÇÃO ENTRE ABAS */}
-        <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '10px', border: '1px solid #e2e8f0', flexWrap: 'wrap', gap: '4px' }}>
-          <button 
-            onClick={() => setSecaoAtiva('exercicios')}
-            style={{ 
-              padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11px', cursor: 'pointer', transition: 'all 0.2s',
-              backgroundColor: secaoAtiva === 'exercicios' ? '#2563eb' : 'transparent', 
-              color: secaoAtiva === 'exercicios' ? 'white' : '#64748b'
-            }}
-          >
-            📝 Simulado CFC (30 Questões)
-          </button>
-          <button 
-            onClick={() => setSecaoAtiva('fichas')}
-            style={{ 
-              padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11px', cursor: 'pointer', transition: 'all 0.2s',
-              backgroundColor: secaoAtiva === 'fichas' ? '#0f172a' : 'transparent', 
-              color: secaoAtiva === 'fichas' ? 'white' : '#64748b'
-            }}
-          >
-            📚 Fichas Técnicas
-          </button>
-          <button 
-            onClick={() => setSecaoAtiva('decore')}
-            style={{ 
-              padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11px', cursor: 'pointer', transition: 'all 0.2s',
-              backgroundColor: secaoAtiva === 'decore' ? '#0f172a' : 'transparent', 
-              color: secaoAtiva === 'decore' ? 'white' : '#64748b'
-            }}
-          >
-            📋 DECORE Eletrônica
-          </button>
-          <button 
-            onClick={() => setSecaoAtiva('pepc')}
-            style={{ 
-              padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11px', cursor: 'pointer', transition: 'all 0.2s',
-              backgroundColor: secaoAtiva === 'pepc' ? '#0f172a' : 'transparent', 
-              color: secaoAtiva === 'pepc' ? 'white' : '#64748b'
-            }}
-          >
-            🎓 PEPC (NBC PG 12)
-          </button>
-          <button 
-            onClick={() => setSecaoAtiva('contratos')}
-            style={{ 
-              padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11px', cursor: 'pointer', transition: 'all 0.2s',
-              backgroundColor: secaoAtiva === 'contratos' ? '#0f172a' : 'transparent', 
-              color: secaoAtiva === 'contratos' ? 'white' : '#64748b'
-            }}
-          >
-            ✍️ Contratos CFC 1.590
-          </button>
-          <button 
-            onClick={() => setSecaoAtiva('anuidade')}
-            style={{ 
-              padding: '8px 12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '11px', cursor: 'pointer', transition: 'all 0.2s',
-              backgroundColor: secaoAtiva === 'anuidade' ? '#16a34a' : 'transparent', 
-              color: secaoAtiva === 'anuidade' ? 'white' : '#64748b'
-            }}
-          >
-            💳 CRP & Anuidade
-          </button>
+        <div style={{ flex: '1 1 auto', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.05)', padding: '16px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', boxSizing: 'border-box' }}>
+          <div style={{ fontSize: '11px', color: '#cbd5e1', fontWeight: 'bold', textTransform: 'uppercase' }}>Simulado CFC</div>
+          <div style={{ fontSize: '28px', fontWeight: '900', color: '#4ade80' }}>{Object.keys(respostasUsuario).length} <span style={{fontSize:'14px', color:'#64748b'}}>/ 30</span></div>
         </div>
       </div>
 
-      {/* PAINEL COM 6 CARDS ANALÍTICOS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '25px' }}>
+      {/* NAVEGAÇÃO ENTRE ABAS */}
+      <div style={{ display: 'flex', backgroundColor: '#e2e8f0', padding: '6px', borderRadius: '14px', flexWrap: 'wrap', gap: '6px', boxSizing: 'border-box' }}>
+        <button onClick={() => setSecaoAtiva('exercicios')} style={{ flex: '1 1 130px', padding: '10px 14px', borderRadius: '10px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', backgroundColor: secaoAtiva === 'exercicios' ? '#2563eb' : 'transparent', color: secaoAtiva === 'exercicios' ? 'white' : '#475569', transition: 'all 0.2s' }}>
+          📝 Simulado (30Q)
+        </button>
+        <button onClick={() => setSecaoAtiva('fichas')} style={{ flex: '1 1 110px', padding: '10px 14px', borderRadius: '10px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', backgroundColor: secaoAtiva === 'fichas' ? '#0f172a' : 'transparent', color: secaoAtiva === 'fichas' ? 'white' : '#475569', transition: 'all 0.2s' }}>
+          📚 Fichas
+        </button>
+        <button onClick={() => setSecaoAtiva('decore')} style={{ flex: '1 1 110px', padding: '10px 14px', borderRadius: '10px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', backgroundColor: secaoAtiva === 'decore' ? '#0f172a' : 'transparent', color: secaoAtiva === 'decore' ? 'white' : '#475569', transition: 'all 0.2s' }}>
+          📋 DECORE
+        </button>
+        <button onClick={() => setSecaoAtiva('pepc')} style={{ flex: '1 1 100px', padding: '10px 14px', borderRadius: '10px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', backgroundColor: secaoAtiva === 'pepc' ? '#0f172a' : 'transparent', color: secaoAtiva === 'pepc' ? 'white' : '#475569', transition: 'all 0.2s' }}>
+          🎓 PEPC
+        </button>
+        <button onClick={() => setSecaoAtiva('contratos')} style={{ flex: '1 1 110px', padding: '10px 14px', borderRadius: '10px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', backgroundColor: secaoAtiva === 'contratos' ? '#0f172a' : 'transparent', color: secaoAtiva === 'contratos' ? 'white' : '#475569', transition: 'all 0.2s' }}>
+          ✍️ Contratos
+        </button>
+        <button onClick={() => setSecaoAtiva('anuidade')} style={{ flex: '1 1 110px', padding: '10px 14px', borderRadius: '10px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', backgroundColor: secaoAtiva === 'anuidade' ? '#16a34a' : 'transparent', color: secaoAtiva === 'anuidade' ? 'white' : '#475569', transition: 'all 0.2s' }}>
+          💳 Anuidade
+        </button>
+      </div>
+
+      {/* PAINEL COM 6 CARDS ANALÍTICOS (Grelha Flexível Inteligente) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))', gap: '14px' }}>
         
-        {/* Card 1: Responsável */}
-        <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: '4px solid #0f172a' }}>
-          <span style={{ color: '#64748b', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Responsável Técnico</span>
-          <strong style={{ display: 'block', color: '#0f172a', fontSize: '15px', marginTop: '4px' }}>
-            {contadorNome}
-          </strong>
+        <div style={{ backgroundColor: '#ffffff', padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', borderLeft: '4px solid #0f172a', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#64748b', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Responsável Técnico</span>
+          <strong style={{ display: 'block', color: '#0f172a', fontSize: '13px', marginTop: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{contadorNome}</strong>
           <span style={{ fontSize: '11px', color: '#64748b' }}>{registroCrc}</span>
         </div>
 
-        {/* Card 2: Simulado CFC */}
-        <div style={{ backgroundColor: '#eff6ff', padding: '16px', borderRadius: '12px', border: '1px solid #bfdbfe', borderLeft: '4px solid #2563eb' }}>
-          <span style={{ color: '#1d4ed8', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Simulado CFC (30Q)</span>
-          <strong style={{ display: 'block', color: '#1e40af', fontSize: '18px', marginTop: '4px' }}>
-            {Object.keys(respostasUsuario).length} / {questoesExame.length} Respondidas
-          </strong>
-          <span style={{ fontSize: '11px', color: '#2563eb' }}>
-            {gabaritoRevelado ? `Aproveitamento: ${aproveitamentoPerc.toFixed(1)}%` : 'Gabarito não revelado'}
-          </span>
+        <div style={{ backgroundColor: '#eff6ff', padding: '16px', borderRadius: '16px', border: '1px solid #bfdbfe', borderLeft: '4px solid #2563eb', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#1d4ed8', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Simulado CFC (30Q)</span>
+          <strong style={{ display: 'block', color: '#1e40af', fontSize: '15px', marginTop: '4px' }}>{Object.keys(respostasUsuario).length} / 30</strong>
+          <span style={{ fontSize: '11px', color: '#2563eb' }}>{gabaritoRevelado ? `Aprov: ${aproveitamentoPerc.toFixed(0)}%` : 'Em aberto'}</span>
         </div>
 
-        {/* Card 3: Status de Aprovação */}
-        <div style={{ backgroundColor: gabaritoRevelado ? (totalAcertos >= 15 ? '#f0fdf4' : '#fff5f5') : '#f8fafc', padding: '16px', borderRadius: '12px', border: `1px solid ${gabaritoRevelado ? (totalAcertos >= 15 ? '#86efac' : '#fecaca') : '#e2e8f0'}`, borderLeft: `4px solid ${gabaritoRevelado ? (totalAcertos >= 15 ? '#16a34a' : '#ef4444') : '#64748b'}` }}>
-          <span style={{ color: gabaritoRevelado ? (totalAcertos >= 15 ? '#166534' : '#991b1b') : '#64748b', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Resultado CFC</span>
-          <strong style={{ display: 'block', color: gabaritoRevelado ? (totalAcertos >= 15 ? '#15803d' : '#dc2626') : '#0f172a', fontSize: '18px', marginTop: '4px' }}>
-            {gabaritoRevelado ? (totalAcertos >= 15 ? '🎉 APROVADO' : '🚨 REPROVADO') : 'Em Andamento'}
-          </strong>
-          <span style={{ fontSize: '11px', color: '#64748b' }}>
-            {gabaritoRevelado ? `${totalAcertos} acertos (mínimo 15)` : 'Nota de corte: 50%'}
-          </span>
+        <div style={{ backgroundColor: gabaritoRevelado ? (totalAcertos >= 15 ? '#f0fdf4' : '#fff5f5') : '#ffffff', padding: '16px', borderRadius: '16px', border: `1px solid ${gabaritoRevelado ? (totalAcertos >= 15 ? '#86efac' : '#fecaca') : '#e2e8f0'}`, borderLeft: `4px solid ${gabaritoRevelado ? (totalAcertos >= 15 ? '#16a34a' : '#ef4444') : '#64748b'}`, boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: gabaritoRevelado ? (totalAcertos >= 15 ? '#166534' : '#991b1b') : '#64748b', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Resultado CFC</span>
+          <strong style={{ display: 'block', color: gabaritoRevelado ? (totalAcertos >= 15 ? '#15803d' : '#dc2626') : '#0f172a', fontSize: '15px', marginTop: '4px' }}>{gabaritoRevelado ? (totalAcertos >= 15 ? '🎉 APROVADO' : '🚨 REPROVADO') : 'Em Andamento'}</strong>
+          <span style={{ fontSize: '11px', color: '#64748b' }}>{gabaritoRevelado ? `${totalAcertos} acertos` : 'Corte: 50%'}</span>
         </div>
 
-        {/* Card 4: PEPC */}
-        <div style={{ backgroundColor: '#f0fdf4', padding: '16px', borderRadius: '12px', border: '1px solid #86efac', borderLeft: '4px solid #16a34a' }}>
-          <span style={{ color: '#166534', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>PEPC (NBC PG 12)</span>
-          <strong style={{ display: 'block', color: '#15803d', fontSize: '18px', marginTop: '4px' }}>
-            {totalPontosPepc} / 40 Pontos
-          </strong>
-          <span style={{ fontSize: '11px', color: '#166534' }}>Meta anual cumprida</span>
+        <div style={{ backgroundColor: '#f0fdf4', padding: '16px', borderRadius: '16px', border: '1px solid #86efac', borderLeft: '4px solid #16a34a', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#166534', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>PEPC (NBC PG 12)</span>
+          <strong style={{ display: 'block', color: '#15803d', fontSize: '15px', marginTop: '4px' }}>{totalPontosPepc} / 40 Pts</strong>
+          <span style={{ fontSize: '11px', color: '#166534' }}>Meta cumprida</span>
         </div>
 
-        {/* Card 5: DECOREs Emitidas */}
-        <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: '4px solid #10b981' }}>
-          <span style={{ color: '#047857', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Volume DECORE</span>
-          <strong style={{ display: 'block', color: '#0f172a', fontSize: '18px', marginTop: '4px' }}>
-            {formatMoeda(totalDecoreValor)}
-          </strong>
-          <span style={{ fontSize: '11px', color: '#64748b' }}>{decoreEmitidas.length} certidões ativas</span>
+        <div style={{ backgroundColor: '#ffffff', padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', borderLeft: '4px solid #10b981', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#047857', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Volume DECORE</span>
+          <strong style={{ display: 'block', color: '#0f172a', fontSize: '14px', marginTop: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatMoeda(totalDecoreValor)}</strong>
+          <span style={{ fontSize: '11px', color: '#64748b' }}>{decoreEmitidas.length} certidões</span>
         </div>
 
-        {/* Card 6: Carteira de Honorários */}
-        <div style={{ backgroundColor: '#eff6ff', padding: '16px', borderRadius: '12px', border: '1px solid #bfdbfe', borderLeft: '4px solid #3b82f6' }}>
-          <span style={{ color: '#1d4ed8', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Honorários Contratados</span>
-          <strong style={{ display: 'block', color: '#1e40af', fontSize: '18px', marginTop: '4px' }}>
-            {formatMoeda(totalHonorariosAtivos)}
-          </strong>
-          <span style={{ fontSize: '11px', color: '#2563eb' }}>{contratos.length} contratos vigentes</span>
+        <div style={{ backgroundColor: '#eff6ff', padding: '16px', borderRadius: '16px', border: '1px solid #bfdbfe', borderLeft: '4px solid #3b82f6', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#1d4ed8', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Honorários Mensais</span>
+          <strong style={{ display: 'block', color: '#1e40af', fontSize: '14px', marginTop: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatMoeda(totalHonorariosAtivos)}</strong>
+          <span style={{ fontSize: '11px', color: '#2563eb' }}>{contratos.length} contratos</span>
         </div>
 
       </div>
@@ -702,16 +640,15 @@ export default function SimuladorCRC() {
       {/* 1. ABA: SIMULADO DE 30 QUESTÕES DO EXAME DE SUFICIÊNCIA   */}
       {/* ========================================================= */}
       {secaoAtiva === 'exercicios' && (
-        <div style={{ animation: 'fadeIn 0.3s' }}>
+        <div style={{ animation: 'fadeIn 0.3s', boxSizing: 'border-box' }}>
           
-          {/* Barra de Ferramentas do Simulado */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px', backgroundColor: '#f8fafc', padding: '14px 18px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#0f172a' }}>Filtrar por Disciplina:</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px', backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0', boxSizing: 'border-box' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 240px', minWidth: 0 }}>
+              <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#0f172a', flexShrink: 0 }}>Disciplina:</span>
               <select 
                 value={filtroMateria} 
                 onChange={e => setFiltroMateria(e.target.value)} 
-                style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '12px', backgroundColor: 'white' }}
+                style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '12px', backgroundColor: 'white', width: '100%', maxWidth: '260px', boxSizing: 'border-box' }}
               >
                 <option value="todas">Todas as Disciplinas (30 Questões)</option>
                 <option value="Contabilidade Geral">Contabilidade Geral</option>
@@ -727,34 +664,26 @@ export default function SimuladorCRC() {
               </select>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button 
-                onClick={() => setRespostasUsuario({})}
-                style={{ padding: '8px 14px', backgroundColor: 'white', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
-              >
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button onClick={() => setRespostasUsuario({})} style={{ padding: '8px 12px', backgroundColor: 'white', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '6px', fontSize: '11.5px', fontWeight: 'bold', cursor: 'pointer' }}>
                 Limpar Respostas
               </button>
-              <button 
-                onClick={() => setGabaritoRevelado(!gabaritoRevelado)}
-                style={{ padding: '8px 16px', backgroundColor: gabaritoRevelado ? '#0f172a' : '#2563eb', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}
-              >
-                {gabaritoRevelado ? 'Ocultar Gabarito Comentado' : 'Corrigir e Ver Gabarito'}
+              <button onClick={() => setGabaritoRevelado(!gabaritoRevelado)} style={{ padding: '8px 14px', backgroundColor: gabaritoRevelado ? '#0f172a' : '#2563eb', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', fontSize: '11.5px', cursor: 'pointer' }}>
+                {gabaritoRevelado ? 'Ocultar Gabarito' : 'Corrigir Prova'}
               </button>
             </div>
           </div>
 
-          {/* Lista de Questões */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {questoesFiltradas.map((q) => {
               const respondida = respostasUsuario[q.id] !== undefined;
               const acertou = respostasUsuario[q.id] === q.correta;
 
               return (
-                <div key={q.id} style={{ backgroundColor: '#ffffff', padding: '18px', borderRadius: '12px', border: `1px solid ${gabaritoRevelado ? (acertou ? '#86efac' : '#fecaca') : '#e2e8f0'}`, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                <div key={q.id} style={{ backgroundColor: '#ffffff', padding: '16px', borderRadius: '12px', border: `1px solid ${gabaritoRevelado ? (acertou ? '#86efac' : '#fecaca') : '#e2e8f0'}`, boxShadow: '0 2px 4px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
                   
-                  {/* Cabeçalho da Questão */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                       <span style={{ backgroundColor: '#0f172a', color: 'white', fontSize: '11px', fontWeight: 'bold', padding: '3px 8px', borderRadius: '4px' }}>
                         Questão {q.id}
                       </span>
@@ -765,17 +694,15 @@ export default function SimuladorCRC() {
 
                     {gabaritoRevelado && (
                       <span style={{ fontSize: '11px', fontWeight: 'bold', color: acertou ? '#16a34a' : '#dc2626' }}>
-                        {acertou ? '✓ RESPOSTA CORRETA' : '✗ RESPOSTA INCORRETA'}
+                        {acertou ? '✓ CERTO' : '✗ ERRADO'}
                       </span>
                     )}
                   </div>
 
-                  {/* Enunciado */}
-                  <p style={{ margin: '0 0 14px 0', fontSize: '13px', color: '#0f172a', lineHeight: '1.5', fontWeight: '500' }}>
+                  <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: '#0f172a', lineHeight: '1.5', fontWeight: '500', wordBreak: 'break-word' }}>
                     {q.enunciado}
                   </p>
 
-                  {/* Opções de Resposta */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {q.opcoes.map(op => {
                       const estaMarcada = respostasUsuario[q.id] === op.id;
@@ -799,29 +726,29 @@ export default function SimuladorCRC() {
                           key={op.id}
                           onClick={() => selecionarOpcao(q.id, op.id)}
                           style={{ 
-                            padding: '10px 14px', 
+                            padding: '10px 12px', 
                             borderRadius: '8px', 
                             border: `1px solid ${borda}`, 
                             backgroundColor: bg, 
                             cursor: gabaritoRevelado ? 'default' : 'pointer', 
                             fontSize: '12px', 
                             display: 'flex', 
-                            alignItems: 'center', 
+                            alignItems: 'flex-start', 
                             gap: '10px',
-                            transition: 'all 0.15s'
+                            transition: 'all 0.15s',
+                            boxSizing: 'border-box'
                           }}
                         >
-                          <span style={{ fontWeight: 'bold', width: '24px', color: '#0f172a' }}>({op.id.toUpperCase()})</span>
-                          <span style={{ flex: 1, color: '#334155' }}>{op.texto}</span>
-                          {gabaritoRevelado && eACorreta && <span style={{ color: '#16a34a', fontWeight: 'bold', fontSize: '11px' }}>GABARITO OFICIAL</span>}
+                          <span style={{ fontWeight: 'bold', color: '#0f172a', flexShrink: 0 }}>({op.id.toUpperCase()})</span>
+                          <span style={{ flex: 1, color: '#334155', wordBreak: 'break-word' }}>{op.texto}</span>
+                          {gabaritoRevelado && eACorreta && <span style={{ color: '#16a34a', fontWeight: 'bold', fontSize: '10px', flexShrink: 0 }}>CORRETA</span>}
                         </div>
                       );
                     })}
                   </div>
 
-                  {/* Justificativa do Gabarito */}
                   {gabaritoRevelado && (
-                    <div style={{ marginTop: '12px', padding: '10px 14px', backgroundColor: '#eff6ff', borderRadius: '8px', borderLeft: '4px solid #2563eb', fontSize: '12px', color: '#1e3a8a', lineHeight: '1.4' }}>
+                    <div style={{ marginTop: '12px', padding: '10px 12px', backgroundColor: '#eff6ff', borderRadius: '8px', borderLeft: '4px solid #2563eb', fontSize: '12px', color: '#1e3a8a', lineHeight: '1.4', wordBreak: 'break-word' }}>
                       <strong>Comentário do Professor:</strong> {q.comentario}
                     </div>
                   )}
@@ -838,38 +765,26 @@ export default function SimuladorCRC() {
       {/* 2. ABA: FICHAS TÉCNICAS E DIRETRIZES DO CFC               */}
       {/* ========================================================= */}
       {secaoAtiva === 'fichas' && (
-        <div style={{ animation: 'fadeIn 0.3s' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-            <div style={{ flex: '1 1 260px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <button 
-                onClick={() => setFichaSelecionada('nbc_pg_01')}
-                style={{ padding: '12px', textAlign: 'left', borderRadius: '8px', border: `1px solid ${fichaSelecionada === 'nbc_pg_01' ? '#0f172a' : '#cbd5e1'}`, backgroundColor: fichaSelecionada === 'nbc_pg_01' ? '#0f172a' : '#f8fafc', color: fichaSelecionada === 'nbc_pg_01' ? 'white' : '#0f172a', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}
-              >
+        <div style={{ animation: 'fadeIn 0.3s', boxSizing: 'border-box' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <button onClick={() => setFichaSelecionada('nbc_pg_01')} style={{ padding: '12px', textAlign: 'left', borderRadius: '8px', border: `1px solid ${fichaSelecionada === 'nbc_pg_01' ? '#0f172a' : '#cbd5e1'}`, backgroundColor: fichaSelecionada === 'nbc_pg_01' ? '#0f172a' : '#f8fafc', color: fichaSelecionada === 'nbc_pg_01' ? 'white' : '#0f172a', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}>
                 ⚖️ NBC PG 01 (Código de Ética)
               </button>
-              <button 
-                onClick={() => setFichaSelecionada('resolucao_1590')}
-                style={{ padding: '12px', textAlign: 'left', borderRadius: '8px', border: `1px solid ${fichaSelecionada === 'resolucao_1590' ? '#0f172a' : '#cbd5e1'}`, backgroundColor: fichaSelecionada === 'resolucao_1590' ? '#0f172a' : '#f8fafc', color: fichaSelecionada === 'resolucao_1590' ? 'white' : '#0f172a', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}
-              >
+              <button onClick={() => setFichaSelecionada('resolucao_1590')} style={{ padding: '12px', textAlign: 'left', borderRadius: '8px', border: `1px solid ${fichaSelecionada === 'resolucao_1590' ? '#0f172a' : '#cbd5e1'}`, backgroundColor: fichaSelecionada === 'resolucao_1590' ? '#0f172a' : '#f8fafc', color: fichaSelecionada === 'resolucao_1590' ? 'white' : '#0f172a', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}>
                 ✍️ Resolução CFC 1.590 (Contratos)
               </button>
-              <button 
-                onClick={() => setFichaSelecionada('resolucao_1364')}
-                style={{ padding: '12px', textAlign: 'left', borderRadius: '8px', border: `1px solid ${fichaSelecionada === 'resolucao_1364' ? '#0f172a' : '#cbd5e1'}`, backgroundColor: fichaSelecionada === 'resolucao_1364' ? '#0f172a' : '#f8fafc', color: fichaSelecionada === 'resolucao_1364' ? 'white' : '#0f172a', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}
-              >
+              <button onClick={() => setFichaSelecionada('resolucao_1364')} style={{ padding: '12px', textAlign: 'left', borderRadius: '8px', border: `1px solid ${fichaSelecionada === 'resolucao_1364' ? '#0f172a' : '#cbd5e1'}`, backgroundColor: fichaSelecionada === 'resolucao_1364' ? '#0f172a' : '#f8fafc', color: fichaSelecionada === 'resolucao_1364' ? 'white' : '#0f172a', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}>
                 📋 Resolução CFC 1.364 (DECORE)
               </button>
-              <button 
-                onClick={() => setFichaSelecionada('nbc_pg_12')}
-                style={{ padding: '12px', textAlign: 'left', borderRadius: '8px', border: `1px solid ${fichaSelecionada === 'nbc_pg_12' ? '#0f172a' : '#cbd5e1'}`, backgroundColor: fichaSelecionada === 'nbc_pg_12' ? '#0f172a' : '#f8fafc', color: fichaSelecionada === 'nbc_pg_12' ? 'white' : '#0f172a', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}
-              >
+              <button onClick={() => setFichaSelecionada('nbc_pg_12')} style={{ padding: '12px', textAlign: 'left', borderRadius: '8px', border: `1px solid ${fichaSelecionada === 'nbc_pg_12' ? '#0f172a' : '#cbd5e1'}`, backgroundColor: fichaSelecionada === 'nbc_pg_12' ? '#0f172a' : '#f8fafc', color: fichaSelecionada === 'nbc_pg_12' ? 'white' : '#0f172a', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}>
                 🎓 NBC PG 12 (PEPC Continuado)
               </button>
             </div>
 
-            <div style={{ flex: '1 1 450px', backgroundColor: '#f8fafc', padding: '22px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+            <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #cbd5e1', boxSizing: 'border-box', overflowX: 'hidden' }}>
               <div style={{ borderBottom: '1px solid #cbd5e1', paddingBottom: '10px', marginBottom: '14px' }}>
-                <strong style={{ fontSize: '16px', color: '#0f172a', display: 'block' }}>
+                <strong style={{ fontSize: '15px', color: '#0f172a', display: 'block', wordBreak: 'break-word' }}>
                   {fichasTecnicas[fichaSelecionada].titulo}
                 </strong>
                 <span style={{ fontSize: '12px', color: '#64748b' }}>
@@ -878,13 +793,13 @@ export default function SimuladorCRC() {
               </div>
 
               <h4 style={{ margin: '0 0 10px 0', fontSize: '13px', color: '#1e3a8a' }}>Principais Diretrizes Normativas:</h4>
-              <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '12px', color: '#334155', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: '#334155', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {fichasTecnicas[fichaSelecionada].pontosChave.map((ponto, idx) => (
-                  <li key={idx} style={{ lineHeight: '1.4' }}>{ponto}</li>
+                  <li key={idx} style={{ lineHeight: '1.4', wordBreak: 'break-word' }}>{ponto}</li>
                 ))}
               </ul>
 
-              <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#fff5f5', borderRadius: '8px', borderLeft: '4px solid #ef4444', fontSize: '11px', color: '#991b1b', lineHeight: '1.4' }}>
+              <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#fff5f5', borderRadius: '8px', borderLeft: '4px solid #ef4444', fontSize: '11px', color: '#991b1b', lineHeight: '1.4', wordBreak: 'break-word' }}>
                 <strong>🚨 Enquadramento de Infração & Penalidade:</strong> {fichasTecnicas[fichaSelecionada].infracao}
               </div>
             </div>
@@ -893,106 +808,119 @@ export default function SimuladorCRC() {
       )}
 
       {/* ========================================================= */}
-      {/* 3. ABA: DECORE ELETRÔNICA                                 */}
+      {/* 3. ABA: DECORE ELETRÔNICA (TOTALMENTE RESPONSIVO)        */}
       {/* ========================================================= */}
       {secaoAtiva === 'decore' && (
-        <div style={{ animation: 'fadeIn 0.3s' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-            <form onSubmit={handleEmitirDecore} style={{ flex: '1 1 350px', backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px' }}>
+        <div style={{ animation: 'fadeIn 0.3s', boxSizing: 'border-box' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px' }}>
+            
+            <form onSubmit={handleEmitirDecore} style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px', boxSizing: 'border-box', minWidth: 0 }}>
+              <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px', wordBreak: 'break-word' }}>
                 Emissão de DECORE com Certificação Digital
               </h3>
 
-              <label style={{ display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-                Beneficiário / Cliente:
+              <div style={{ display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0 }}>
+                <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#475569', display: 'block', marginBottom: '4px' }}>
+                  Beneficiário / Cliente:
+                </label>
                 <input 
                   type="text" 
                   value={clienteBeneficiario} 
                   onChange={e => setClienteBeneficiario(e.target.value)} 
                   placeholder="Nome completo..."
-                  style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
+                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box' }} 
                 />
-              </label>
+              </div>
 
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-                  CPF:
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 130px), 1fr))', gap: '10px', width: '100%', boxSizing: 'border-box' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                  <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#475569', display: 'block', marginBottom: '4px' }}>
+                    CPF:
+                  </label>
                   <input 
                     type="text" 
                     value={cpfBeneficiario} 
                     onChange={e => setCpfBeneficiario(e.target.value)} 
-                    style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
+                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box' }} 
                   />
-                </label>
+                </div>
 
-                <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-                  Mês de Referência:
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                  <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#475569', display: 'block', marginBottom: '4px' }}>
+                    Mês de Referência:
+                  </label>
                   <input 
                     type="text" 
                     value={mesReferencia} 
                     onChange={e => setMesReferencia(e.target.value)} 
-                    style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
+                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box' }} 
                   />
-                </label>
+                </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-                  Natureza do Rendimento:
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 130px), 1fr))', gap: '10px', width: '100%', boxSizing: 'border-box' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                  <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#475569', display: 'block', marginBottom: '4px' }}>
+                    Natureza do Rendimento:
+                  </label>
                   <select 
                     value={naturezaRendimento} 
                     onChange={e => setNaturezaRendimento(e.target.value)} 
-                    style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: 'white' }}
+                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: 'white', boxSizing: 'border-box' }}
                   >
                     <option value="pro_labore">Pró-Labore</option>
                     <option value="distribuicao_lucros">Distribuição de Lucros</option>
                     <option value="livro_caixa">Livro Caixa / Autônomo</option>
                   </select>
-                </label>
+                </div>
 
-                <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#0f172a' }}>
-                  Rendimento Líquido (R$):
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                  <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#0f172a', display: 'block', marginBottom: '4px' }}>
+                    Rendimento Líquido (R$):
+                  </label>
                   <input 
                     type="text" 
                     value={rendimentoMensalStr} 
                     onChange={e => setRendimentoMensalStr(e.target.value.replace(/[^0-9.]/g, ''))} 
-                    style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
+                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box' }} 
                   />
-                </label>
+                </div>
               </div>
 
-              <label style={{ display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-                Documento de Lastro Legal:
+              <div style={{ display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0 }}>
+                <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#475569', display: 'block', marginBottom: '4px' }}>
+                  Documento de Lastro Legal:
+                </label>
                 <input 
                   type="text" 
                   value={tipoDocumentoLastro} 
                   onChange={e => setTipoDocumentoLastro(e.target.value)} 
-                  style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
+                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box' }} 
                 />
-              </label>
+              </div>
 
               <button 
                 type="submit" 
-                style={{ padding: '10px', backgroundColor: '#0f172a', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', marginTop: '6px' }}
+                style={{ width: '100%', padding: '12px', backgroundColor: '#0f172a', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', marginTop: '6px', boxSizing: 'border-box' }}
               >
                 🔐 Assinar e Homologar no CFC
               </button>
             </form>
 
-            <div style={{ flex: '1 1 400px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ backgroundColor: '#1e293b', color: 'white', padding: '12px 16px', borderRadius: '12px 12px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', minWidth: 0, boxSizing: 'border-box' }}>
+              <div style={{ backgroundColor: '#1e293b', color: 'white', padding: '12px 16px', borderRadius: '12px 12px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
                 <h3 style={{ margin: 0, fontSize: '14px' }}>Extrato de DECOREs Homologadas</h3>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>Chave Pública de Validação</span>
+                <span style={{ fontSize: '11px', color: '#94a3b8' }}>Validação CFC</span>
               </div>
 
-              <div style={{ border: '1px solid #cbd5e1', borderTop: 'none', borderRadius: '0 0 12px 12px', overflowX: 'auto', backgroundColor: 'white' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+              <div style={{ border: '1px solid #cbd5e1', borderTop: 'none', borderRadius: '0 0 12px 12px', overflowX: 'auto', backgroundColor: 'white', boxSizing: 'border-box' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', minWidth: '450px' }}>
                   <thead style={{ backgroundColor: '#f8fafc', color: '#475569' }}>
                     <tr>
                       <th style={{ padding: '10px 14px', textAlign: 'left' }}>Beneficiário</th>
                       <th style={{ padding: '10px 14px' }}>Natureza</th>
                       <th style={{ padding: '10px 14px', textAlign: 'right' }}>Valor</th>
-                      <th style={{ padding: '10px 14px', textAlign: 'center' }}>Código CFC</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'center' }}>Código</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1015,6 +943,7 @@ export default function SimuladorCRC() {
                 </table>
               </div>
             </div>
+
           </div>
         </div>
       )}
@@ -1023,9 +952,9 @@ export default function SimuladorCRC() {
       {/* 4. ABA: PEPC (NBC PG 12)                                  */}
       {/* ========================================================= */}
       {secaoAtiva === 'pepc' && (
-        <div style={{ animation: 'fadeIn 0.3s' }}>
-          <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+        <div style={{ animation: 'fadeIn 0.3s', boxSizing: 'border-box' }}>
+          <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', minWidth: '450px' }}>
               <thead style={{ backgroundColor: '#1e293b', color: 'white' }}>
                 <tr>
                   <th style={{ padding: '12px 14px', textAlign: 'left' }}>Atividade / Evento Credenciado</th>
@@ -1063,14 +992,14 @@ export default function SimuladorCRC() {
       {/* 5. ABA: CONTRATOS DE SERVIÇOS CONTÁBEIS                   */}
       {/* ========================================================= */}
       {secaoAtiva === 'contratos' && (
-        <div style={{ animation: 'fadeIn 0.3s' }}>
-          <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
+        <div style={{ animation: 'fadeIn 0.3s', boxSizing: 'border-box' }}>
+          <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left', minWidth: '500px' }}>
               <thead style={{ backgroundColor: '#1e293b', color: 'white' }}>
                 <tr>
                   <th style={{ padding: '12px 14px' }}>Cliente / Empresa</th>
                   <th style={{ padding: '12px 14px' }}>CNPJ</th>
-                  <th style={{ padding: '12px 14px', textAlign: 'right' }}>Honorários Mensais</th>
+                  <th style={{ padding: '12px 14px', textAlign: 'right' }}>Honorários</th>
                   <th style={{ padding: '12px 14px', textAlign: 'center' }}>Vencimento</th>
                   <th style={{ padding: '12px 14px', textAlign: 'center' }}>Situação</th>
                 </tr>
@@ -1098,26 +1027,29 @@ export default function SimuladorCRC() {
       )}
 
       {/* ========================================================= */}
-      {/* 6. ABA: ANUIDADE E REGULARIDADE PROFISSIONAL             */}
+      {/* 6. ABA: ANUIDADE E REGULARIDADE PROFISSIONAL              */}
+      {/* ========================================================= */}
       {secaoAtiva === 'anuidade' && (
-        <div style={{ animation: 'fadeIn 0.3s' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-            <div style={{ flex: '1 1 340px', backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div style={{ animation: 'fadeIn 0.3s', boxSizing: 'border-box' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px' }}>
+            <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px', boxSizing: 'border-box' }}>
               <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px' }}>
                 Anuidade Institucional CRC (2026)
               </h3>
 
-              <label style={{ display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-                Valor da Anuidade (R$):
+              <div style={{ display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0 }}>
+                <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#475569', display: 'block', marginBottom: '4px' }}>
+                  Valor da Anuidade (R$):
+                </label>
                 <input 
                   type="text" 
                   value={valorAnuidadeStr} 
                   onChange={e => setValorAnuidadeStr(e.target.value.replace(/[^0-9.]/g, ''))} 
-                  style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
+                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box' }} 
                 />
-              </label>
+              </div>
 
-              <div style={{ backgroundColor: 'white', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ backgroundColor: 'white', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
                 <div>
                   <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#0f172a', display: 'block' }}>Situação Financeira:</span>
                   <span style={{ fontSize: '11px', color: anuidadePaga ? '#166534' : '#dc2626' }}>
@@ -1133,12 +1065,12 @@ export default function SimuladorCRC() {
               </div>
             </div>
 
-            <div style={{ flex: '1 1 380px', backgroundColor: 'white', border: '1px solid #0f172a', borderRadius: '12px', padding: '20px' }}>
+            <div style={{ backgroundColor: 'white', border: '1px solid #0f172a', borderRadius: '12px', padding: '20px', boxSizing: 'border-box' }}>
               <div style={{ borderBottom: '1px solid #0f172a', paddingBottom: '10px', textAlign: 'center' }}>
-                <strong style={{ fontSize: '15px', color: '#0f172a', display: 'block' }}>CONSELHO REGIONAL DE CONTABILIDADE</strong>
+                <strong style={{ fontSize: '14px', color: '#0f172a', display: 'block' }}>CONSELHO REGIONAL DE CONTABILIDADE</strong>
                 <span style={{ fontSize: '11px', color: '#64748b' }}>CERTIDÃO DE REGULARIDADE PROFISSIONAL (CRP)</span>
               </div>
-              <div style={{ padding: '14px 0', fontSize: '12px', lineHeight: '1.5' }}>
+              <div style={{ padding: '14px 0', fontSize: '12px', lineHeight: '1.5', color: '#334155' }}>
                 Certificamos que <strong>{contadorNome}</strong> ({registroCrc}) encontra-se <strong>HABILITADO E REGULAR</strong> para o exercício de suas funções contábeis em todo o território nacional.
               </div>
             </div>
@@ -1147,25 +1079,22 @@ export default function SimuladorCRC() {
       )}
 
       {/* GUIA DE LANÇAMENTOS NO LIVRO DIÁRIO */}
-      <div style={{ marginTop: '25px', backgroundColor: '#eff6ff', borderRadius: '12px', border: '1px solid #bfdbfe', padding: '18px' }}>
-        <h3 style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div style={{ marginTop: '20px', backgroundColor: '#eff6ff', borderRadius: '12px', border: '1px solid #bfdbfe', padding: '16px', boxSizing: 'border-box', overflowX: 'hidden' }}>
+        <h3 style={{ margin: '0 0 10px 0', fontSize: '13px', color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span>🧭</span> Lançamentos Contábeis no Livro Diário
         </h3>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '15px', fontSize: '11px', fontFamily: 'monospace' }}>
-          <div style={{ backgroundColor: 'white', padding: '12px', borderRadius: '8px', borderLeft: '4px solid #2563eb' }}>
-            <span style={{ fontWeight: 'bold', color: '#1d4ed8', display: 'block', marginBottom: '4px' }}>1. Pagamento da Anuidade do CRC (Regime de Competência):</span>
-            <div style={{ color: '#059669', fontWeight: 'bold' }}>D: Anuidades a Apropriar (Ativo Circulante) ...... {formatMoeda(parseFloat(valorAnuidadeStr) || 0)}</div>
-            <div style={{ color: '#dc2626', fontWeight: 'bold' }}>C: Banco Conta Movimento (Ativo Circulante) ....... {formatMoeda(parseFloat(valorAnuidadeStr) || 0)}</div>
-            <span style={{ color: '#64748b', display: 'block', marginTop: '4px' }}>
-              * Apropriação mensal de 1/12 em "Despesas c/ Órgãos de Classe (DRE)".
-            </span>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '12px', fontSize: '11px', fontFamily: 'monospace' }}>
+          <div style={{ backgroundColor: 'white', padding: '12px', borderRadius: '8px', borderLeft: '4px solid #2563eb', wordBreak: 'break-word', boxSizing: 'border-box' }}>
+            <span style={{ fontWeight: 'bold', color: '#1d4ed8', display: 'block', marginBottom: '4px' }}>1. Pagamento da Anuidade do CRC:</span>
+            <div style={{ color: '#059669', fontWeight: 'bold' }}>D: Anuidades a Apropriar ....... {formatMoeda(parseFloat(valorAnuidadeStr) || 0)}</div>
+            <div style={{ color: '#dc2626', fontWeight: 'bold' }}>C: Banco Conta Movimento ....... {formatMoeda(parseFloat(valorAnuidadeStr) || 0)}</div>
           </div>
 
-          <div style={{ backgroundColor: 'white', padding: '12px', borderRadius: '8px', borderLeft: '4px solid #16a34a' }}>
-            <span style={{ fontWeight: 'bold', color: '#16a34a', display: 'block', marginBottom: '4px' }}>2. Reconhecimento de Honorários dos Contratos:</span>
-            <div style={{ color: '#059669', fontWeight: 'bold' }}>D: Clientes / Honorários a Receber (Ativo) ....... {formatMoeda(totalHonorariosAtivos)}</div>
-            <div style={{ color: '#dc2626', fontWeight: 'bold' }}>C: Receita de Prestação de Serviços (DRE) ........ {formatMoeda(totalHonorariosAtivos)}</div>
+          <div style={{ backgroundColor: 'white', padding: '12px', borderRadius: '8px', borderLeft: '4px solid #16a34a', wordBreak: 'break-word', boxSizing: 'border-box' }}>
+            <span style={{ fontWeight: 'bold', color: '#16a34a', display: 'block', marginBottom: '4px' }}>2. Reconhecimento de Honorários:</span>
+            <div style={{ color: '#059669', fontWeight: 'bold' }}>D: Clientes a Receber .......... {formatMoeda(totalHonorariosAtivos)}</div>
+            <div style={{ color: '#dc2626', fontWeight: 'bold' }}>C: Receita de Serviços ......... {formatMoeda(totalHonorariosAtivos)}</div>
           </div>
         </div>
       </div>

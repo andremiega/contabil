@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 
 export default function SimuladorAnaliseBalanco() {
   const formatMoeda = (valor) => Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -56,7 +56,7 @@ export default function SimuladorAnaliseBalanco() {
     const totalPassivoOnerosoEOperacional = pc + pnc;
     const endividamentoGeral = pl > 0 ? (totalPassivoOnerosoEOperacional / (pl + totalPassivoOnerosoEOperacional)) * 100 : 0;
     const composEndiv = totalPassivoOnerosoEOperacional > 0 ? (pc / totalPassivoOnerosoEOperacional) * 100 : 0;
-    const alavancagemFinanceira = pl > 0 ? at / pl : 0; // Multiplicador de Alavancagem (Ativo Total / PL)
+    const alavancagemFinanceira = pl > 0 ? at / pl : 0; 
 
     // 3. Rentabilidade
     const margemLiq = rec > 0 ? (ll / rec) * 100 : 0;
@@ -79,31 +79,35 @@ export default function SimuladorAnaliseBalanco() {
 
   }, [ativoCirculanteStr, estoquesStr, realizavelLongoPrazoStr, ativoTotalStr, passivoCirculanteStr, passivoLongoPrazoStr, patrimonioLiquidoStr, receitaBrutaStr, lucroLiquidoStr]);
 
+  const inputStyle = { width: '100%', maxWidth: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', color: '#0f172a', backgroundColor: '#f8fafc', outline: 'none', boxSizing: 'border-box' };
+  const labelStyle = { fontWeight: '700', fontSize: '12px', color: '#475569', display: 'block', marginBottom: '6px', wordBreak: 'break-word' };
+  const cardStyle = { backgroundColor: 'white', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', boxSizing: 'border-box', minWidth: 0 };
+
   return (
-    <div style={{ backgroundColor: '#ffffff', padding: '25px', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animation: 'fadeIn 0.5s' }}>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#ffffff', padding: '16px', borderRadius: '24px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animation: 'fadeIn 0.5s', boxSizing: 'border-box', width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
       
       {/* CABEÇALHO */}
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '15px' }}>
-        <div>
-          <h2 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '28px' }}>📊</span> Análise de Balanços & Indicadores Econômico-Financeiros
+        <div style={{ minWidth: 0, flex: '1 1 250px' }}>
+          <h2 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px', wordBreak: 'break-word' }}>
+            <span style={{ fontSize: '24px' }}>📊</span> Análise de Balanços & Indicadores Econômico-Financeiros
           </h2>
           <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '13px' }}>
             Diagnóstico patrimonial: Índices de Liquidez, Endividamento, Rentabilidade (ROA/ROE) e Decomposição Du Pont.
           </p>
         </div>
 
-        <div style={{ backgroundColor: '#eff6ff', padding: '6px 14px', borderRadius: '8px', border: '1px solid #bfdbfe', fontSize: '12px', fontWeight: 'bold', color: '#1e40af' }}>
+        <div style={{ backgroundColor: '#eff6ff', padding: '8px 14px', borderRadius: '10px', border: '1px solid #bfdbfe', fontSize: '12px', fontWeight: 'bold', color: '#1e40af', boxSizing: 'border-box' }}>
           Rentabilidade do Capital Próprio (ROE): <span style={{ color: '#2563eb' }}>{formatPct(indices.roe)}</span>
         </div>
       </div>
 
       {/* SELETOR DE ABAS INTERNAS */}
-      <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '25px', gap: '4px', width: 'fit-content' }}>
+      <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px', gap: '4px', flexWrap: 'wrap', boxSizing: 'border-box' }}>
         <button
           onClick={() => setAbaAtiva('diagnostico')}
           style={{
-            padding: '8px 16px',
+            padding: '10px 16px',
             borderRadius: '8px',
             border: 'none',
             fontWeight: 'bold',
@@ -111,7 +115,9 @@ export default function SimuladorAnaliseBalanco() {
             cursor: 'pointer',
             backgroundColor: abaAtiva === 'diagnostico' ? '#0f172a' : 'transparent',
             color: abaAtiva === 'diagnostico' ? 'white' : '#64748b',
-            transition: 'all 0.2s'
+            transition: 'all 0.2s',
+            flex: '1 1 auto',
+            boxSizing: 'border-box'
           }}
         >
           📋 Diagnóstico Consolidado
@@ -119,7 +125,7 @@ export default function SimuladorAnaliseBalanco() {
         <button
           onClick={() => setAbaAtiva('dupont')}
           style={{
-            padding: '8px 16px',
+            padding: '10px 16px',
             borderRadius: '8px',
             border: 'none',
             fontWeight: 'bold',
@@ -127,7 +133,9 @@ export default function SimuladorAnaliseBalanco() {
             cursor: 'pointer',
             backgroundColor: abaAtiva === 'dupont' ? '#2563eb' : 'transparent',
             color: abaAtiva === 'dupont' ? 'white' : '#64748b',
-            transition: 'all 0.2s'
+            transition: 'all 0.2s',
+            flex: '1 1 auto',
+            boxSizing: 'border-box'
           }}
         >
           🔬 Decomposição Du Pont & Alavancagem
@@ -135,217 +143,172 @@ export default function SimuladorAnaliseBalanco() {
       </div>
 
       {/* DASHBOARDS DOS PRINCIPAIS ÍNDICES (SEMPRE VISÍVEIS) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '15px', marginBottom: '25px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px', marginBottom: '20px', boxSizing: 'border-box' }}>
         
-        <div style={{ backgroundColor: '#f8fafc', padding: '18px', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: '4px solid #0f172a' }}>
-          <span style={{ color: '#475569', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Liquidez Corrente</span>
-          <strong style={{ display: 'block', color: '#0f172a', fontSize: '24px', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', borderLeft: '4px solid #0f172a', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#475569', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Liquidez Corrente</span>
+          <strong style={{ display: 'block', color: '#0f172a', fontSize: '22px', marginTop: '4px', wordBreak: 'break-word' }}>
             {indices.liquidezCorrente.toFixed(2)}x
           </strong>
-          <span style={{ fontSize: '11px', color: '#64748b' }}>Capacidade de pagamento de curto prazo</span>
+          <span style={{ fontSize: '11px', color: '#64748b', wordBreak: 'break-word' }}>Capacidade de pagamento de curto prazo</span>
         </div>
 
-        <div style={{ backgroundColor: '#eff6ff', padding: '18px', borderRadius: '12px', border: '1px solid #bfdbfe', borderLeft: '4px solid #2563eb' }}>
-          <span style={{ color: '#1d4ed8', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Endividamento Geral</span>
-          <strong style={{ display: 'block', color: '#1e40af', fontSize: '24px', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#eff6ff', padding: '16px', borderRadius: '16px', border: '1px solid #bfdbfe', borderLeft: '4px solid #2563eb', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#1d4ed8', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Endividamento Geral</span>
+          <strong style={{ display: 'block', color: '#1e40af', fontSize: '22px', marginTop: '4px', wordBreak: 'break-word' }}>
             {formatPct(indices.endividamentoGeral)}
           </strong>
-          <span style={{ fontSize: '11px', color: '#2563eb' }}>Participação de capitais de terceiros</span>
+          <span style={{ fontSize: '11px', color: '#2563eb', wordBreak: 'break-word' }}>Participação de capitais de terceiros</span>
         </div>
 
-        <div style={{ backgroundColor: '#f0fdf4', padding: '18px', borderRadius: '12px', border: '1px solid #86efac', borderLeft: '4px solid #16a34a' }}>
-          <span style={{ color: '#166534', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Margem Líquida</span>
-          <strong style={{ display: 'block', color: '#15803d', fontSize: '24px', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#f0fdf4', padding: '16px', borderRadius: '16px', border: '1px solid #86efac', borderLeft: '4px solid #16a34a', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#166534', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Margem Líquida</span>
+          <strong style={{ display: 'block', color: '#15803d', fontSize: '22px', marginTop: '4px', wordBreak: 'break-word' }}>
             {formatPct(indices.margemLiquida)}
           </strong>
-          <span style={{ fontSize: '11px', color: '#166534' }}>Lucro líquido sobre vendas</span>
+          <span style={{ fontSize: '11px', color: '#166534', wordBreak: 'break-word' }}>Lucro líquido sobre vendas</span>
         </div>
 
-        <div style={{ backgroundColor: '#f8fafc', padding: '18px', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: '4px solid #f59e0b' }}>
-          <span style={{ color: '#b45309', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' }}>Retorno sobre Ativo (ROA)</span>
-          <strong style={{ display: 'block', color: '#b45309', fontSize: '24px', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', borderLeft: '4px solid #f59e0b', boxSizing: 'border-box', minWidth: 0 }}>
+          <span style={{ color: '#b45309', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>Retorno sobre Ativo (ROA)</span>
+          <strong style={{ display: 'block', color: '#b45309', fontSize: '22px', marginTop: '4px', wordBreak: 'break-word' }}>
             {formatPct(indices.roa)}
           </strong>
-          <span style={{ fontSize: '11px', color: '#64748b' }}>Eficiência operativa geral</span>
+          <span style={{ fontSize: '11px', color: '#64748b', wordBreak: 'break-word' }}>Eficiência operativa geral</span>
         </div>
 
       </div>
 
       {/* ========================================================= */}
-      {/* 1. ABA: DIAGNÓSTICO CONSOLIDADO (CONTEÚDO ORIGINAL INTACTO) */}
+      {/* 1. ABA: DIAGNÓSTICO CONSOLIDADO                           */}
       {/* ========================================================= */}
       {abaAtiva === 'diagnostico' && (
-        <div style={{ animation: 'fadeIn 0.3s' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginBottom: '25px' }}>
+        <div style={{ animation: 'fadeIn 0.3s', boxSizing: 'border-box' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px', boxSizing: 'border-box' }}>
             
             {/* ENTRADA DE CONTAS PATRIMONIAIS */}
-            <div style={{ flex: '1 1 350px', backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px' }}>
+            <div style={cardStyle}>
+              <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px', wordBreak: 'break-word' }}>
                 Balanço Patrimonial & DRE Consolidada
               </h3>
 
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-                  Ativo Circulante (R$):
-                  <input 
-                    type="text" 
-                    value={ativoCirculanteStr} 
-                    onChange={e => setAtivoCirculanteStr(e.target.value.replace(/[^0-9.]/g, ''))} 
-                    style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
-                  />
-                </label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '14px', boxSizing: 'border-box' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 130px), 1fr))', gap: '10px', boxSizing: 'border-box' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <label style={labelStyle}>Ativo Circulante (R$):</label>
+                    <input type="text" value={ativoCirculanteStr} onChange={e => setAtivoCirculanteStr(e.target.value.replace(/[^0-9.]/g, ''))} style={inputStyle} />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <label style={labelStyle}>Destes, Estoques (R$):</label>
+                    <input type="text" value={estoquesStr} onChange={e => setEstoquesStr(e.target.value.replace(/[^0-9.]/g, ''))} style={inputStyle} />
+                  </div>
+                </div>
 
-                <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-                  Destes, Estoques (R$):
-                  <input 
-                    type="text" 
-                    value={estoquesStr} 
-                    onChange={e => setEstoquesStr(e.target.value.replace(/[^0-9.]/g, ''))} 
-                    style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
-                  />
-                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 130px), 1fr))', gap: '10px', boxSizing: 'border-box' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <label style={labelStyle}>Realizável Longo Prazo:</label>
+                    <input type="text" value={realizavelLongoPrazoStr} onChange={e => setRealizavelLongoPrazoStr(e.target.value.replace(/[^0-9.]/g, ''))} style={inputStyle} />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <label style={{ ...labelStyle, color: '#0f172a' }}>Ativo Total (R$):</label>
+                    <input type="text" value={ativoTotalStr} onChange={e => setAtivoTotalStr(e.target.value.replace(/[^0-9.]/g, ''))} style={inputStyle} />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 130px), 1fr))', gap: '10px', boxSizing: 'border-box' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <label style={{ ...labelStyle, color: '#dc2626' }}>Passivo Circulante (R$):</label>
+                    <input type="text" value={passivoCirculanteStr} onChange={e => setPassivoCirculanteStr(e.target.value.replace(/[^0-9.]/g, ''))} style={inputStyle} />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <label style={{ ...labelStyle, color: '#dc2626' }}>Passivo Não Circulante:</label>
+                    <input type="text" value={passivoLongoPrazoStr} onChange={e => setPassivoLongoPrazoStr(e.target.value.replace(/[^0-9.]/g, ''))} style={inputStyle} />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 130px), 1fr))', gap: '10px', boxSizing: 'border-box' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <label style={{ ...labelStyle, color: '#16a34a' }}>Patrimônio Líquido (R$):</label>
+                    <input type="text" value={patrimonioLiquidoStr} onChange={e => setPatrimonioLiquidoStr(e.target.value.replace(/[^0-9.]/g, ''))} style={inputStyle} />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <label style={{ ...labelStyle, color: '#16a34a' }}>Receita Bruta Vendas:</label>
+                    <input type="text" value={receitaBrutaStr} onChange={e => setReceitaBrutaStr(e.target.value.replace(/[^0-9.]/g, ''))} style={inputStyle} />
+                  </div>
+                </div>
+
+                <div style={{ minWidth: 0 }}>
+                  <label style={{ ...labelStyle, color: '#16a34a' }}>Lucro Líquido do Exercício (R$):</label>
+                  <input type="text" value={lucroLiquidoStr} onChange={e => setLucroLiquidoStr(e.target.value.replace(/[^0-9.]/g, ''))} style={{ ...inputStyle, borderColor: '#86efac', backgroundColor: '#f0fdf4' }} />
+                </div>
               </div>
-
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#475569' }}>
-                  Realizável a Longo Prazo:
-                  <input 
-                    type="text" 
-                    value={realizavelLongoPrazoStr} 
-                    onChange={e => setRealizavelLongoPrazoStr(e.target.value.replace(/[^0-9.]/g, ''))} 
-                    style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
-                  />
-                </label>
-
-                <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#0f172a' }}>
-                  Ativo Total (R$):
-                  <input 
-                    type="text" 
-                    value={ativoTotalStr} 
-                    onChange={e => setAtivoTotalStr(e.target.value.replace(/[^0-9.]/g, ''))} 
-                    style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
-                  />
-                </label>
-              </div>
-
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#dc2626' }}>
-                  Passivo Circulante (R$):
-                  <input 
-                    type="text" 
-                    value={passivoCirculanteStr} 
-                    onChange={e => setPassivoCirculanteStr(e.target.value.replace(/[^0-9.]/g, ''))} 
-                    style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
-                  />
-                </label>
-
-                <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#dc2626' }}>
-                  Passivo Não Circulante:
-                  <input 
-                    type="text" 
-                    value={passivoLongoPrazoStr} 
-                    onChange={e => setPassivoLongoPrazoStr(e.target.value.replace(/[^0-9.]/g, ''))} 
-                    style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
-                  />
-                </label>
-              </div>
-
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#16a34a' }}>
-                  Patrimônio Líquido (R$):
-                  <input 
-                    type="text" 
-                    value={patrimonioLiquidoStr} 
-                    onChange={e => setPatrimonioLiquidoStr(e.target.value.replace(/[^0-9.]/g, ''))} 
-                    style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
-                  />
-                </label>
-
-                <label style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#16a34a' }}>
-                  Receita Bruta Vendas:
-                  <input 
-                    type="text" 
-                    value={receitaBrutaStr} 
-                    onChange={e => setReceitaBrutaStr(e.target.value.replace(/[^0-9.]/g, ''))} 
-                    style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }} 
-                  />
-                </label>
-              </div>
-
-              <label style={{ display: 'flex', flexDirection: 'column', fontSize: '12px', fontWeight: 'bold', color: '#16a34a' }}>
-                Lucro Líquido do Exercício (R$):
-                <input 
-                  type="text" 
-                  value={lucroLiquidoStr} 
-                  onChange={e => setLucroLiquidoStr(e.target.value.replace(/[^0-9.]/g, ''))} 
-                  style={{ padding: '8px 10px', marginTop: '4px', borderRadius: '6px', border: '1px solid #86efac', backgroundColor: '#f0fdf4', fontSize: '13px' }} 
-                />
-              </label>
             </div>
 
             {/* RELATÓRIO DE DIAGNÓSTICO DOS ÍNDICES */}
-            <div style={{ flex: '1 1 400px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0, boxSizing: 'border-box' }}>
               
-              <div style={{ backgroundColor: 'white', border: '1px solid #0f172a', borderRadius: '12px', padding: '18px', boxShadow: '0 4px 10px rgba(0,0,0,0.03)' }}>
-                <div style={{ borderBottom: '1px solid #0f172a', paddingBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <strong style={{ fontSize: '14px', color: '#0f172a' }}>Relatório Consolidado de Índices</strong>
+              <div style={cardStyle}>
+                <div style={{ borderBottom: '1px solid #0f172a', paddingBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+                  <strong style={{ fontSize: '14px', color: '#0f172a', wordBreak: 'break-word' }}>Relatório Consolidado de Índices</strong>
                   <span style={{ backgroundColor: '#0f172a', color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '3px 8px', borderRadius: '4px' }}>
                     CONTROLADORIA
                   </span>
                 </div>
 
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', marginTop: '12px' }}>
-                  <thead>
-                    <tr style={{ backgroundColor: '#f1f5f9', color: '#475569' }}>
-                      <th style={{ padding: '8px', textAlign: 'left' }}>Indicador Financeiro</th>
-                      <th style={{ padding: '8px', textAlign: 'right' }}>Resultado</th>
-                      <th style={{ padding: '8px', textAlign: 'center' }}>Padrão / Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '8px', fontWeight: 'bold' }}>Liquidez Corrente</td>
-                      <td style={{ padding: '8px', textAlign: 'right' }}>{indices.liquidezCorrente.toFixed(2)}x</td>
-                      <td style={{ padding: '8px', textAlign: 'center', color: indices.liquidezCorrente >= 1 ? '#16a34a' : '#dc2626', fontWeight: 'bold' }}>
-                        {indices.liquidezCorrente >= 1 ? 'Saudável (>= 1.0)' : 'Alerta (< 1.0)'}
-                      </td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '8px', fontWeight: 'bold' }}>Liquidez Seca</td>
-                      <td style={{ padding: '8px', textAlign: 'right' }}>{indices.liquidezSeca.toFixed(2)}x</td>
-                      <td style={{ padding: '8px', textAlign: 'center', color: indices.liquidezSeca >= 0.8 ? '#16a34a' : '#d97706', fontWeight: 'bold' }}>
-                        {indices.liquidezSeca >= 0.8 ? 'Bom' : 'Restrito'}
-                      </td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '8px', fontWeight: 'bold' }}>Liquidez Geral</td>
-                      <td style={{ padding: '8px', textAlign: 'right' }}>{indices.liquidezGeral.toFixed(2)}x</td>
-                      <td style={{ padding: '8px', textAlign: 'center', color: indices.liquidezGeral >= 1 ? '#16a34a' : '#dc2626', fontWeight: 'bold' }}>
-                        {indices.liquidezGeral >= 1 ? 'Solvente' : 'Insolvente a Longo Prazo'}
-                      </td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '8px', fontWeight: 'bold' }}>Endividamento Geral</td>
-                      <td style={{ padding: '8px', textAlign: 'right' }}>{formatPct(indices.endividamentoGeral)}</td>
-                      <td style={{ padding: '8px', textAlign: 'center', color: indices.endividamentoGeral <= 60 ? '#16a34a' : '#dc2626', fontWeight: 'bold' }}>
-                        {indices.endividamentoGeral <= 60 ? 'Endividamento Adequado' : 'Alavancagem Elevada'}
-                      </td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '8px', fontWeight: 'bold' }}>Giro do Ativo</td>
-                      <td style={{ padding: '8px', textAlign: 'right' }}>{indices.giroAtivo.toFixed(2)}x</td>
-                      <td style={{ padding: '8px', textAlign: 'center', color: '#2563eb', fontWeight: 'bold' }}>Velocidade Operacional</td>
-                    </tr>
-                    <tr style={{ backgroundColor: '#f8fafc', fontWeight: 'bold' }}>
-                      <td style={{ padding: '10px 8px' }}>Retorno sobre o PL (ROE)</td>
-                      <td style={{ padding: '10px 8px', textAlign: 'right', color: '#16a34a' }}>{formatPct(indices.roe)}</td>
-                      <td style={{ padding: '10px 8px', textAlign: 'center', color: '#16a34a' }}>Rentabilidade Acionista</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div style={{ overflowX: 'auto', boxSizing: 'border-box', marginTop: '12px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', minWidth: '380px' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f1f5f9', color: '#475569' }}>
+                        <th style={{ padding: '8px', textAlign: 'left' }}>Indicador Financeiro</th>
+                        <th style={{ padding: '8px', textAlign: 'right' }}>Resultado</th>
+                        <th style={{ padding: '8px', textAlign: 'center' }}>Padrão / Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '8px', fontWeight: 'bold', wordBreak: 'break-word' }}>Liquidez Corrente</td>
+                        <td style={{ padding: '8px', textAlign: 'right' }}>{indices.liquidezCorrente.toFixed(2)}x</td>
+                        <td style={{ padding: '8px', textAlign: 'center', color: indices.liquidezCorrente >= 1 ? '#16a34a' : '#dc2626', fontWeight: 'bold', wordBreak: 'break-word' }}>
+                          {indices.liquidezCorrente >= 1 ? 'Saudável' : 'Alerta'}
+                        </td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '8px', fontWeight: 'bold', wordBreak: 'break-word' }}>Liquidez Seca</td>
+                        <td style={{ padding: '8px', textAlign: 'right' }}>{indices.liquidezSeca.toFixed(2)}x</td>
+                        <td style={{ padding: '8px', textAlign: 'center', color: indices.liquidezSeca >= 0.8 ? '#16a34a' : '#d97706', fontWeight: 'bold', wordBreak: 'break-word' }}>
+                          {indices.liquidezSeca >= 0.8 ? 'Bom' : 'Restrito'}
+                        </td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '8px', fontWeight: 'bold', wordBreak: 'break-word' }}>Liquidez Geral</td>
+                        <td style={{ padding: '8px', textAlign: 'right' }}>{indices.liquidezGeral.toFixed(2)}x</td>
+                        <td style={{ padding: '8px', textAlign: 'center', color: indices.liquidezGeral >= 1 ? '#16a34a' : '#dc2626', fontWeight: 'bold', wordBreak: 'break-word' }}>
+                          {indices.liquidezGeral >= 1 ? 'Solvente' : 'Insolvente'}
+                        </td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '8px', fontWeight: 'bold', wordBreak: 'break-word' }}>Endividamento Geral</td>
+                        <td style={{ padding: '8px', textAlign: 'right' }}>{formatPct(indices.endividamentoGeral)}</td>
+                        <td style={{ padding: '8px', textAlign: 'center', color: indices.endividamentoGeral <= 60 ? '#16a34a' : '#dc2626', fontWeight: 'bold', wordBreak: 'break-word' }}>
+                          {indices.endividamentoGeral <= 60 ? 'Adequado' : 'Elevado'}
+                        </td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '8px', fontWeight: 'bold', wordBreak: 'break-word' }}>Giro do Ativo</td>
+                        <td style={{ padding: '8px', textAlign: 'right' }}>{indices.giroAtivo.toFixed(2)}x</td>
+                        <td style={{ padding: '8px', textAlign: 'center', color: '#2563eb', fontWeight: 'bold', wordBreak: 'break-word' }}>Operacional</td>
+                      </tr>
+                      <tr style={{ backgroundColor: '#f8fafc', fontWeight: 'bold' }}>
+                        <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>Retorno sobre o PL (ROE)</td>
+                        <td style={{ padding: '10px 8px', textAlign: 'right', color: '#16a34a' }}>{formatPct(indices.roe)}</td>
+                        <td style={{ padding: '10px 8px', textAlign: 'center', color: '#16a34a', wordBreak: 'break-word' }}>Acionista</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
-              <div style={{ backgroundColor: '#eff6ff', borderRadius: '12px', border: '1px solid #bfdbfe', padding: '14px', fontSize: '11px', color: '#1e3a8a', lineHeight: '1.4' }}>
+              <div style={{ backgroundColor: '#eff6ff', borderRadius: '12px', border: '1px solid #bfdbfe', padding: '14px', fontSize: '11.5px', color: '#1e3a8a', lineHeight: '1.4', boxSizing: 'border-box', wordBreak: 'break-word' }}>
                 💡 <strong>Análise Du Pont:</strong> O ROE ({formatPct(indices.roe)}) é composto pelo produto da Margem Líquida ({formatPct(indices.margemLiquida)}) pelo Giro do Ativo ({indices.giroAtivo.toFixed(2)}x) e pela Alavancagem Financeira.
               </div>
 
@@ -359,89 +322,85 @@ export default function SimuladorAnaliseBalanco() {
       {/* 2. ABA: DECOMPOSIÇÃO DU PONT & ALAVANCAGEM FINANCEIRA    */}
       {/* ========================================================= */}
       {abaAtiva === 'dupont' && (
-        <div style={{ animation: 'fadeIn 0.3s', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ animation: 'fadeIn 0.3s', display: 'flex', flexDirection: 'column', gap: '20px', boxSizing: 'border-box' }}>
           
           {/* FÓRMULA MATEMÁTICA VISUAL DU PONT */}
-          <div style={{ backgroundColor: '#0f172a', color: 'white', padding: '22px', borderRadius: '12px', textAlign: 'center' }}>
+          <div style={{ backgroundColor: '#0f172a', color: 'white', padding: '20px', borderRadius: '16px', textAlign: 'center', boxSizing: 'border-box' }}>
             <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', color: '#38bdf8' }}>
               Decomposição de 3 Estágios (DuPont Model)
             </span>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px', flexWrap: 'wrap', marginTop: '15px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginTop: '15px', boxSizing: 'border-box' }}>
               
-              <div style={{ backgroundColor: '#1e293b', padding: '12px 18px', borderRadius: '8px', border: '1px solid #334155' }}>
-                <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block' }}>Margem Líquida</span>
-                <strong style={{ fontSize: '18px', color: '#10b981' }}>{formatPct(indices.margemLiquida)}</strong>
-                <span style={{ fontSize: '10px', color: '#64748b', display: 'block' }}>(Lucro / Receita)</span>
+              <div style={{ backgroundColor: '#1e293b', padding: '10px 14px', borderRadius: '8px', border: '1px solid #334155', boxSizing: 'border-box', minWidth: 0 }}>
+                <span style={{ fontSize: '10.5px', color: '#94a3b8', display: 'block' }}>Margem Líq.</span>
+                <strong style={{ fontSize: '16px', color: '#10b981', wordBreak: 'break-word' }}>{formatPct(indices.margemLiquida)}</strong>
               </div>
 
-              <span style={{ fontSize: '20px', color: '#38bdf8', fontWeight: 'bold' }}>×</span>
+              <span style={{ fontSize: '18px', color: '#38bdf8', fontWeight: 'bold' }}>×</span>
 
-              <div style={{ backgroundColor: '#1e293b', padding: '12px 18px', borderRadius: '8px', border: '1px solid #334155' }}>
-                <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block' }}>Giro do Ativo</span>
-                <strong style={{ fontSize: '18px', color: '#38bdf8' }}>{indices.giroAtivo.toFixed(2)}x</strong>
-                <span style={{ fontSize: '10px', color: '#64748b', display: 'block' }}>(Receita / Ativo)</span>
+              <div style={{ backgroundColor: '#1e293b', padding: '10px 14px', borderRadius: '8px', border: '1px solid #334155', boxSizing: 'border-box', minWidth: 0 }}>
+                <span style={{ fontSize: '10.5px', color: '#94a3b8', display: 'block' }}>Giro Ativo</span>
+                <strong style={{ fontSize: '16px', color: '#38bdf8', wordBreak: 'break-word' }}>{indices.giroAtivo.toFixed(2)}x</strong>
               </div>
 
-              <span style={{ fontSize: '20px', color: '#38bdf8', fontWeight: 'bold' }}>×</span>
+              <span style={{ fontSize: '18px', color: '#38bdf8', fontWeight: 'bold' }}>×</span>
 
-              <div style={{ backgroundColor: '#1e293b', padding: '12px 18px', borderRadius: '8px', border: '1px solid #334155' }}>
-                <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block' }}>Alavancagem (MAF)</span>
-                <strong style={{ fontSize: '18px', color: '#f59e0b' }}>{indices.alavancagemFinanceira.toFixed(2)}x</strong>
-                <span style={{ fontSize: '10px', color: '#64748b', display: 'block' }}>(Ativo / PL)</span>
+              <div style={{ backgroundColor: '#1e293b', padding: '10px 14px', borderRadius: '8px', border: '1px solid #334155', boxSizing: 'border-box', minWidth: 0 }}>
+                <span style={{ fontSize: '10.5px', color: '#94a3b8', display: 'block' }}>Alavancagem</span>
+                <strong style={{ fontSize: '16px', color: '#f59e0b', wordBreak: 'break-word' }}>{indices.alavancagemFinanceira.toFixed(2)}x</strong>
               </div>
 
-              <span style={{ fontSize: '20px', color: 'white', fontWeight: 'bold' }}>=</span>
+              <span style={{ fontSize: '18px', color: 'white', fontWeight: 'bold' }}>=</span>
 
-              <div style={{ backgroundColor: '#16a34a', padding: '12px 22px', borderRadius: '8px' }}>
-                <span style={{ fontSize: '11px', color: '#dcfce7', display: 'block' }}>ROE Final</span>
-                <strong style={{ fontSize: '20px', color: 'white' }}>{formatPct(indices.roe)}</strong>
-                <span style={{ fontSize: '10px', color: '#dcfce7', display: 'block' }}>(Lucro / PL)</span>
+              <div style={{ backgroundColor: '#16a34a', padding: '10px 18px', borderRadius: '8px', boxSizing: 'border-box', minWidth: 0 }}>
+                <span style={{ fontSize: '10.5px', color: '#dcfce7', display: 'block' }}>ROE Final</span>
+                <strong style={{ fontSize: '18px', color: 'white', wordBreak: 'break-word' }}>{formatPct(indices.roe)}</strong>
               </div>
 
             </div>
           </div>
 
           {/* CARDS COM OS PILARES EXECUTIVOS */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '15px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px', boxSizing: 'border-box' }}>
             
-            <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+            <div style={cardStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <span style={{ fontSize: '18px' }}>🏷️</span>
-                <strong style={{ fontSize: '14px', color: '#0f172a' }}>1. Eficiência Operacional (Margem)</strong>
+                <strong style={{ fontSize: '14px', color: '#0f172a', wordBreak: 'break-word' }}>1. Eficiência Operacional (Margem)</strong>
               </div>
-              <p style={{ fontSize: '12.5px', color: '#475569', lineHeight: '1.5', margin: 0 }}>
+              <p style={{ fontSize: '12.5px', color: '#475569', lineHeight: '1.5', margin: 0, wordBreak: 'break-word' }}>
                 A cada R$ 100 faturados, restam <strong>R$ {indices.margemLiquida.toFixed(2)}</strong> líquidos após todos os custos e tributos. Se este indicador cair, o Controller deve focar em precificação ou corte de custos fixos.
               </p>
             </div>
 
-            <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+            <div style={cardStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <span style={{ fontSize: '18px' }}>⚡</span>
-                <strong style={{ fontSize: '14px', color: '#0f172a' }}>2. Eficiência de Ativos (Giro)</strong>
+                <strong style={{ fontSize: '14px', color: '#0f172a', wordBreak: 'break-word' }}>2. Eficiência de Ativos (Giro)</strong>
               </div>
-              <p style={{ fontSize: '12.5px', color: '#475569', lineHeight: '1.5', margin: 0 }}>
+              <p style={{ fontSize: '12.5px', color: '#475569', lineHeight: '1.5', margin: 0, wordBreak: 'break-word' }}>
                 O Ativo Total girou <strong>{indices.giroAtivo.toFixed(2)} vezes</strong> em relação à receita. Mostra a velocidade com que os recursos aplicados (máquinas, estoques, caixa) geram vendas.
               </p>
             </div>
 
-            <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+            <div style={cardStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <span style={{ fontSize: '18px' }}>⚖️</span>
-                <strong style={{ fontSize: '14px', color: '#0f172a' }}>3. Multiplicador de Alavancagem</strong>
+                <strong style={{ fontSize: '14px', color: '#0f172a', wordBreak: 'break-word' }}>3. Multiplicador de Alavancagem</strong>
               </div>
-              <p style={{ fontSize: '12.5px', color: '#475569', lineHeight: '1.5', margin: 0 }}>
-                O Multiplicador de Ativo sobre PL está em <strong>{indices.alavancagemFinanceira.toFixed(2)}x</strong>. Quanto maior, mais a empresa usa capital de terceiros para impulsionar o retorno dos acionistas (com maior risco de solvência).
+              <p style={{ fontSize: '12.5px', color: '#475569', lineHeight: '1.5', margin: 0, wordBreak: 'break-word' }}>
+                O Multiplicador de Ativo sobre PL está em <strong>{indices.alavancagemFinanceira.toFixed(2)}x</strong>. Quanto maior, mais a empresa usa capital de terceiros para impulsionar o retorno dos acionistas.
               </p>
             </div>
 
           </div>
 
           {/* DIAGNÓSTICO ESTRATÉGICO PARA DIRETORIA */}
-          <div style={{ backgroundColor: '#f0fdf4', padding: '20px', borderRadius: '12px', border: '1px solid #86efac' }}>
-            <h4 style={{ margin: '0 0 10px 0', color: '#166534', fontSize: '14px' }}>
+          <div style={{ backgroundColor: '#f0fdf4', padding: '20px', borderRadius: '16px', border: '1px solid #86efac', boxSizing: 'border-box' }}>
+            <h4 style={{ margin: '0 0 10px 0', color: '#166534', fontSize: '14px', wordBreak: 'break-word' }}>
               🎯 Parecer de Controladoria sobre o Retorno do Acionista
             </h4>
-            <p style={{ margin: 0, fontSize: '13px', color: '#14532d', lineHeight: '1.6' }}>
+            <p style={{ margin: 0, fontSize: '13px', color: '#14532d', lineHeight: '1.6', wordBreak: 'break-word' }}>
               {indices.roe > indices.roa ? (
                 <>
                   <strong>Alavancagem Financeira Favorável:</strong> O ROE ({formatPct(indices.roe)}) é superior ao ROA ({formatPct(indices.roa)}), comprovando que o uso de capitais de terceiros está gerando um efeito multiplicador positivo sobre o capital próprio dos acionistas.

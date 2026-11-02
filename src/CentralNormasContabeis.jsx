@@ -153,26 +153,26 @@ export default function CentralNormasContabeis() {
   });
 
   return (
-    <div style={{ backgroundColor: '#ffffff', padding: '25px', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animation: 'fadeIn 0.5s' }}>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#ffffff', padding: '16px', borderRadius: '24px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animation: 'fadeIn 0.5s', boxSizing: 'border-box', width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
       
       {/* CABEÇALHO */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', gap: '15px' }}>
-        <div>
-          <h2 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '28px' }}>📚</span> Central de Normas Contábeis, CPCs e Legislação
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '15px' }}>
+        <div style={{ flex: '1 1 280px', minWidth: 0 }}>
+          <h2 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px', wordBreak: 'break-word' }}>
+            <span style={{ fontSize: '24px' }}>📚</span> Central de Normas Contábeis, CPCs e Legislação
           </h2>
           <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '13px' }}>
             Repositório técnico oficial para consulta de Pronunciamentos (CPC), ITGs, Leis Societárias, CTN e Reforma Tributária.
           </p>
         </div>
 
-        <div style={{ backgroundColor: '#eff6ff', padding: '6px 14px', borderRadius: '8px', border: '1px solid #bfdbfe', fontSize: '12px', fontWeight: 'bold', color: '#1e40af' }}>
+        <div style={{ backgroundColor: '#eff6ff', padding: '8px 14px', borderRadius: '10px', border: '1px solid #bfdbfe', fontSize: '12px', fontWeight: 'bold', color: '#1e40af', boxSizing: 'border-box' }}>
           Normas Indexadas: <span style={{ color: '#2563eb' }}>{normasDB.length} Ativas</span>
         </div>
       </div>
 
       {/* BARRA DE PESQUISA E FILTROS POR CATEGORIA */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', marginBottom: '25px', alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '20px', alignItems: 'center', boxSizing: 'border-box' }}>
         
         {/* Input de Pesquisa */}
         <input 
@@ -180,30 +180,31 @@ export default function CentralNormasContabeis() {
           placeholder="Pesquisar por norma (ex: EC 132, CPC 27, CTN, Simples)..."
           value={termoBusca}
           onChange={e => setTermoBusca(e.target.value)}
-          style={{ flex: '1 1 280px', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px' }}
+          style={{ flex: '1 1 260px', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box', width: '100%' }}
         />
 
         {/* Botões de Filtro */}
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '12px', border: '1px solid #e2e8f0', boxSizing: 'border-box' }}>
           {[
             { id: 'todas', label: 'Todas' },
-            { id: 'cpc', label: 'CPCs (Pronunciamentos)' },
+            { id: 'cpc', label: 'CPCs' },
             { id: 'itg', label: 'ITGs / CFC' },
             { id: 'societaria', label: 'Societária' },
-            { id: 'fiscal', label: 'Tributária & Fiscal' }
+            { id: 'fiscal', label: 'Tributária' }
           ].map(cat => (
             <button
               key={cat.id}
               onClick={() => setCategoriaAtiva(cat.id)}
               style={{
-                padding: '6px 12px',
-                borderRadius: '6px',
+                padding: '8px 12px',
+                borderRadius: '8px',
                 border: 'none',
                 fontSize: '11px',
                 fontWeight: 'bold',
                 cursor: 'pointer',
                 backgroundColor: categoriaAtiva === cat.id ? '#0f172a' : 'transparent',
-                color: categoriaAtiva === cat.id ? 'white' : '#64748b'
+                color: categoriaAtiva === cat.id ? 'white' : '#64748b',
+                transition: 'all 0.2s'
               }}
             >
               {cat.label}
@@ -213,8 +214,8 @@ export default function CentralNormasContabeis() {
 
       </div>
 
-      {/* GRID DE CARDS DAS NORMAS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+      {/* GRID DE CARDS DAS NORMAS (Grelha Flexível Inteligente) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '16px', boxSizing: 'border-box' }}>
         {normasFiltradas.length === 0 ? (
           <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: '#64748b', fontSize: '13px' }}>
             Nenhuma norma encontrada para os critérios de busca informados.
@@ -225,17 +226,18 @@ export default function CentralNormasContabeis() {
               key={norma.id} 
               style={{ 
                 backgroundColor: '#f8fafc', 
-                borderRadius: '12px', 
+                borderRadius: '16px', 
                 border: '1px solid #cbd5e1', 
                 padding: '20px', 
                 display: 'flex', 
                 flexDirection: 'column', 
                 gap: '12px',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
-                transition: 'transform 0.2s'
+                boxSizing: 'border-box',
+                minWidth: 0
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '6px' }}>
                 <span style={{ fontSize: '11px', fontWeight: 'bold', padding: '3px 8px', borderRadius: '6px', backgroundColor: '#e2e8f0', color: '#1e293b' }}>
                   {norma.codigo}
                 </span>
@@ -244,15 +246,15 @@ export default function CentralNormasContabeis() {
                 </span>
               </div>
 
-              <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a' }}>
+              <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', wordBreak: 'break-word' }}>
                 {norma.titulo}
               </h3>
 
-              <p style={{ margin: 0, fontSize: '12.5px', color: '#475569', lineHeight: '1.5' }}>
+              <p style={{ margin: 0, fontSize: '12.5px', color: '#475569', lineHeight: '1.5', wordBreak: 'break-word' }}>
                 {norma.resumo}
               </p>
 
-              <div style={{ marginTop: 'auto', backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '11.5px', color: '#334155' }}>
+              <div style={{ marginTop: 'auto', backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '11.5px', color: '#334155', boxSizing: 'border-box', wordBreak: 'break-word' }}>
                 <strong>💡 Aplicação no ERP:</strong> {norma.aplicacaoPratica}
               </div>
             </div>

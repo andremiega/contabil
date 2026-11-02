@@ -18,14 +18,12 @@ export default function BuscaApostilasChat() {
     setCarregando(true);
 
     try {
-      // Busca todos os registos da tabela 'apostilas'
       const { data, error } = await supabase
         .from('apostilas')
         .select('*');
 
       if (error) throw error;
 
-      // Filtra de forma segura pelo título ou pelas palavras-chave (array)
       const termo = textoUsuario.toLowerCase();
       const resultadosFiltrados = data?.filter(item => {
         const tituloMatch = item.titulo_livro?.toLowerCase().includes(termo);
@@ -55,33 +53,39 @@ export default function BuscaApostilasChat() {
     }
   };
 
+  const inputStyle = { width: '100%', maxWidth: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', color: '#0f172a', backgroundColor: '#f8fafc', outline: 'none', boxSizing: 'border-box' };
+
   return (
-    <div style={{ backgroundColor: '#ffffff', padding: '25px', borderRadius: '12px', border: '1px solid #cbd5e1', maxWidth: '800px', margin: '0 auto', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-      <h2 style={{ margin: '0 0 10px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <span>🤖</span> Assistente de Busca de Apostilas
-      </h2>
-      <p style={{ color: '#64748b', fontSize: '13.5px', marginBottom: '20px' }}>
-        Pesquise por temas técnicos e receba os materiais em PDF instantaneamente.
-      </p>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#ffffff', padding: '16px', borderRadius: '24px', border: '1px solid #cbd5e1', maxWidth: '800px', margin: '0 auto', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', boxSizing: 'border-box', width: '100%', overflowX: 'hidden' }}>
+      
+      <div style={{ marginBottom: '16px', boxSizing: 'border-box' }}>
+        <h2 style={{ margin: '0 0 6px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px', wordBreak: 'break-word' }}>
+          <span style={{ fontSize: '24px' }}>🤖</span> Assistente de Busca de Apostilas
+        </h2>
+        <p style={{ color: '#64748b', fontSize: '13px', margin: 0, wordBreak: 'break-word' }}>
+          Pesquise por temas técnicos e receba os materiais em PDF instantaneamente.
+        </p>
+      </div>
 
       {/* HISTÓRICO DE MENSAGENS */}
-      <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', height: '350px', overflowY: 'auto', padding: '15px', marginBottom: '15px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', height: '350px', overflowY: 'auto', padding: '16px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '12px', boxSizing: 'border-box' }}>
         {mensagens.map((msg, index) => (
-          <div key={index} style={{ alignSelf: msg.remetente === 'usuario' ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
+          <div key={index} style={{ alignSelf: msg.remetente === 'usuario' ? 'flex-end' : 'flex-start', maxWidth: '85%', boxSizing: 'border-box', minWidth: 0 }}>
             <div style={{ 
               backgroundColor: msg.remetente === 'usuario' ? '#2563eb' : '#ffffff', 
               color: msg.remetente === 'usuario' ? '#ffffff' : '#0f172a', 
               padding: '12px 16px', 
-              borderRadius: '12px', 
+              borderRadius: '16px', 
               border: msg.remetente === 'bot' ? '1px solid #cbd5e1' : 'none',
               fontSize: '13.5px',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+              boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+              boxSizing: 'border-box',
+              wordBreak: 'break-word'
             }}>
-              <p style={{ margin: 0 }}>{msg.texto}</p>
+              <p style={{ margin: 0, wordBreak: 'break-word' }}>{msg.texto}</p>
 
               {/* RESULTADOS DA BUSCA */}
               {msg.resultados && msg.resultados.map(res => {
-                // Gera o link público do PDF no Storage do Supabase de forma segura
                 const { data: storageData } = supabase.storage
                   .from('apostilas')
                   .getPublicUrl(res.nome_arquivo_storage || '');
@@ -89,16 +93,16 @@ export default function BuscaApostilasChat() {
                 const urlParaDownload = storageData?.publicUrl || '#';
 
                 return (
-                  <div key={res.id} style={{ marginTop: '10px', padding: '10px', backgroundColor: '#f1f5f9', borderRadius: '8px', border: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
-                    <div>
-                      <strong style={{ fontSize: '13px', color: '#0f172a', display: 'block' }}>{res.titulo_livro}</strong>
-                      <span style={{ fontSize: '11px', color: '#64748b' }}>Ficheiro: {res.nome_arquivo_storage}</span>
+                  <div key={res.id} style={{ marginTop: '10px', padding: '12px', backgroundColor: '#f1f5f9', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', flexWrap: 'wrap', boxSizing: 'border-box', minWidth: 0 }}>
+                    <div style={{ minWidth: 0, flex: '1 1 200px' }}>
+                      <strong style={{ fontSize: '13px', color: '#0f172a', display: 'block', wordBreak: 'break-word' }}>{res.titulo_livro}</strong>
+                      <span style={{ fontSize: '11px', color: '#64748b', wordBreak: 'break-word' }}>Ficheiro: {res.nome_arquivo_storage}</span>
                     </div>
                     <a 
                       href={urlParaDownload} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      style={{ backgroundColor: '#16a34a', color: 'white', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none', whiteSpace: 'nowrap' }}
+                      style={{ backgroundColor: '#16a34a', color: 'white', padding: '8px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0, boxSizing: 'border-box' }}
                     >
                       📥 Baixar PDF
                     </a>
@@ -108,19 +112,19 @@ export default function BuscaApostilasChat() {
             </div>
           </div>
         ))}
-        {carregando && <div style={{ color: '#64748b', fontSize: '13px', fontStyle: 'italic' }}>A pesquisar no acervo...</div>}
+        {carregando && <div style={{ color: '#64748b', fontSize: '13px', fontStyle: 'italic', wordBreak: 'break-word' }}>A pesquisar no acervo...</div>}
       </div>
 
       {/* FORMULÁRIO DE PESQUISA */}
-      <form onSubmit={handleBuscar} style={{ display: 'flex', gap: '10px' }}>
+      <form onSubmit={handleBuscar} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', boxSizing: 'border-box' }}>
         <input 
           type="text" 
           placeholder="Ex: contabilidade, fiscal, mei, dp..." 
           value={pergunta}
           onChange={e => setPergunta(e.target.value)}
-          style={{ flex: 1, padding: '12px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', outline: 'none' }}
+          style={{ ...inputStyle, flex: '1 1 250px' }}
         />
-        <button type="submit" style={{ backgroundColor: '#0f172a', color: 'white', border: 'none', padding: '0 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '13.5px', cursor: 'pointer' }}>
+        <button type="submit" style={{ backgroundColor: '#0f172a', color: 'white', border: 'none', padding: '12px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '13.5px', cursor: 'pointer', boxSizing: 'border-box', flexShrink: 0 }}>
           Pesquisar
         </button>
       </form>

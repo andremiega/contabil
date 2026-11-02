@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function SimuladorHP12c({ mostrarToast }) {
   const [modo, setModo] = useState('trilha'); // 'trilha' ou 'livre'
@@ -91,7 +91,7 @@ export default function SimuladorHP12c({ mostrarToast }) {
 
   const pressSTO = () => {
     setMemoriaAux(Number(visor));
-    mostrarToast('Valor salvo na Memória (STO).', 'sucesso');
+    if (mostrarToast) mostrarToast('Valor salvo na Memória (STO).', 'sucesso');
     setInputando(true);
     validarMissao(Number(visor)); 
   };
@@ -100,19 +100,19 @@ export default function SimuladorHP12c({ mostrarToast }) {
     setVisor(memoriaAux.toString());
     setPilha({ ...pilha, x: memoriaAux });
     setInputando(false);
-    mostrarToast('Valor recuperado da Memória (RCL).', 'sucesso');
+    if (mostrarToast) mostrarToast('Valor recuperado da Memória (RCL).', 'sucesso');
   };
 
   const clearX = () => {
     setVisor('0.00');
     setPilha({ x: 0, y: 0, z: 0, t: 0 }); 
     setInputando(false);
-    mostrarToast('Pilha operacional limpa!', 'sucesso');
+    if (mostrarToast) mostrarToast('Pilha operacional limpa!', 'sucesso');
   };
 
   const clearFin = () => {
     setFin({ n: 0, i: 0, pv: 0, pmt: 0, fv: 0 });
-    mostrarToast('Memória Financeira limpa!', 'sucesso');
+    if (mostrarToast) mostrarToast('Memória Financeira limpa!', 'sucesso');
   };
 
   const pressFin = (reg) => {
@@ -150,14 +150,14 @@ export default function SimuladorHP12c({ mostrarToast }) {
         const pmtOverI = fin.pmt / taxa;
         const num = -fin.fv + pmtOverI;
         const den = fin.pv + pmtOverI;
-        if (den === 0 || num / den <= 0) return mostrarToast("Erro: PV e FV precisam de sinais opostos.", "erro");
+        if (den === 0 || num / den <= 0) return mostrarToast ? mostrarToast("Erro: PV e FV precisam de sinais opostos.", "erro") : alert("Erro: PV e FV precisam de sinais opostos.");
         res = Math.log(num / den) / Math.log(1 + taxa);
       }
     }
     else if (reg === 'i') {
-      if (fin.pmt !== 0) return mostrarToast("Laboratório calcula 'i' apenas se PMT = 0.", "erro");
+      if (fin.pmt !== 0) return mostrarToast ? mostrarToast("Laboratório calcula 'i' apenas se PMT = 0.", "erro") : alert("Laboratório calcula 'i' apenas se PMT = 0.");
       const ratio = fin.fv / -fin.pv;
-      if (ratio <= 0) return mostrarToast("Erro: PV e FV precisam de sinais opostos.", "erro");
+      if (ratio <= 0) return mostrarToast ? mostrarToast("Erro: PV e FV precisam de sinais opostos.", "erro") : alert("Erro: PV e FV precisam de sinais opostos.");
       res = (Math.pow(ratio, 1 / fin.n) - 1) * 100;
     }
 
@@ -173,13 +173,13 @@ export default function SimuladorHP12c({ mostrarToast }) {
 
     if (m && Math.abs(resultadoAtual - m.alvo) < 0.10) { 
       setTimeout(() => {
-        mostrarToast(`🎯 Correto!`, 'sucesso');
+        if (mostrarToast) mostrarToast(`🎯 Correto!`, 'sucesso');
         if (missaoAtual < missoes.length - 1) {
           setMissaoAtual(missaoAtual + 1);
           clearX();
           clearFin();
         } else {
-          mostrarToast('🏆 Parabéns! Você concluiu a trilha básica!', 'sucesso');
+          if (mostrarToast) mostrarToast('🏆 Parabéns! Você concluiu a trilha básica!', 'sucesso');
           setModo('livre');
         }
       }, 300);
@@ -187,44 +187,44 @@ export default function SimuladorHP12c({ mostrarToast }) {
   };
 
   return (
-    <div style={{ backgroundColor: '#f1f5f9', display: 'flex', flexDirection: 'column', gap: '20px', animation: 'fadeIn 0.4s' }}>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '24px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animation: 'fadeIn 0.5s', boxSizing: 'border-box', width: '100%', maxWidth: '100%', overflowX: 'hidden', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
       {/* HEADER & TOGGLE */}
-      <div style={{ backgroundColor: '#0f172a', padding: '25px', borderRadius: '12px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '15px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <span style={{ fontSize: '38px' }}>🧮</span>
-          <div>
-            <h2 style={{ margin: 0, fontSize: 'clamp(20px, 4vw, 24px)', fontWeight: '900' }}>Simulador HP 12c & Sandbox</h2>
-            <p style={{ margin: '5px 0 0 0', color: '#94a3b8', fontSize: '14px' }}>Aprenda matemática financeira operando a calculadora padrão do mercado.</p>
+      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #3b82f6 100%)', color: 'white', padding: '24px', borderRadius: '20px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', boxSizing: 'border-box' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flex: '1 1 280px', minWidth: 0 }}>
+          <span style={{ fontSize: '32px' }}>🧮</span>
+          <div style={{ minWidth: 0 }}>
+            <span style={{ backgroundColor: '#1e3a8a', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '900', letterSpacing: '1px' }}>MATEMÁTICA FINANCEIRA</span>
+            <h2 style={{ margin: '8px 0 0 0', fontSize: '22px', fontWeight: '900', wordBreak: 'break-word' }}>Simulador HP 12c & Sandbox</h2>
           </div>
         </div>
         
         {/* Toggle Modo */}
-        <div style={{ display: 'flex', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '8px', padding: '4px' }}>
+        <div style={{ display: 'flex', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '10px', padding: '4px', flexWrap: 'wrap', gap: '4px' }}>
           <button onClick={() => {setModo('trilha'); clearX(); clearFin();}} style={toggleBtn(modo === 'trilha')}>🎮 Modo Guiado</button>
           <button onClick={() => {setModo('livre'); clearX(); clearFin();}} style={toggleBtn(modo === 'livre')}>📖 Exercícios (Modo Livre)</button>
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '25px', justifyContent: 'center', alignItems: 'flex-start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '24px', alignItems: 'flex-start', boxSizing: 'border-box' }}>
         
         {/* ==========================================
-            1. A CALCULADORA VIRTUAL (ESQUERDA)
+            1. A CALCULADORA VIRTUAL
             ========================================== */}
-        <div style={{ flex: '1 1 350px', maxWidth: '480px', backgroundColor: '#1e293b', padding: '30px 20px', borderRadius: '16px', border: '4px solid #0f172a', boxShadow: '0 10px 30px rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', gap: '20px', position: 'sticky', top: '20px' }}>
+        <div style={{ backgroundColor: '#1e293b', padding: '24px 16px', borderRadius: '20px', border: '4px solid #0f172a', boxShadow: '0 10px 30px rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', gap: '16px', boxSizing: 'border-box', minWidth: 0 }}>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ color: '#d4d4d8', fontWeight: '900', fontStyle: 'italic', letterSpacing: '2px' }}>hp 12c</span>
             <span style={{ color: '#d4d4d8', fontSize: '10px' }}>Contábil Cloud Edition</span>
           </div>
 
-          <div style={{ backgroundColor: '#b5ccad', padding: '15px', borderRadius: '6px', textAlign: 'right', border: 'inset 3px #64748b', boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.2)' }}>
-            <span style={{ fontFamily: 'monospace', fontSize: '32px', color: '#1e293b', fontWeight: 'bold' }}>
+          <div style={{ backgroundColor: '#b5ccad', padding: '14px', borderRadius: '8px', textAlign: 'right', border: 'inset 3px #64748b', boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.2)', boxSizing: 'border-box' }}>
+            <span style={{ fontFamily: 'monospace', fontSize: '26px', color: '#1e293b', fontWeight: 'bold', wordBreak: 'break-all' }}>
               {formatarVisor(visor)}
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', boxSizing: 'border-box' }}>
             <Key label="n" onClick={() => pressFin('n')} />
             <Key label="i" onClick={() => pressFin('i')} />
             <Key label="PV" onClick={() => pressFin('pv')} />
@@ -262,120 +262,91 @@ export default function SimuladorHP12c({ mostrarToast }) {
             <Key label="CLx" onClick={clearX} bg="#ef4444" />
           </div>
 
-          <button onClick={pressEnter} style={{ backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', padding: '15px 0', fontSize: '18px', fontWeight: '900', cursor: 'pointer', boxShadow: '0 4px 0 rgba(0,0,0,0.5)', transition: 'all 0.1s', marginTop: '5px' }}>
+          <button onClick={pressEnter} style={{ backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', padding: '14px 0', fontSize: '16px', fontWeight: '900', cursor: 'pointer', boxShadow: '0 4px 0 rgba(0,0,0,0.5)', transition: 'all 0.1s', width: '100%', boxSizing: 'border-box' }}>
             ENTER
           </button>
         </div>
 
         {/* ==========================================
-            2. PAINEL CENTRAL (MISSÕES OU APOSTILA DE CARTÕES)
+            2. PAINEL CENTRAL (MISSÕES OU APOSTILA)
             ========================================== */}
-        <div style={{ flex: '1 1 350px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0, boxSizing: 'border-box' }}>
           
           {modo === 'trilha' ? (
             /* COMPONENTE DA TRILHA */
-            <div style={{ backgroundColor: '#eff6ff', padding: '25px', borderRadius: '12px', border: '1px solid #bfdbfe', animation: 'fadeIn 0.3s' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                <span style={{ backgroundColor: '#2563eb', color: 'white', padding: '6px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold' }}>
+            <div style={{ backgroundColor: '#ffffff', padding: '24px', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', animation: 'fadeIn 0.3s', boxSizing: 'border-box' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                <span style={{ backgroundColor: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', padding: '4px 10px', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold' }}>
                   Missão {missaoAtual + 1} de {missoes.length}
                 </span>
                 <span style={{ fontSize: '13px', color: '#1e40af', fontWeight: 'bold' }}>Alvo: {formatarVisor(m.alvo)}</span>
               </div>
               
-              <h3 style={{ margin: '0 0 10px 0', color: '#1e40af', fontSize: '20px' }}>{m.titulo}</h3>
-              <p style={{ fontSize: '14px', color: '#1e293b', marginBottom: '20px', lineHeight: '1.5' }}>{m.contexto}</p>
+              <h3 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '18px', wordBreak: 'break-word' }}>{m.titulo}</h3>
+              <p style={{ margin: '0 0 16px 0', fontSize: '13.5px', color: '#475569', lineHeight: '1.5', wordBreak: 'break-word' }}>{m.contexto}</p>
               
-              <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #3b82f6', marginBottom: '20px' }}>
-                <strong style={{ color: '#0f172a', display: 'block', marginBottom: '6px' }}>Seu Desafio:</strong>
-                <span style={{ color: '#475569', fontSize: '15px' }}>{m.missao}</span>
+              <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '12px', borderLeft: '4px solid #3b82f6', marginBottom: '16px', boxSizing: 'border-box' }}>
+                <strong style={{ color: '#0f172a', display: 'block', marginBottom: '4px', fontSize: '13px' }}>Seu Desafio:</strong>
+                <span style={{ color: '#334155', fontSize: '13.5px', wordBreak: 'break-word' }}>{m.missao}</span>
               </div>
 
-              <div style={{ fontSize: '13px', color: '#2563eb', fontWeight: 'bold', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ fontSize: '12.5px', color: '#2563eb', fontWeight: 'bold', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <span>💡 Sequência na Calculadora:</span>
-                <span style={{ backgroundColor: '#dbeafe', padding: '10px', borderRadius: '6px', textAlign: 'center', letterSpacing: '1px' }}>{m.dica}</span>
+                <span style={{ backgroundColor: '#eff6ff', padding: '10px', borderRadius: '8px', textAlign: 'center', letterSpacing: '1px', wordBreak: 'break-word', fontSize: '12px', border: '1px solid #bfdbfe' }}>{m.dica}</span>
               </div>
             </div>
           ) : (
-            /* COMPONENTE APOSTILA NATIVA DE CARTÕES (SUBSTITUI O PDF) */
-            <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', animation: 'fadeIn 0.3s', maxHeight: '700px', overflowY: 'auto' }}>
-              <h2 style={{ textAlign: 'center', color: '#0f172a', marginBottom: '25px', fontSize: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+            /* COMPONENTE APOSTILA NATIVA DE CARTÕES */
+            <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', animation: 'fadeIn 0.3s', maxHeight: '550px', overflowY: 'auto', boxSizing: 'border-box' }}>
+              <h2 style={{ textAlign: 'center', color: '#0f172a', marginBottom: '20px', fontSize: '17px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                 <span>📑</span> Exercícios de Mercado (CPA-20 / CEA)
               </h2>
               
               <CartaoExercicio num="1" cat="Matemática Básica" titulo="Taxas Equivalentes (a.a. p/ a.m.)" 
-                texto="Um CDB rende 15% ao ano (a.a.). Qual é a taxa equivalente ao mês (a.m.) considerando juros compostos? (Fórmula: [(1 + i)^(1/12) - 1] * 100)"
+                texto="Um CDB rende 15% ao ano (a.a.). Qual é a taxa equivalente ao mês (a.m.) considerando juros compostos?"
                 teclas="1.15 [ENTER] 1 [ENTER] 12 [÷] [y^x] 1 [-] 100 [x]" resp="1.17 % a.m." 
               />
-              
               <CartaoExercicio num="2" cat="Mercado de Capitais" titulo="Variação Percentual (Δ%) de Ações" 
-                texto="Você comprou um Fundo Imobiliário por R$ 115,00. Hoje a cota está R$ 138,50. Qual foi a rentabilidade dessa valorização?"
+                texto="Você comprou um Fundo Imobiliário por R$ 115,00. Hoje a cota está R$ 138,50. Qual foi a rentabilidade?"
                 teclas="115 [ENTER] 138.50 [Δ%]" resp="20.43 %" 
               />
-
               <CartaoExercicio num="3" cat="Gestão Empresarial" titulo="Market Share (%T)" 
-                texto="Uma rede de franquias faturou R$ 450.000 (Total). A filial Sul foi responsável por R$ 112.500. Qual a participação (%) dessa filial no total?"
+                texto="Uma rede faturou R$ 450.000 (Total). A filial Sul faturou R$ 112.500. Qual a participação (%) da filial?"
                 teclas="450000 [ENTER] 112500 [%T]" resp="25.00 %" 
               />
-              
               <CartaoExercicio num="4" cat="Técnica HP" titulo="Memória Auxiliar (STO/RCL)" 
-                texto="Guarde o valor da Taxa Selic de 10.50 na memória da HP. Limpe a tela (CLx). Depois, puxe esse valor de volta e descubra quanto é 30% da Selic."
+                texto="Guarde a Selic de 10.50 na memória. Limpe o visor (CLx). Puxe de volta e ache 30% desse valor."
                 teclas="10.50 [STO] [CLx] [RCL] [ENTER] 30 [%]" resp="3.15 %" 
               />
-
               <CartaoExercicio num="5" cat="Financiamentos" titulo="Cálculo de Tabela Price (PMT)" 
-                texto="Qual o valor da prestação mensal de um financiamento imobiliário de R$ 300.000,00, a ser pago em 360 meses, com taxa de 0.8% a.m.?"
+                texto="Prestação de financiamento de R$ 300.000,00 em 360 meses a 0.8% a.m.?"
                 teclas="300000 [CHS] [PV] 0.8 [i] 360 [n] [PMT]" resp="2,544.75" 
-              />
-
-              <CartaoExercicio num="6" cat="Empréstimos" titulo="Quitação Antecipada (PV)" 
-                texto="Faltam 48 parcelas de R$ 1.500,00 para quitar o carro. A taxa original foi 1.2% a.m. Quanto o banco deve cobrar se você quiser pagar tudo à vista hoje?"
-                teclas="1500 [CHS] [PMT] 1.2 [i] 48 [n] [PV]" resp="54,496.09" 
-              />
-
-              <CartaoExercicio num="7" cat="Investimentos" titulo="Acumulação de Capital (FV)" 
-                texto="Você já tem R$ 10.000 investidos e vai poupar R$ 1.000 todos os meses por 10 anos (120 meses). Se a taxa for 1% a.m., quanto terá no final?"
-                teclas="10000 [CHS] [PV] 1000 [CHS] [PMT] 1 [i] 120 [n] [FV]" resp="263,043.91" 
-              />
-
-              <CartaoExercicio num="8" cat="Avaliação" titulo="Custo Efetivo Total (CET)" 
-                texto="Você pegou R$ 10.000 emprestados e vai pagar em 24 vezes de R$ 550,00. Qual é a taxa de juros (i) real escondida nesse parcelamento?"
-                teclas="10000 [CHS] [PV] 550 [PMT] 24 [n] [i]" resp="2.35 %" 
-              />
-
-              <CartaoExercicio num="9" cat="Economia" titulo="Taxa Real (Descontando a Inflação)" 
-                texto="Você ganhou 12% a.a. num CDB, mas a inflação (IPCA) foi 5% no ano. Qual foi seu Ganho Real? Fórmula: [(1+Inom) / (1+Iinf) - 1] * 100"
-                teclas="1.12 [ENTER] 1.05 [÷] 1 [-] 100 [x]" resp="6.67 %" 
-              />
-
-              <CartaoExercicio num="10" cat="Técnica HP" titulo="Proporção Inversa (1/x)" 
-                texto="Se um robô constrói 1 carro em 4 dias (4), qual a produtividade diária dele? (Use a tecla de inverso para descobrir carros/dia)."
-                teclas="4 [1/x]" resp="0.25 carros por dia" 
               />
             </div>
           )}
 
           {/* ==========================================
-              3. RAIO-X DA MEMÓRIA (DIREITA/INFERIOR)
+              3. RAIO-X DA MEMÓRIA
               ========================================== */}
-          <div style={{ backgroundColor: 'white', padding: '25px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
-            <h3 style={{ margin: '0 0 15px 0', color: '#0f172a', fontSize: '18px' }}>🔍 Raio-X da Memória Interna</h3>
+          <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', boxSizing: 'border-box' }}>
+            <h3 style={{ margin: '0 0 12px 0', color: '#0f172a', fontSize: '16px' }}>🔍 Raio-X da Memória Interna</h3>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '16px' }}>
               {/* Pilha RPN */}
-              <div style={{ backgroundColor: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b', marginBottom: '10px' }}>PILHA OPERACIONAL (RPN)</div>
+              <div style={{ backgroundColor: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', boxSizing: 'border-box' }}>
+                <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#64748b', marginBottom: '8px' }}>PILHA OPERACIONAL (RPN)</div>
                 <div style={memRow}><span>T (Top):</span> <span>{formatarVisor(pilha.t)}</span></div>
                 <div style={memRow}><span>Z:</span> <span>{formatarVisor(pilha.z)}</span></div>
                 <div style={memRow}><span>Y (Anterior):</span> <span>{formatarVisor(pilha.y)}</span></div>
-                <div style={{...memRow, backgroundColor: '#dcfce7', borderColor: '#86efac', color: '#166534', fontWeight: 'bold'}}>
+                <div style={{...memRow, backgroundColor: '#dcfce7', borderColor: '#86efac', color: '#166534', fontWeight: 'bold', borderRadius: '4px'}}>
                   <span>X (Visor):</span> <span>{formatarVisor(visor)}</span>
                 </div>
               </div>
               
               {/* Finanças e STO */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <div style={{ backgroundColor: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b', marginBottom: '10px' }}>REGISTROS FINANCEIROS</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', minWidth: 0 }}>
+                <div style={{ backgroundColor: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', boxSizing: 'border-box' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#64748b', marginBottom: '8px' }}>REGISTROS FINANCEIROS</div>
                   <div style={memRow}><span>n:</span> <span>{fin.n}</span></div>
                   <div style={memRow}><span>i:</span> <span>{fin.i}</span></div>
                   <div style={memRow}><span>PV:</span> <span>{formatarVisor(fin.pv)}</span></div>
@@ -383,8 +354,8 @@ export default function SimuladorHP12c({ mostrarToast }) {
                   <div style={memRow}><span>FV:</span> <span>{formatarVisor(fin.fv)}</span></div>
                 </div>
                 
-                <div style={{ backgroundColor: '#faf5ff', padding: '10px 15px', borderRadius: '8px', border: '1px solid #e9d5ff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#7e22ce' }}>MEMÓRIA (STO/RCL)</span>
+                <div style={{ backgroundColor: '#faf5ff', padding: '12px 14px', borderRadius: '12px', border: '1px solid #e9d5ff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxSizing: 'border-box' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#7e22ce' }}>MEMÓRIA (STO/RCL)</span>
                   <span style={{ fontWeight: '900', color: '#9333ea' }}>{formatarVisor(memoriaAux)}</span>
                 </div>
               </div>
@@ -404,44 +375,43 @@ const Key = ({ label, onClick, bg = '#334155' }) => (
   <button 
     onClick={onClick} 
     style={{
-      backgroundColor: bg, color: 'white', border: 'none', borderRadius: '4px', padding: '12px 0',
-      fontSize: '14px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 0 rgba(0,0,0,0.6)',
-      transition: 'transform 0.1s, box-shadow 0.1s', userSelect: 'none'
+      backgroundColor: bg, color: 'white', border: 'none', borderRadius: '6px', padding: '10px 0',
+      fontSize: '13px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 3px 0 rgba(0,0,0,0.6)',
+      transition: 'transform 0.1s, box-shadow 0.1s', userSelect: 'none', boxSizing: 'border-box'
     }}
-    onMouseDown={(e) => { e.currentTarget.style.transform = 'translateY(4px)'; e.currentTarget.style.boxShadow = '0 0 0 rgba(0,0,0,0.6)'; }}
-    onMouseUp={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 0 rgba(0,0,0,0.6)'; }}
-    onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 0 rgba(0,0,0,0.6)'; }}
+    onMouseDown={(e) => { e.currentTarget.style.transform = 'translateY(3px)'; e.currentTarget.style.boxShadow = '0 0 0 rgba(0,0,0,0.6)'; }}
+    onMouseUp={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 3px 0 rgba(0,0,0,0.6)'; }}
+    onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 3px 0 rgba(0,0,0,0.6)'; }}
   >
     {label}
   </button>
 );
 
-// O NOVO CARTÃO DE EXERCÍCIO INTERATIVO (Substitui o PDF)
 const CartaoExercicio = ({ num, cat, titulo, texto, teclas, resp }) => {
   const [aberto, setAberto] = useState(false);
   
   return (
-    <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', padding: '20px', marginBottom: '15px', backgroundColor: 'white', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-        <span style={{ backgroundColor: '#e2e8f0', color: '#475569', fontSize: '11px', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>{cat}</span>
-        <span style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 'bold' }}>Exercício {num}</span>
+    <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', marginBottom: '12px', backgroundColor: '#f8fafc', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '4px' }}>
+        <span style={{ backgroundColor: '#e2e8f0', color: '#475569', fontSize: '10.5px', padding: '3px 6px', borderRadius: '4px', fontWeight: 'bold' }}>{cat}</span>
+        <span style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 'bold' }}>Exercício {num}</span>
       </div>
-      <h4 style={{ margin: '0 0 10px 0', color: '#0f172a', fontSize: '16px' }}>{titulo}</h4>
-      <p style={{ margin: '0 0 15px 0', fontSize: '14px', color: '#475569', lineHeight: '1.5' }}>{texto}</p>
+      <h4 style={{ margin: '0 0 6px 0', color: '#0f172a', fontSize: '14.5px', wordBreak: 'break-word' }}>{titulo}</h4>
+      <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: '#475569', lineHeight: '1.5', wordBreak: 'break-word' }}>{texto}</p>
 
       {!aberto ? (
-        <button onClick={() => setAberto(true)} style={{ backgroundColor: '#f1f5f9', color: '#2563eb', border: '1px dashed #93c5fd', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', width: '100%', fontSize: '13px' }}>
+        <button onClick={() => setAberto(true)} style={{ backgroundColor: '#ffffff', color: '#2563eb', border: '1px dashed #93c5fd', padding: '8px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', width: '100%', fontSize: '12px', boxSizing: 'border-box' }}>
           👀 Ver Gabarito da Calculadora
         </button>
       ) : (
-        <div style={{ backgroundColor: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0', animation: 'fadeIn 0.3s' }}>
-          <div style={{ fontSize: '13px', fontFamily: 'monospace', color: '#2563eb', fontWeight: 'bold', marginBottom: '10px', wordBreak: 'break-word', letterSpacing: '1px' }}>
+        <div style={{ backgroundColor: '#ffffff', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', animation: 'fadeIn 0.3s', boxSizing: 'border-box' }}>
+          <div style={{ fontSize: '12px', fontFamily: 'monospace', color: '#2563eb', fontWeight: 'bold', marginBottom: '8px', wordBreak: 'break-word', letterSpacing: '0.5px' }}>
             ⌨️ Teclas: {teclas}
           </div>
-          <div style={{ fontSize: '14px', color: '#10b981', fontWeight: 'bold' }}>
+          <div style={{ fontSize: '13px', color: '#10b981', fontWeight: 'bold', wordBreak: 'break-word' }}>
             ✅ Resposta no Visor: {resp}
           </div>
-          <button onClick={() => setAberto(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '12px', marginTop: '10px', cursor: 'pointer', textDecoration: 'underline' }}>Ocultar Gabarito</button>
+          <button onClick={() => setAberto(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '11px', marginTop: '8px', cursor: 'pointer', textDecoration: 'underline' }}>Ocultar Gabarito</button>
         </div>
       )}
     </div>
@@ -449,8 +419,8 @@ const CartaoExercicio = ({ num, cat, titulo, texto, teclas, resp }) => {
 }
 
 const toggleBtn = (ativo) => ({
-  backgroundColor: ativo ? 'white' : 'transparent', color: ativo ? '#0f172a' : 'white',
-  border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 'bold', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s'
+  backgroundColor: ativo ? '#ffffff' : 'transparent', color: ativo ? '#0f172a' : '#ffffff',
+  border: 'none', padding: '6px 12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', transition: 'all 0.2s', boxSizing: 'border-box'
 });
 
-const memRow = { display: 'flex', justifyContent: 'space-between', padding: '6px 8px', borderBottom: '1px solid #e2e8f0', fontSize: '13px', color: '#334155' };
+const memRow = { display: 'flex', justifyContent: 'space-between', padding: '4px 6px', borderBottom: '1px solid #e2e8f0', fontSize: '12px', color: '#334155' };

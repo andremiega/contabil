@@ -136,7 +136,6 @@ export default function SimuladorMotorMissoes() {
     setAbaAtiva('crises');
     setTempoRestante(crise.tempoMaximo);
     setFaseCrise('jogando');
-    // Reseta todos os campos
     setMg1Imovel(''); setMg1Estoque('');
     setMgSelectD(contasDisponiveis[0].codigo); setMgSelectC(contasDisponiveis[5].codigo);
     setMg3QtdCerta(0);
@@ -183,7 +182,7 @@ export default function SimuladorMotorMissoes() {
   const btnAbaBase = { padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s' };
   
   return (
-    <div style={{ backgroundColor: '#ffffff', padding: '24px', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', fontFamily: 'system-ui, sans-serif' }}>
+    <div translate="no" className="notranslate" style={{ backgroundColor: '#ffffff', padding: '16px', borderRadius: '24px', border: '1px solid #cbd5e1', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', fontFamily: 'system-ui, sans-serif' }}>
       
       {/* CSS para Efeitos de Crise */}
       <style>{`
@@ -204,21 +203,21 @@ export default function SimuladorMotorMissoes() {
       `}</style>
 
       {/* CABEÇALHO & XP */}
-      <div style={{ backgroundColor: faseCrise === 'jogando' ? '#7f1d1d' : '#0f172a', color: 'white', padding: '20px 24px', borderRadius: '10px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', gap: '15px', transition: 'background-color 0.5s' }} className={faseCrise === 'jogando' ? 'crisis-header' : ''}>
-        <div>
+      <div style={{ backgroundColor: faseCrise === 'jogando' ? '#7f1d1d' : '#0f172a', color: 'white', padding: '20px', borderRadius: '20px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '15px', transition: 'background-color 0.5s' }} className={faseCrise === 'jogando' ? 'crisis-header' : ''}>
+        <div style={{ flex: '1 1 280px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
             <span style={{ backgroundColor: faseCrise === 'jogando' ? '#fca5a5' : '#3b82f6', color: '#0f172a', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '900' }}>
               {faseCrise === 'jogando' ? '🚨 MODO SOBREVIVÊNCIA' : 'SISTEMA DE TREINAMENTO'}
             </span>
-            <span style={{ fontSize: '18px', fontWeight: '800' }}>Arena de Missões Contábeis</span>
+            <span style={{ fontSize: '16px', fontWeight: '800' }}>Arena de Missões Contábeis</span>
           </div>
           <div style={{ fontSize: '13px', color: '#cbd5e1' }}>Resolva os desafios práticos, acumule XP e evolua na carreira.</div>
         </div>
 
-        <div style={{ backgroundColor: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.2)', padding: '12px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '15px' }}>
+        <div style={{ backgroundColor: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.2)', padding: '12px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '15px' }}>
           <div>
             <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#94a3b8', display: 'block', textTransform: 'uppercase' }}>{perfil.nivel}</span>
-            <strong style={{ fontSize: '15px', color: '#ffffff' }}>{perfil.xp} / {perfil.proximoNivelXP} XP</strong>
+            <strong style={{ fontSize: '14px', color: '#ffffff' }}>{perfil.xp} / {perfil.proximoNivelXP} XP</strong>
           </div>
           <div style={{ backgroundColor: '#10b981', padding: '6px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', color: '#022c22' }}>
             🏆 {perfil.concluidas} Missões
@@ -227,7 +226,7 @@ export default function SimuladorMotorMissoes() {
       </div>
 
       {/* ABAS NAVEGAÇÃO */}
-      <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '6px', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '24px', gap: '6px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '6px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px', gap: '6px', flexWrap: 'wrap' }}>
         <button onClick={() => {setAbaAtiva('trilhas'); setFaseCrise('intro');}} style={{ ...btnAbaBase, backgroundColor: abaAtiva === 'trilhas' ? '#0f172a' : 'transparent', color: abaAtiva === 'trilhas' ? 'white' : '#64748b' }}>
           🗺️ Trilha Padrão (10 Missões)
         </button>
@@ -245,9 +244,9 @@ export default function SimuladorMotorMissoes() {
       {/* 1. TRILHA DE MISSÕES PADRÃO */}
       {/* ========================================================= */}
       {abaAtiva === 'trilhas' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px', animation: 'fadeIn 0.4s' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '16px', animation: 'fadeIn 0.4s' }}>
           {missoes.map(m => (
-            <div key={m.id} style={{ backgroundColor: m.status === 'concluido' ? '#f0fdf4' : '#ffffff', padding: '20px', borderRadius: '12px', border: m.status === 'concluido' ? '1px solid #bbf7d0' : '1px solid #cbd5e1', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div key={m.id} style={{ backgroundColor: m.status === 'concluido' ? '#f0fdf4' : '#ffffff', padding: '20px', borderRadius: '16px', border: m.status === 'concluido' ? '1px solid #bbf7d0' : '1px solid #cbd5e1', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                   <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
@@ -259,7 +258,7 @@ export default function SimuladorMotorMissoes() {
                 <strong style={{ fontSize: '15px', color: '#0f172a', display: 'block', marginBottom: '8px' }}>{m.titulo}</strong>
                 <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#475569', lineHeight: '1.5' }}>{m.enunciado}</p>
               </div>
-              <button onClick={() => abrirMissao(m)} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '13px', cursor: 'pointer', backgroundColor: m.status === 'concluido' ? '#16a34a' : '#0f172a', color: 'white', transition: 'all 0.2s' }}>
+              <button onClick={() => abrirMissao(m)} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: 'none', fontWeight: 'bold', fontSize: '13px', cursor: 'pointer', backgroundColor: m.status === 'concluido' ? '#16a34a' : '#0f172a', color: 'white', transition: 'all 0.2s' }}>
                 {m.status === 'concluido' ? '✓ Missão Cumprida' : 'Resolver na Arena ➔'}
               </button>
             </div>
@@ -271,45 +270,46 @@ export default function SimuladorMotorMissoes() {
       {/* 2. ARENA DE RESOLUÇÃO (NORMAL) */}
       {/* ========================================================= */}
       {abaAtiva === 'arena' && missaoAtiva && (
-        <div style={{ backgroundColor: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #cbd5e1', animation: 'fadeIn 0.3s' }}>
-          <div style={{ borderBottom: '1px solid #cbd5e1', paddingBottom: '16px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #cbd5e1', animation: 'fadeIn 0.3s' }}>
+          <div style={{ borderBottom: '1px solid #cbd5e1', paddingBottom: '14px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
             <div>
-              <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#2563eb', textTransform: 'uppercase' }}>{missaoAtiva.trilha}</span>
-              <h3 style={{ margin: '4px 0 0 0', fontSize: '18px', color: '#0f172a' }}>{missaoAtiva.titulo}</h3>
+              <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#2563eb', textTransform: 'uppercase' }}>{missaoAtiva.trilha}</span>
+              <h3 style={{ margin: '2px 0 0 0', fontSize: '16px', color: '#0f172a' }}>{missaoAtiva.titulo}</h3>
             </div>
-            <button onClick={() => setAbaAtiva('trilhas')} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px' }}>✖ Fechar Arena</button>
+            <button onClick={() => setAbaAtiva('trilhas')} style={{ background: '#e2e8f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', color: '#334155' }}>✖</button>
           </div>
 
-          <p style={{ fontSize: '14px', color: '#334155', marginBottom: '24px', backgroundColor: 'white', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '13.5px', color: '#334155', marginBottom: '20px', backgroundColor: 'white', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', lineHeight: '1.6' }}>
             {missaoAtiva.enunciado}
           </p>
 
           <form onSubmit={validarLancamento} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-              <div style={{ flex: '1 1 300px' }}>
-                <label style={{ fontSize: '12.5px', fontWeight: 'bold', color: '#1e3a8a', display: 'block', marginBottom: '6px' }}>DÉBITO (Aplicação de Recursos):</label>
-                <select value={inputDebito} onChange={e => setInputDebito(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '2px solid #bfdbfe', backgroundColor: 'white', fontSize: '13px', outline: 'none' }}>
+            {/* GRELHA INTELIGENTE: Adapta-se perfeitamente a telemóveis e tablets */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#1e3a8a', display: 'block', marginBottom: '6px' }}>DÉBITO (Aplicação de Recursos):</label>
+                <select value={inputDebito} onChange={e => setInputDebito(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '2px solid #bfdbfe', backgroundColor: 'white', fontSize: '12.5px', outline: 'none' }}>
                   {contasDisponiveis.map(c => <option key={c.codigo} value={`${c.codigo} - ${c.nome}`}>{c.codigo} - {c.nome}</option>)}
                 </select>
               </div>
-              <div style={{ flex: '1 1 300px' }}>
-                <label style={{ fontSize: '12.5px', fontWeight: 'bold', color: '#991b1b', display: 'block', marginBottom: '6px' }}>CRÉDITO (Origem de Recursos):</label>
-                <select value={inputCredito} onChange={e => setInputCredito(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '2px solid #fecaca', backgroundColor: 'white', fontSize: '13px', outline: 'none' }}>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#991b1b', display: 'block', marginBottom: '6px' }}>CRÉDITO (Origem de Recursos):</label>
+                <select value={inputCredito} onChange={e => setInputCredito(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '2px solid #fecaca', backgroundColor: 'white', fontSize: '12.5px', outline: 'none' }}>
                   {contasDisponiveis.map(c => <option key={c.codigo} value={`${c.codigo} - ${c.nome}`}>{c.codigo} - {c.nome}</option>)}
                 </select>
               </div>
             </div>
             
-            <div style={{ maxWidth: '300px' }}>
-              <label style={{ fontSize: '12.5px', fontWeight: 'bold', color: '#0f172a', display: 'block', marginBottom: '6px' }}>Valor da Operação (R$):</label>
-              <input type="text" value={inputValorStr} onChange={e => setInputValorStr(e.target.value.replace(/[^0-9.]/g, ''))} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', fontWeight: 'bold' }} />
+            <div style={{ width: '100%', maxWidth: '280px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#0f172a', display: 'block', marginBottom: '6px' }}>Valor da Operação (R$):</label>
+              <input type="text" value={inputValorStr} onChange={e => setInputValorStr(e.target.value.replace(/[^0-9.]/g, ''))} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', fontWeight: 'bold', boxSizing: 'border-box' }} />
             </div>
 
-            {resultadoTentativa === 'sucesso' && <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: '#f0fdf4', border: '1px solid #86efac', color: '#15803d', fontSize: '14px' }}>🎉 <strong>Lançamento Correto! (+{missaoAtiva.xp} XP).</strong><br/><br/>{missaoAtiva.explicacao}</div>}
-            {resultadoTentativa === 'erro' && <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: '#fff5f5', border: '1px solid #fecaca', color: '#dc2626', fontSize: '14px', fontWeight: 'bold' }}>❌ Lançamento Incorreto. Analise a origem e aplicação dos recursos!</div>}
+            {resultadoTentativa === 'sucesso' && <div style={{ padding: '14px', borderRadius: '10px', backgroundColor: '#f0fdf4', border: '1px solid #86efac', color: '#15803d', fontSize: '13.5px' }}>🎉 <strong>Lançamento Correto! (+{missaoAtiva.xp} XP).</strong><br/><br/>{missaoAtiva.explicacao}</div>}
+            {resultadoTentativa === 'erro' && <div style={{ padding: '14px', borderRadius: '10px', backgroundColor: '#fff5f5', border: '1px solid #fecaca', color: '#dc2626', fontSize: '13.5px', fontWeight: 'bold' }}>❌ Lançamento Incorreto. Analise a origem e aplicação dos recursos!</div>}
             
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-              <button type="submit" style={{ padding: '14px 28px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '900', fontSize: '14px', cursor: 'pointer', boxShadow: '0 4px 6px rgba(37,99,235,0.2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
+              <button type="submit" style={{ padding: '14px 28px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '10px', fontWeight: '900', fontSize: '14px', cursor: 'pointer', boxShadow: '0 4px 6px rgba(37,99,235,0.2)', width: '100%', maxWidth: '280px' }}>
                 Validar Partidas Dobradas ➔
               </button>
             </div>
@@ -326,26 +326,26 @@ export default function SimuladorMotorMissoes() {
           {/* FASE INTRO: LISTA DE CRISES */}
           {faseCrise === 'intro' && (
             <div>
-              <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', padding: '20px', borderRadius: '12px', marginBottom: '24px', borderLeft: '6px solid #ef4444' }}>
-                <h3 style={{ margin: '0 0 8px 0', color: '#991b1b', fontSize: '18px' }}>🚨 Sala de Guerra (Modo Sobrevivência)</h3>
-                <p style={{ margin: 0, color: '#b91c1c', fontSize: '13.5px', lineHeight: '1.5' }}>
+              <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', padding: '20px', borderRadius: '16px', marginBottom: '24px', borderLeft: '6px solid #ef4444' }}>
+                <h3 style={{ margin: '0 0 8px 0', color: '#991b1b', fontSize: '16px' }}>🚨 Sala de Guerra (Modo Sobrevivência)</h3>
+                <p style={{ margin: 0, color: '#b91c1c', fontSize: '13px', lineHeight: '1.5' }}>
                   Aviso: Estes cenários simulam ambientes de alta pressão corporativa. Você correrá contra o relógio para salvar a contabilidade da empresa. Se o tempo esgotar ou você errar, o prejuízo é irreversível. Prepare-se!
                 </p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
                 {crisesLista.map(c => (
-                  <div key={c.id} style={{ backgroundColor: 'white', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: '0 4px 6px rgba(0,0,0,0.04)' }}>
+                  <div key={c.id} style={{ backgroundColor: 'white', border: '1px solid #cbd5e1', borderRadius: '16px', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: '0 4px 6px rgba(0,0,0,0.04)' }}>
                     <div>
-                      <div style={{ fontSize: '32px', marginBottom: '12px' }}>{c.icone}</div>
-                      <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#0f172a' }}>{c.titulo}</h4>
-                      <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#475569', lineHeight: '1.5' }}>{c.descricao}</p>
-                      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                      <div style={{ fontSize: '28px', marginBottom: '10px' }}>{c.icone}</div>
+                      <h4 style={{ margin: '0 0 6px 0', fontSize: '15px', color: '#0f172a' }}>{c.titulo}</h4>
+                      <p style={{ margin: '0 0 14px 0', fontSize: '12.5px', color: '#475569', lineHeight: '1.5' }}>{c.descricao}</p>
+                      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
                         <span style={{ backgroundColor: '#f1f5f9', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', color: '#475569' }}>⏱️ Tempo: {c.tempoMaximo}s</span>
                         <span style={{ backgroundColor: '#fef3c7', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', color: '#b45309' }}>🏆 +{c.xp} XP</span>
                       </div>
                     </div>
-                    <button onClick={() => iniciarCrise(c)} style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s', width: '100%' }}>
+                    <button onClick={() => iniciarCrise(c)} style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: 'bold', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s', width: '100%' }}>
                       INICIAR CRISE ➔
                     </button>
                   </div>
@@ -356,30 +356,30 @@ export default function SimuladorMotorMissoes() {
 
           {/* FASE JOGANDO: A CRISE ESTÁ ACONTECENDO */}
           {faseCrise === 'jogando' && criseAtiva && (
-            <div className="crisis-active" style={{ backgroundColor: 'white', padding: '30px', borderRadius: '12px', position: 'relative', overflow: 'hidden' }}>
+            <div className="crisis-active" style={{ backgroundColor: 'white', padding: '20px', borderRadius: '20px', position: 'relative', overflow: 'hidden' }}>
               
               {/* HEADER DO MINI-GAME */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #fecaca', paddingBottom: '16px', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #fecaca', paddingBottom: '14px', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '22px', color: '#991b1b', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <h3 style={{ margin: 0, fontSize: '18px', color: '#991b1b', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {criseAtiva.icone} {criseAtiva.titulo}
                   </h3>
-                  <span style={{ fontSize: '12px', color: '#ef4444', fontWeight: 'bold' }}>ATENÇÃO: RESOLVA ANTES DO TEMPO ACABAR!</span>
+                  <span style={{ fontSize: '11px', color: '#ef4444', fontWeight: 'bold' }}>ATENÇÃO: RESOLVA ANTES DO TEMPO ACABAR!</span>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '32px', fontWeight: '900', color: tempoRestante <= 15 ? '#dc2626' : '#0f172a', animation: tempoRestante <= 15 ? 'shake 0.5s infinite' : 'none' }}>
+                  <div style={{ fontSize: '26px', fontWeight: '900', color: tempoRestante <= 15 ? '#dc2626' : '#0f172a', animation: tempoRestante <= 15 ? 'shake 0.5s infinite' : 'none' }}>
                     00:{tempoRestante < 10 ? `0${tempoRestante}` : tempoRestante}
                   </div>
                 </div>
               </div>
 
               {/* BARRA DE PÂNICO */}
-              <div style={{ marginBottom: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 'bold', color: '#64748b', marginBottom: '6px' }}>
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 'bold', color: '#64748b', marginBottom: '4px' }}>
                   <span>Nível de Pânico da Diretoria</span>
                   <span>{nivelPanicoPct.toFixed(0)}%</span>
                 </div>
-                <div style={{ width: '100%', backgroundColor: '#e2e8f0', height: '12px', borderRadius: '6px', overflow: 'hidden' }}>
+                <div style={{ width: '100%', backgroundColor: '#e2e8f0', height: '10px', borderRadius: '5px', overflow: 'hidden' }}>
                   <div style={{ width: `${nivelPanicoPct}%`, backgroundColor: nivelPanicoPct > 80 ? '#dc2626' : nivelPanicoPct > 50 ? '#f59e0b' : '#16a34a', height: '100%', transition: 'width 1s linear, background-color 0.5s' }} />
                 </div>
               </div>
@@ -389,52 +389,51 @@ export default function SimuladorMotorMissoes() {
               {/* ============================================== */}
               {criseAtiva.tipo === 'balanco_determinacao' && (
                 <div>
-                  <p style={{ fontSize: '14px', color: '#334155', marginBottom: '20px', lineHeight: '1.6' }}>
+                  <p style={{ fontSize: '13.5px', color: '#334155', marginBottom: '16px', lineHeight: '1.6' }}>
                     {criseAtiva.instrucao}
                   </p>
-                  <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
-                    <strong style={{ display: 'block', marginBottom: '12px' }}>Ajuste os valores para o Valor Justo (Mercado):</strong>
-                    <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-                      <div style={{ flex: 1 }}>
+                  <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+                    <strong style={{ display: 'block', marginBottom: '12px', fontSize: '13px' }}>Ajuste os valores para o Valor Justo (Mercado):</strong>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '16px', marginBottom: '20px' }}>
+                      <div>
                         <label style={{ fontSize: '12px', fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>Valor do Imóvel (R$):</label>
-                        <input type="number" value={mg1Imovel} onChange={e => setMg1Imovel(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #94a3b8' }} placeholder="Ex: 500000" />
+                        <input type="number" value={mg1Imovel} onChange={e => setMg1Imovel(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #94a3b8', boxSizing: 'border-box' }} placeholder="Ex: 500000" />
                       </div>
-                      <div style={{ flex: 1 }}>
+                      <div>
                         <label style={{ fontSize: '12px', fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>Valor do Estoque (R$):</label>
-                        <input type="number" value={mg1Estoque} onChange={e => setMg1Estoque(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #94a3b8' }} placeholder="Ex: 30000" />
+                        <input type="number" value={mg1Estoque} onChange={e => setMg1Estoque(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #94a3b8', boxSizing: 'border-box' }} placeholder="Ex: 30000" />
                       </div>
                     </div>
-                    <button onClick={validarMiniGame} style={{ backgroundColor: '#10b981', color: 'white', padding: '12px 24px', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', width: '100%' }}>APLICAR AJUSTE DE AVALIAÇÃO PATRIMONIAL</button>
+                    <button onClick={validarMiniGame} style={{ backgroundColor: '#10b981', color: 'white', padding: '14px 20px', border: 'none', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', width: '100%', fontSize: '14px' }}>APLICAR AJUSTE DE AVALIAÇÃO PATRIMONIAL</button>
                   </div>
                 </div>
               )}
 
               {/* ============================================== */}
               {/* LÓGICA DO MINI-GAME: ESCOLHA DE CONTAS (D/C)   */}
-              {/* SERVE PARA CRISES 2, 4, 5 e 6                  */}
               {/* ============================================== */}
               {['ransomware', 'receita_federal', 'fraude', 'estorno_folha'].includes(criseAtiva.tipo) && (
                 <div>
-                  <p style={{ fontSize: '14px', color: '#334155', marginBottom: '20px', lineHeight: '1.6' }}>
+                  <p style={{ fontSize: '13.5px', color: '#334155', marginBottom: '16px', lineHeight: '1.6' }}>
                     {criseAtiva.instrucao}
                   </p>
-                  <div style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '8px', color: 'white' }}>
-                    <strong style={{ display: 'block', marginBottom: '12px', color: '#38bdf8' }}>Terminal de Correção:</strong>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '20px' }}>
+                  <div style={{ backgroundColor: '#1e293b', padding: '16px', borderRadius: '12px', color: 'white' }}>
+                    <strong style={{ display: 'block', marginBottom: '12px', color: '#38bdf8', fontSize: '13px' }}>Terminal de Correção:</strong>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
                       <div>
-                        <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#93c5fd', display: 'block', marginBottom: '4px' }}>CONTA DEBITADA (D):</label>
-                        <select value={mgSelectD} onChange={e => setMgSelectD(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', backgroundColor: '#0f172a', color: 'white', border: '1px solid #3b82f6' }}>
-                          {contasDisponiveis.map(c => <option key={c.codigo} value={c.codigo}>{c.codigo} - {c.nome}</option>)}
+                        <label style={{ fontSize: '11.5px', fontWeight: 'bold', color: '#93c5fd', display: 'block', marginBottom: '4px' }}>CONTA DEBITADA (D):</label>
+                        <select value={mgSelectD} onChange={e => setMgSelectD(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', backgroundColor: '#0f172a', color: 'white', border: '1px solid #3b82f6', fontSize: '12px' }}>
+                          {contasDisponiveis.map(c => <option key={c.codigo} value={`${c.codigo} - ${c.nome}`}>{c.codigo} - {c.nome}</option>)}
                         </select>
                       </div>
                       <div>
-                        <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#fca5a5', display: 'block', marginBottom: '4px' }}>CONTA CREDITADA (C):</label>
-                        <select value={mgSelectC} onChange={e => setMgSelectC(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', backgroundColor: '#0f172a', color: 'white', border: '1px solid #ef4444' }}>
-                          {contasDisponiveis.map(c => <option key={c.codigo} value={c.codigo}>{c.codigo} - {c.nome}</option>)}
+                        <label style={{ fontSize: '11.5px', fontWeight: 'bold', color: '#fca5a5', display: 'block', marginBottom: '4px' }}>CONTA CREDITADA (C):</label>
+                        <select value={mgSelectC} onChange={e => setMgSelectC(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', backgroundColor: '#0f172a', color: 'white', border: '1px solid #ef4444', fontSize: '12px' }}>
+                          {contasDisponiveis.map(c => <option key={c.codigo} value={`${c.codigo} - ${c.nome}`}>{c.codigo} - {c.nome}</option>)}
                         </select>
                       </div>
                     </div>
-                    <button onClick={validarMiniGame} style={{ backgroundColor: '#ef4444', color: 'white', padding: '12px 24px', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', width: '100%' }}>EXECUTAR LANÇAMENTO DE EMERGÊNCIA</button>
+                    <button onClick={validarMiniGame} style={{ backgroundColor: '#ef4444', color: 'white', padding: '14px 20px', border: 'none', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', width: '100%', fontSize: '14px' }}>EXECUTAR LANÇAMENTO DE EMERGÊNCIA</button>
                   </div>
                 </div>
               )}
@@ -444,20 +443,20 @@ export default function SimuladorMotorMissoes() {
               {/* ============================================== */}
               {criseAtiva.tipo === 'backup' && (
                 <div>
-                  <p style={{ fontSize: '14px', color: '#334155', marginBottom: '20px', lineHeight: '1.6' }}>
+                  <p style={{ fontSize: '13.5px', color: '#334155', marginBottom: '16px', lineHeight: '1.6' }}>
                     {criseAtiva.instrucao}
                   </p>
-                  <div style={{ backgroundColor: '#f8fafc', padding: '30px', borderRadius: '8px', border: '1px solid #cbd5e1', textAlign: 'center' }}>
-                    <div style={{ fontSize: '24px', fontWeight: '900', color: '#0f172a', marginBottom: '20px' }}>
+                  <div style={{ backgroundColor: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #cbd5e1', textAlign: 'center' }}>
+                    <div style={{ fontSize: '20px', fontWeight: '900', color: '#0f172a', marginBottom: '20px' }}>
                       {mg3QtdCerta === 0 ? "Receita de Vendas de Mercadorias" : 
                        mg3QtdCerta === 1 ? "Salários a Pagar" : "Estoque de Mercadorias"}
                     </div>
-                    <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
-                      <button onClick={() => { if(mg3QtdCerta===2){setMg3QtdCerta(3); setTimeout(validarMiniGame, 100);} else {alert('Errou!')} }} style={{ padding: '12px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '8px', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>ATIVO</button>
-                      <button onClick={() => { if(mg3QtdCerta===1){setMg3QtdCerta(2)} else {alert('Errou!')} }} style={{ padding: '12px 20px', backgroundColor: '#ef4444', color: 'white', borderRadius: '8px', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>PASSIVO</button>
-                      <button onClick={() => { if(mg3QtdCerta===0){setMg3QtdCerta(1)} else {alert('Errou!')} }} style={{ padding: '12px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '8px', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>RECEITA</button>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                      <button onClick={() => { if(mg3QtdCerta===2){setMg3QtdCerta(3); setTimeout(validarMiniGame, 100);} else {alert('Errou!')} }} style={{ padding: '12px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '8px', fontWeight: 'bold', border: 'none', cursor: 'pointer', flex: '1 1 90px' }}>ATIVO</button>
+                      <button onClick={() => { if(mg3QtdCerta===1){setMg3QtdCerta(2)} else {alert('Errou!')} }} style={{ padding: '12px 20px', backgroundColor: '#ef4444', color: 'white', borderRadius: '8px', fontWeight: 'bold', border: 'none', cursor: 'pointer', flex: '1 1 90px' }}>PASSIVO</button>
+                      <button onClick={() => { if(mg3QtdCerta===0){setMg3QtdCerta(1)} else {alert('Errou!')} }} style={{ padding: '12px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '8px', fontWeight: 'bold', border: 'none', cursor: 'pointer', flex: '1 1 90px' }}>RECEITA</button>
                     </div>
-                    <div style={{ marginTop: '20px', fontWeight: 'bold', color: '#64748b' }}>Acertos: {mg3QtdCerta} / 3</div>
+                    <div style={{ marginTop: '16px', fontWeight: 'bold', color: '#64748b', fontSize: '13px' }}>Acertos: {mg3QtdCerta} / 3</div>
                   </div>
                 </div>
               )}
@@ -466,21 +465,21 @@ export default function SimuladorMotorMissoes() {
 
           {/* FASES DE FIM DE JOGO */}
           {faseCrise === 'sucesso' && (
-            <div style={{ backgroundColor: '#f0fdf4', padding: '40px', borderRadius: '12px', textAlign: 'center', border: '2px solid #4ade80' }}>
-              <div style={{ fontSize: '60px', marginBottom: '10px' }}>🎖️</div>
-              <h2 style={{ color: '#166534', margin: '0 0 10px 0' }}>Crise Neutralizada!</h2>
-              <p style={{ color: '#15803d', fontSize: '16px' }}>Você salvou a empresa e provou seu valor sob pressão.</p>
-              <div style={{ fontSize: '20px', fontWeight: '900', color: '#2563eb', margin: '20px 0' }}>+{criseAtiva.xp} XP Adquiridos!</div>
-              <button onClick={() => {setCriseAtiva(null); setFaseCrise('intro');}} style={{ padding: '12px 24px', backgroundColor: '#0f172a', color: 'white', borderRadius: '8px', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>Voltar para a Sala de Guerra</button>
+            <div style={{ backgroundColor: '#f0fdf4', padding: '30px 20px', borderRadius: '20px', textAlign: 'center', border: '2px solid #4ade80' }}>
+              <div style={{ fontSize: '50px', marginBottom: '10px' }}>🎖️</div>
+              <h2 style={{ color: '#166534', margin: '0 0 8px 0', fontSize: '24px', fontWeight: '900' }}>Crise Neutralizada!</h2>
+              <p style={{ color: '#15803d', fontSize: '14.5px', marginBottom: '16px' }}>Você salvou a empresa e provou seu valor sob pressão.</p>
+              <div style={{ fontSize: '18px', fontWeight: '900', color: '#2563eb', marginBottom: '24px' }}>+{criseAtiva.xp} XP Adquiridos!</div>
+              <button onClick={() => {setCriseAtiva(null); setFaseCrise('intro');}} style={{ padding: '14px 28px', backgroundColor: '#0f172a', color: 'white', borderRadius: '10px', fontWeight: 'bold', border: 'none', cursor: 'pointer', width: '100%', maxWidth: '280px' }}>Voltar para a Sala de Guerra</button>
             </div>
           )}
 
           {faseCrise === 'gameover' && (
-            <div style={{ backgroundColor: '#fef2f2', padding: '40px', borderRadius: '12px', textAlign: 'center', border: '2px solid #f87171' }}>
-              <div style={{ fontSize: '60px', marginBottom: '10px' }}>💀</div>
-              <h2 style={{ color: '#991b1b', margin: '0 0 10px 0' }}>O Tempo Esgotou.</h2>
-              <p style={{ color: '#b91c1c', fontSize: '16px' }}>A empresa sofreu perdas irrecuperáveis ou a fiscalização aplicou multas milionárias.</p>
-              <button onClick={() => {setCriseAtiva(null); setFaseCrise('intro');}} style={{ marginTop: '20px', padding: '12px 24px', backgroundColor: '#dc2626', color: 'white', borderRadius: '8px', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>Tentar Novamente</button>
+            <div style={{ backgroundColor: '#fef2f2', padding: '30px 20px', borderRadius: '20px', textAlign: 'center', border: '2px solid #f87171' }}>
+              <div style={{ fontSize: '50px', marginBottom: '10px' }}>💀</div>
+              <h2 style={{ color: '#991b1b', margin: '0 0 8px 0', fontSize: '24px', fontWeight: '900' }}>O Tempo Esgotou.</h2>
+              <p style={{ color: '#b91c1c', fontSize: '14.5px', marginBottom: '20px' }}>A empresa sofreu perdas irrecuperáveis ou a fiscalização aplicou multas milionárias.</p>
+              <button onClick={() => {setCriseAtiva(null); setFaseCrise('intro');}} style={{ padding: '14px 28px', backgroundColor: '#dc2626', color: 'white', borderRadius: '10px', fontWeight: 'bold', border: 'none', cursor: 'pointer', width: '100%', maxWidth: '280px' }}>Tentar Novamente</button>
             </div>
           )}
         </div>
