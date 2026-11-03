@@ -1383,7 +1383,7 @@ export default function App() {
                   {abaAdminAtiva === 'biblioteca' && (
                     <div style={{ backgroundColor: 'white', padding: '25px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
                       <h3 style={{ margin: '0 0 15px 0', color: '#0f172a' }}>Upload de Apostilas e Manuais</h3>
-                      <p style={{color: '#64748b', fontSize: '14px', marginBottom: '20px'}}>Insira um novo documento na tabela <strong>apostilas_docs</strong> do Supabase.</p>
+                      <p style={{color: '#64748b', fontSize: '14px', marginBottom: '20px'}}>Insira um novo documento na tabela <strong>apostilas</strong> do Supabase.</p>
                       
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                         <div>
