@@ -4,7 +4,7 @@ import { supabase } from './supabase';
 export default function BuscaApostilasChat() {
   const [pergunta, setPergunta] = useState('');
   const [mensagens, setMensagens] = useState([
-    { remetente: 'bot', texto: 'Olá! Digite o tema ou assunto que procura (ex: "contabilidade", "fiscal", "mei", "dp") para encontrar a apostila ideal.' }
+    { remetente: 'bot', texto: 'Olá! Digite o tema ou assunto que procura (ex: "contabilidade", "fiscal", "mei", "hp12c") para encontrar a apostila ideal.' }
   ]);
   const [carregando, setCarregando] = useState(false);
 
@@ -18,6 +18,7 @@ export default function BuscaApostilasChat() {
     setCarregando(true);
 
     try {
+      // Consulta a tabela correta 'apostilas' que aparece no seu Supabase
       const { data, error } = await supabase
         .from('apostilas')
         .select('*');
@@ -26,8 +27,16 @@ export default function BuscaApostilasChat() {
 
       const termo = textoUsuario.toLowerCase();
       const resultadosFiltrados = data?.filter(item => {
+        // Usa as colunas corretas vistas na sua base de dados
         const tituloMatch = item.titulo_livro?.toLowerCase().includes(termo);
-        const tagsMatch = item.palavras_chave?.some(tag => tag.toLowerCase().includes(termo));
+        
+        let tagsMatch = false;
+        if (Array.isArray(item.palavras_chave)) {
+          tagsMatch = item.palavras_chave.some(tag => tag.toLowerCase().includes(termo));
+        } else if (typeof item.palavras_chave === 'string') {
+          tagsMatch = item.palavras_chave.toLowerCase().includes(termo);
+        }
+
         return tituloMatch || tagsMatch;
       }) || [];
 
@@ -39,7 +48,7 @@ export default function BuscaApostilasChat() {
       } else {
         setMensagens(prev => [
           ...prev, 
-          { remetente: 'bot', texto: 'Não encontrei nenhuma apostila com esse termo. Tente pesquisar por palavras como "contabilidade", "fiscal", "mei" ou "dp".' }
+          { remetente: 'bot', texto: 'Não encontrei nenhuma apostila com esse termo. Tente pesquisar por palavras como "contabilidade", "fiscal", "mei" ou "hp12c".' }
         ]);
       }
     } catch (err) {
@@ -86,6 +95,7 @@ export default function BuscaApostilasChat() {
 
               {/* RESULTADOS DA BUSCA */}
               {msg.resultados && msg.resultados.map(res => {
+                // Gera o link público diretamente do storage do Supabase usando o nome correto do ficheiro
                 const { data: storageData } = supabase.storage
                   .from('apostilas')
                   .getPublicUrl(res.nome_arquivo_storage || '');
@@ -93,7 +103,7 @@ export default function BuscaApostilasChat() {
                 const urlParaDownload = storageData?.publicUrl || '#';
 
                 return (
-                  <div key={res.id} style={{ marginTop: '10px', padding: '12px', backgroundColor: '#f1f5f9', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', flexWrap: 'wrap', boxSizing: 'border-box', minWidth: 0 }}>
+                  <div key={res.id || res.titulo_livro} style={{ marginTop: '10px', padding: '12px', backgroundColor: '#f1f5f9', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', flexWrap: 'wrap', boxSizing: 'border-box', minWidth: 0 }}>
                     <div style={{ minWidth: 0, flex: '1 1 200px' }}>
                       <strong style={{ fontSize: '13px', color: '#0f172a', display: 'block', wordBreak: 'break-word' }}>{res.titulo_livro}</strong>
                       <span style={{ fontSize: '11px', color: '#64748b', wordBreak: 'break-word' }}>Ficheiro: {res.nome_arquivo_storage}</span>
@@ -112,14 +122,14 @@ export default function BuscaApostilasChat() {
             </div>
           </div>
         ))}
-        {carregando && <div style={{ color: '#64748b', fontSize: '13px', fontStyle: 'italic', wordBreak: 'break-word' }}>A pesquisar no acervo...</div>}
+        {carregando && <div style={{ color: '#64748b', fontSize: '13px', fontStyle: 'italic', wordBreak: 'border-box' }}>A pesquisar no acervo...</div>}
       </div>
 
       {/* FORMULÁRIO DE PESQUISA */}
       <form onSubmit={handleBuscar} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', boxSizing: 'border-box' }}>
         <input 
           type="text" 
-          placeholder="Ex: contabilidade, fiscal, mei, dp..." 
+          placeholder="Ex: contabilidade, fiscal, mei, hp12c..." 
           value={pergunta}
           onChange={e => setPergunta(e.target.value)}
           style={{ ...inputStyle, flex: '1 1 250px' }}
