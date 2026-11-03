@@ -333,11 +333,18 @@ export default function App() {
   const [pdfFile, setPdfFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 // ==========================================================
-  // FUNÇÃO DE UPLOAD DA APOSTILA (BLINDADA PARA ARRAY)
+  // FUNÇÃO DE UPLOAD DA APOSTILA (BLINDADA E COM DEBUG)
   // ==========================================================
   const handleUploadApostila = async () => {
-    if (!uploadForm.titulo || !uploadForm.categoria || !pdfFile) {
-      return mostrarToast("Preencha o título, categoria e selecione o PDF.", "erro");
+    // Validação individual para sabermos exatamente o que está em falta
+    if (!uploadForm.titulo) {
+      return mostrarToast("Por favor, preencha o Título do Documento.", "erro");
+    }
+    if (!uploadForm.categoria) {
+      return mostrarToast("Por favor, selecione a Categoria.", "erro");
+    }
+    if (!pdfFile) {
+      return mostrarToast("Por favor, selecione um arquivo PDF.", "erro");
     }
     
     setIsUploading(true);
@@ -349,16 +356,16 @@ export default function App() {
       const { error: uploadError } = await supabase.storage.from('apostilas').upload(finalFilePath, pdfFile);
       if (uploadError) throw uploadError;
 
-      // 2. Transforma as palavras-chave escritas numa lista (Array) compatível com o Supabase
+      // 2. Transforma as palavras-chave escritas numa lista (Array) compatível
       const tagsArray = typeof uploadForm.palavras_chave === 'string' 
         ? uploadForm.palavras_chave.split(',').map(tag => tag.trim()).filter(Boolean)
         : [];
 
-      // 3. Insere os dados na tabela 'apostilas' com o formato correto
+      // 3. Insere os dados na tabela correta 'apostilas'
       const { error: dbError } = await supabase.from('apostilas').insert([{
         titulo_livro: uploadForm.titulo,
         categoria: uploadForm.categoria,
-        palavras_chave: tagsArray, // Formato correto para text[]
+        palavras_chave: tagsArray,
         nome_arquivo_storage: finalFilePath
       }]);
       
