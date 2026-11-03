@@ -1380,71 +1380,120 @@ export default function App() {
                     </div>
                   )}
 
-                  {/* ABA 4: UPLOAD DE APOSTILAS */}
-                  {abaAdminAtiva === 'biblioteca' && (
-                    <div style={{ backgroundColor: 'white', padding: '25px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
-                      <h3 style={{ margin: '0 0 15px 0', color: '#0f172a' }}>Upload de Apostilas e Manuais</h3>
-                      <p style={{color: '#64748b', fontSize: '14px', marginBottom: '20px'}}>Insira um novo documento na tabela <strong>apostilas</strong> do Supabase.</p>
-                      
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                        <div>
-                          <label style={{display: 'block', fontWeight: 'bold', fontSize: '13px', marginBottom: '8px', color: '#334155'}}>Título do Documento</label>
-                          <input type="text" placeholder="Ex: Manual de Contabilidade" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box' }} value={uploadForm.titulo} onChange={e => setUploadForm({...uploadForm, titulo: e.target.value})} />
-                        </div>
-                        <div>
-                          <label style={{display: 'block', fontWeight: 'bold', fontSize: '13px', marginBottom: '8px', color: '#334155'}}>Categoria</label>
-                          <select style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box' }} value={uploadForm.categoria} onChange={e => setUploadForm({...uploadForm, categoria: e.target.value})}>
-                            <option value="">Selecione...</option>
-                            <option value="Contabilidade">Contabilidade</option>
-                            <option value="Fiscal">Fiscal e Tributário</option>
-                            <option value="Departamento Pessoal">Departamento Pessoal</option>
-                            <option value="Gestão">Gestão e Negócios</option>
-                          </select>
-                        </div>
-                        <div style={{ gridColumn: '1 / -1' }}>
-                          <label style={{display: 'block', fontWeight: 'bold', fontSize: '13px', marginBottom: '8px', color: '#334155'}}>Palavras-Chave (Busca do Aluno)</label>
-                          <input type="text" placeholder="Ex: balanço, dre, auditoria, lançamentos" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box' }} value={uploadForm.palavras_chave} onChange={e => setUploadForm({...uploadForm, palavras_chave: e.target.value})} />
-                        </div>
-                      </div>
+       {/* ABA 4: UPLOAD DE APOSTILAS */}
+{abaAdminAtiva === 'biblioteca' && (
+  <div style={{ backgroundColor: 'white', padding: '25px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+    <h3 style={{ margin: '0 0 15px 0', color: '#0f172a' }}>Upload de Apostilas e Manuais</h3>
+    <p style={{color: '#64748b', fontSize: '14px', marginBottom: '20px'}}>Insira um novo documento na tabela <strong>apostilas</strong> do Supabase.</p>
+    
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+      <div>
+        <label style={{display: 'block', fontWeight: 'bold', fontSize: '13px', marginBottom: '8px', color: '#334155'}}>Título do Documento</label>
+        <input type="text" placeholder="Ex: Manual de Contabilidade" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box' }} value={uploadForm.titulo} onChange={e => setUploadForm({...uploadForm, titulo: e.target.value})} />
+      </div>
+      <div>
+        <label style={{display: 'block', fontWeight: 'bold', fontSize: '13px', marginBottom: '8px', color: '#334155'}}>Categoria</label>
+        <select style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box' }} value={uploadForm.categoria} onChange={e => setUploadForm({...uploadForm, categoria: e.target.value})}>
+          <option value="">Selecione...</option>
+          <option value="Contabilidade">Contabilidade</option>
+          <option value="Fiscal">Fiscal e Tributário</option>
+          <option value="Departamento Pessoal">Departamento Pessoal</option>
+          <option value="Gestão">Gestão e Negócios</option>
+        </select>
+      </div>
+      <div style={{ gridColumn: '1 / -1' }}>
+        <label style={{display: 'block', fontWeight: 'bold', fontSize: '13px', marginBottom: '8px', color: '#334155'}}>Palavras-Chave (Busca do Aluno)</label>
+        <input type="text" placeholder="Ex: balanço, dre, auditoria, lançamentos" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box' }} value={uploadForm.palavras_chave} onChange={e => setUploadForm({...uploadForm, palavras_chave: e.target.value})} />
+      </div>
+    </div>
 
-                   <div style={{ border: '2px dashed #94a3b8', padding: '24px', borderRadius: '12px', textAlign: 'center', backgroundColor: '#f8fafc', marginTop: '20px' }}>
-                        <span style={{ fontSize: '36px', display: 'block', marginBottom: '8px' }}>📁</span>
-                        <p style={{ color: '#475569', fontWeight: 'bold', margin: '0 0 12px 0', fontSize: '14px' }}>
-                          {pdfFile ? `📄 ${pdfFile.name}` : 'Selecione o arquivo PDF'}
-                        </p>
-                        <input 
-                          type="file" 
-                          accept=".pdf" 
-                          onChange={e => {
-                            if (e.target.files && e.target.files[0]) {
-                              setPdfFile(e.target.files[0]);
-                              mostrarToast("PDF selecionado com sucesso!", "sucesso");
-                            }
-                          }} 
-                          style={{ margin: '0 auto', display: 'block', fontSize: '13px', color: '#64748b' }} 
-                        />
-                      </div>
+    {/* Caixa Única de Seleção de Ficheiro PDF */}
+    <div style={{ border: '2px dashed #94a3b8', padding: '24px', borderRadius: '12px', textAlign: 'center', backgroundColor: '#f8fafc', marginTop: '20px' }}>
+      <span style={{ fontSize: '36px', display: 'block', marginBottom: '8px' }}>📁</span>
+      <p style={{ color: '#475569', fontWeight: 'bold', margin: '0 0 12px 0', fontSize: '14px' }}>
+        {pdfFile ? `📄 ${pdfFile.name}` : 'Selecione o arquivo PDF'}
+      </p>
+      <input 
+        type="file" 
+        accept=".pdf" 
+        onChange={e => {
+          if (e.target.files && e.target.files[0]) {
+            setPdfFile(e.target.files[0]);
+            mostrarToast("PDF selecionado com sucesso!", "sucesso");
+          }
+        }} 
+        style={{ margin: '0 auto', display: 'block', fontSize: '13px', color: '#64748b' }} 
+      />
+    </div>
 
-                      <button 
-                        onClick={handleUploadApostila} 
-                        disabled={isUploading} 
-                        style={{ 
-                          marginTop: '20px', 
-                          padding: '14px 20px', 
-                          backgroundColor: isUploading ? '#94a3b8' : '#2563eb', 
-                          color: 'white', 
-                          border: 'none', 
-                          borderRadius: '8px', 
-                          fontWeight: 'bold', 
-                          cursor: isUploading ? 'not-allowed' : 'pointer', 
-                          width: '100%', 
-                          fontSize: '15px',
-                          boxShadow: '0 4px 6px rgba(37, 99, 235, 0.2)'
-                        }}
-                      >
-                        {isUploading ? '⏳ Salvando no banco de dados...' : '🚀 Enviar para o Supabase'}
-                      </button>
-                    </div>
+    {/* Botão de Envio Unificado */}
+    <div style={{ marginTop: '20px' }}>
+      <button 
+        onClick={async () => {
+          if (!uploadForm.titulo) {
+            return mostrarToast("Por favor, preencha o Título do Documento.", "erro");
+          }
+          if (!uploadForm.categoria) {
+            return mostrarToast("Por favor, selecione a Categoria.", "erro");
+          }
+          if (!pdfFile) {
+            return mostrarToast("Por favor, selecione um arquivo PDF.", "erro");
+          }
+          
+          setIsUploading(true);
+          try {
+            const nomeLimpo = pdfFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+            const finalFilePath = `${Date.now()}_${nomeLimpo}`;
+
+            // 1. Upload do PDF para o Storage 'apostilas'
+            const { error: uploadError } = await supabase.storage.from('apostilas').upload(finalFilePath, pdfFile);
+            if (uploadError) throw uploadError;
+
+            // 2. Formata as palavras-chave em Array
+            const tagsArray = typeof uploadForm.palavras_chave === 'string' 
+              ? uploadForm.palavras_chave.split(',').map(tag => tag.trim()).filter(Boolean)
+              : [];
+
+            // 3. Registo na tabela 'apostilas'
+            const { error: dbError } = await supabase.from('apostilas').insert([{
+              titulo_livro: uploadForm.titulo,
+              categoria: uploadForm.categoria,
+              palavras_chave: tagsArray,
+              nome_arquivo_storage: finalFilePath
+            }]);
+            
+            if (dbError) throw dbError;
+
+            mostrarToast("Apostila enviada com sucesso!", "sucesso");
+            setUploadForm({ titulo: '', palavras_chave: '', categoria: '' });
+            setPdfFile(null);
+          } catch (error) {
+            console.error("Erro detalhado:", error);
+            mostrarToast("Erro ao fazer upload: " + error.message, "erro");
+          } finally {
+            setIsUploading(false);
+          }
+        }} 
+        disabled={isUploading} 
+        style={{ 
+          padding: '14px 20px', 
+          backgroundColor: isUploading ? '#94a3b8' : '#2563eb', 
+          color: 'white', 
+          border: 'none', 
+          borderRadius: '8px', 
+          fontWeight: 'bold', 
+          cursor: isUploading ? 'not-allowed' : 'pointer', 
+          width: '100%', 
+          fontSize: '15px',
+          boxShadow: '0 4px 6px rgba(37, 99, 235, 0.2)'
+        }}
+      >
+        {isUploading ? '⏳ Salvando no banco de dados...' : '🚀 Enviar para o Supabase'}
+      </button>
+    </div>
+  </div>
+)}
+  
 
                 {/* ABA 5: CONFIGURAÇÕES GERAIS / SAC */}
                   {abaAdminAtiva === 'config' && (
