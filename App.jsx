@@ -333,7 +333,7 @@ export default function App() {
   const [pdfFile, setPdfFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 // ==========================================================
-  // FUNÇÃO DE UPLOAD DA APOSTILA (CORREÇÃO DIRETA)
+  // FUNÇÃO DE UPLOAD DA APOSTILA (BLINDADA PARA ARRAY)
   // ==========================================================
   const handleUploadApostila = async () => {
     if (!uploadForm.titulo || !uploadForm.categoria || !pdfFile) {
@@ -345,15 +345,20 @@ export default function App() {
       const nomeLimpo = pdfFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
       const finalFilePath = `${Date.now()}_${nomeLimpo}`;
 
-      // 1. Faz o upload do PDF para o Storage
+      // 1. Faz o upload do ficheiro PDF para o Storage 'apostilas'
       const { error: uploadError } = await supabase.storage.from('apostilas').upload(finalFilePath, pdfFile);
       if (uploadError) throw uploadError;
 
-      // 2. Insere estritamente nas colunas existentes na sua tabela do Supabase
+      // 2. Transforma as palavras-chave escritas numa lista (Array) compatível com o Supabase
+      const tagsArray = typeof uploadForm.palavras_chave === 'string' 
+        ? uploadForm.palavras_chave.split(',').map(tag => tag.trim()).filter(Boolean)
+        : [];
+
+      // 3. Insere os dados na tabela 'apostilas' com o formato correto
       const { error: dbError } = await supabase.from('apostilas').insert([{
         titulo_livro: uploadForm.titulo,
         categoria: uploadForm.categoria,
-        palavras_chave: uploadForm.palavras_chave,
+        palavras_chave: tagsArray, // Formato correto para text[]
         nome_arquivo_storage: finalFilePath
       }]);
       
