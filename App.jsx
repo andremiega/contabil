@@ -333,8 +333,8 @@ export default function App() {
   const [pdfFile, setPdfFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
- // ==========================================================
-  // FUNÇÃO DE UPLOAD DA APOSTILA (DEFINITIVA)
+// ==========================================================
+  // FUNÇÃO DE UPLOAD DA APOSTILA (BLINDADA E CORRIGIDA)
   // ==========================================================
   const handleUploadApostila = async () => {
     if (!uploadForm.titulo || !uploadForm.categoria || !pdfFile) {
@@ -346,17 +346,28 @@ export default function App() {
       const nomeLimpo = pdfFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
       const finalFilePath = `${Date.now()}_${nomeLimpo}`;
 
-      // 1. Faz o upload para o Storage 'apostilas'
+      // 1. Faz o upload do ficheiro PDF para o Storage 'apostilas'
       const { error: uploadError } = await supabase.storage.from('apostilas').upload(finalFilePath, pdfFile);
       if (uploadError) throw uploadError;
 
-      // 2. Insere na tabela CORRETA 'apostilas' (garantido sem vestígios de apostilas_docs)
+      // 2. Obtém a URL pública do ficheiro no Storage
+      const { data: publicURLData } = supabase.storage.from('apostilas').getPublicUrl(finalFilePath);
+      const fileUrl = publicURLData?.publicUrl || '';
+
+      // 3. Transforma as palavras-chave escritas numa lista (Array) limpa
+      const tagsArray = typeof uploadForm.palavras_chave === 'string' 
+        ? uploadForm.palavras_chave.split(',').map(tag => tag.trim()).filter(Boolean)
+        : [];
+
+      // 4. Insere na tabela 'apostilas' com todas as colunas correspondentes
       const { error: dbError } = await supabase.from('apostilas').insert([{
         titulo_livro: uploadForm.titulo,
-        palavras_chave: uploadForm.palavras_chave,
         categoria: uploadForm.categoria,
-        nome_arquivo_storage: finalFilePath
+        palavras_chave: tagsArray, // Envia corretamente como matriz/array
+        nome_arquivo_storage: finalFilePath,
+        file_url: fileUrl // Inclui o link direto para compatibilidade
       }]);
+      
       if (dbError) throw dbError;
 
       mostrarToast("Apostila enviada para o banco de dados com sucesso!", "sucesso");
