@@ -1407,17 +1407,44 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div style={{ border: '2px dashed #94a3b8', padding: '30px', borderRadius: '12px', textAlign: 'center', backgroundColor: '#f8fafc', marginTop: '20px' }}>
-                        <span style={{ fontSize: '40px' }}>📁</span>
-                        <p style={{ color: '#475569', fontWeight: 'bold', margin: '10px 0' }}>Selecione o arquivo PDF</p>
-                        <input type="file" accept=".pdf" onChange={e => setPdfFile(e.target.files[0])} style={{ margin: '0 auto', display: 'block' }} />
+                   <div style={{ border: '2px dashed #94a3b8', padding: '24px', borderRadius: '12px', textAlign: 'center', backgroundColor: '#f8fafc', marginTop: '20px' }}>
+                        <span style={{ fontSize: '36px', display: 'block', marginBottom: '8px' }}>📁</span>
+                        <p style={{ color: '#475569', fontWeight: 'bold', margin: '0 0 12px 0', fontSize: '14px' }}>
+                          {pdfFile ? `📄 ${pdfFile.name}` : 'Selecione o arquivo PDF'}
+                        </p>
+                        <input 
+                          type="file" 
+                          accept=".pdf" 
+                          onChange={e => {
+                            if (e.target.files && e.target.files[0]) {
+                              setPdfFile(e.target.files[0]);
+                              mostrarToast("PDF selecionado com sucesso!", "sucesso");
+                            }
+                          }} 
+                          style={{ margin: '0 auto', display: 'block', fontSize: '13px', color: '#64748b' }} 
+                        />
                       </div>
 
-                      <button onClick={handleUploadApostila} disabled={isUploading} style={{ marginTop: '20px', padding: '14px 20px', backgroundColor: isUploading ? '#94a3b8' : '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: isUploading ? 'not-allowed' : 'pointer', width: '100%', fontSize: '15px' }}>
+                      <button 
+                        onClick={handleUploadApostila} 
+                        disabled={isUploading} 
+                        style={{ 
+                          marginTop: '20px', 
+                          padding: '14px 20px', 
+                          backgroundColor: isUploading ? '#94a3b8' : '#2563eb', 
+                          color: 'white', 
+                          border: 'none', 
+                          borderRadius: '8px', 
+                          fontWeight: 'bold', 
+                          cursor: isUploading ? 'not-allowed' : 'pointer', 
+                          width: '100%', 
+                          fontSize: '15px',
+                          boxShadow: '0 4px 6px rgba(37, 99, 235, 0.2)'
+                        }}
+                      >
                         {isUploading ? '⏳ Salvando no banco de dados...' : '🚀 Enviar para o Supabase'}
                       </button>
                     </div>
-                  )}
 
                 {/* ABA 5: CONFIGURAÇÕES GERAIS / SAC */}
                   {abaAdminAtiva === 'config' && (
