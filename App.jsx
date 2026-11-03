@@ -334,7 +334,7 @@ export default function App() {
   const [isUploading, setIsUploading] = useState(false);
 
  // ==========================================================
-  // FUNÇÃO DE UPLOAD DA APOSTILA (CORRIGIDA)
+  // FUNÇÃO DE UPLOAD DA APOSTILA (DEFINITIVA)
   // ==========================================================
   const handleUploadApostila = async () => {
     if (!uploadForm.titulo || !uploadForm.categoria || !pdfFile) {
@@ -346,11 +346,11 @@ export default function App() {
       const nomeLimpo = pdfFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
       const finalFilePath = `${Date.now()}_${nomeLimpo}`;
 
-      // 1. Faz o upload do PDF para o Storage 'apostilas'
+      // 1. Faz o upload para o Storage 'apostilas'
       const { error: uploadError } = await supabase.storage.from('apostilas').upload(finalFilePath, pdfFile);
       if (uploadError) throw uploadError;
 
-      // 2. Insere na tabela correta 'apostilas' com os nomes exatos das colunas
+      // 2. Insere na tabela CORRETA 'apostilas' (garantido sem vestígios de apostilas_docs)
       const { error: dbError } = await supabase.from('apostilas').insert([{
         titulo_livro: uploadForm.titulo,
         palavras_chave: uploadForm.palavras_chave,
@@ -369,7 +369,6 @@ export default function App() {
       setIsUploading(false);
     }
   };
-
   // ==========================================================
   // FUNÇÃO DE UPLOAD DA PROMOÇÃO (MARKETING) - BLINDADA
   // ==========================================================
