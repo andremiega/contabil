@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import LaboratorioMercadoCapitais from './LaboratorioMercadoCapitais';
+import LaboratorioContabilidadeRural from './LaboratorioContabilidadeRural';
+import LaboratorioContabilidadePublica from './LaboratorioContabilidadePublica';
+import LaboratorioIAContabil from './LaboratorioIAContabil'
+import LaboratorioGamesContabeis from './LaboratorioGamesContabeis';
 import InputCustomizado from './InputCustomizado'; 
 import ServicosIniciais from './ServicosIniciais';
 import AssistenteRobo from './AssistenteRobo';
@@ -23,6 +28,7 @@ import SimuladorRateioCustos from './SimuladorRateioCustos';
 import SimuladorAnaliseBalanco from './SimuladorAnaliseBalanco';
 import SimuladorCEO from './SimuladorCEO';
 import SimuladorGreenBelt from './SimuladorGreenBelt';
+import SimuladorAtualizacaoJudiciaria from './SimuladorAtualizacaoJudiciaria';
 import SimuladorDepreciacao from './SimuladorDepreciacao';
 import SimuladorConsultoriaContabil from './SimuladorConsultoriaContabil';
 import SimuladorInvestimentos from './SimuladorInvestimentos';
@@ -46,6 +52,7 @@ import SimuladorEmprestimo from './SimuladorEmprestimo';
 import SimuladorEngenhariaTributaria from './SimuladorEngenhariaTributaria';
 import SimuladorConciliacaoOFX from './SimuladorConciliacaoOFX';
 import SimuladorLalur from './SimuladorLalur';
+import LaboratorioEducacaoFinanceira from './LaboratorioEducacaoFinanceira';
 import CentroConhecimentoApostilas from './CentroConhecimentoApostilas';
 import CentralNormasContabeis from './CentralNormasContabeis';
 import BuscaApostilasChat from './BuscaApostilasChat';
@@ -70,6 +77,7 @@ import SimuladorOnboardingContratos from './SimuladorOnboardingContratos';
 import DemonstracoesContabeis from './DemonstracoesContabeis';
 import { supabase } from './supabase';
 import './App.css';
+
 
 export default function App() {
   
@@ -332,47 +340,70 @@ export default function App() {
   const [uploadForm, setUploadForm] = useState({ titulo: '', palavras_chave: '', categoria: '' });
   const [pdfFile, setPdfFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const inputFileRef = React.useRef(null);
+// ==========================================================
+  // FUNÇÃO DE UPLOAD DA APOSTILA (CORRIGIDA E BLINDADA MOBILE)
+  // ==========================================================
+const handleUploadApostila = async (e) => {
+    if (e) e.preventDefault(); // Previne comportamentos inesperados do botão no mobile
 
-  // ==========================================================
-  // FUNÇÃO DE UPLOAD DA APOSTILA
-  // ==========================================================
-  const handleUploadApostila = async () => {
-    if (!uploadForm.titulo || !uploadForm.categoria || !pdfFile) {
-      return mostrarToast("Preencha o título, categoria e selecione o PDF.", "erro");
+    if (!uploadForm.titulo) {
+      return mostrarToast("Preencha o Título do Documento.", "erro");
+    }
+    if (!uploadForm.categoria) {
+      return mostrarToast("Selecione a Categoria.", "erro");
+    }
+    if (!pdfFile || !pdfFile.buffer) {
+      return mostrarToast("Por favor, selecione um arquivo PDF novamente.", "erro");
     }
     
     setIsUploading(true);
     try {
-      const fileExt = pdfFile.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
       const nomeLimpo = pdfFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
       const finalFilePath = `${Date.now()}_${nomeLimpo}`;
 
-      const { error: uploadError } = await supabase.storage.from('apostilas').upload(finalFilePath, pdfFile);
-      if (uploadError) throw uploadError;
+      // 1. Envia o ArrayBuffer puro diretamente para o Supabase
+      const { error: uploadError } = await supabase.storage
+        .from('apostilas')
+        .upload(finalFilePath, pdfFile.buffer, {
+          cacheControl: '3600',
+          upsert: true,
+          contentType: pdfFile.type
+        });
+        
+      if (uploadError) throw new Error("Erro no Storage: " + uploadError.message);
 
-      const { data: publicURLData } = supabase.storage.from('apostilas').getPublicUrl(finalFilePath);
-      const fileUrl = publicURLData.publicUrl;
+      // 2. Formata as palavras-chave
+      const tagsArray = typeof uploadForm.palavras_chave === 'string' 
+        ? uploadForm.palavras_chave.split(',').map(tag => tag.trim()).filter(Boolean)
+        : [];
 
-      const { error: dbError } = await supabase.from('apostilas_docs').insert([{
-        titulo: uploadForm.titulo,
-        palavras_chave: uploadForm.palavras_chave,
+      // 3. Grava na base de dados
+      const { error: dbError } = await supabase.from('apostilas').insert([{
+        titulo_livro: uploadForm.titulo,
         categoria: uploadForm.categoria,
-        file_url: fileUrl
+        palavras_chave: tagsArray,
+        nome_arquivo_storage: finalFilePath
       }]);
-      if (dbError) throw dbError;
+      
+      if (dbError) throw new Error("Erro na Base de Dados: " + dbError.message);
 
-      mostrarToast("Apostila enviada para o banco de dados com sucesso!", "sucesso");
+      mostrarToast("Apostila enviada com sucesso!", "sucesso");
+      
+      // 4. Limpa tudo
       setUploadForm({ titulo: '', palavras_chave: '', categoria: '' });
       setPdfFile(null);
+      if (inputFileRef.current) {
+        inputFileRef.current.value = '';
+      }
+
     } catch (error) {
-      console.error(error);
-      mostrarToast("Erro ao fazer upload: " + error.message, "erro");
+      console.error("Erro detalhado:", error);
+      mostrarToast("Erro: " + error.message, "erro");
     } finally {
       setIsUploading(false);
     }
   };
-
   // ==========================================================
   // FUNÇÃO DE UPLOAD DA PROMOÇÃO (MARKETING) - BLINDADA
   // ==========================================================
@@ -1063,6 +1094,9 @@ export default function App() {
                 { id: 'analise', icone: '🔎', label: 'Auditoria de Balanço' },
                 { id: 'infoprodutos', icone: '🛒', label: 'Contab. Infoprodutos' },
                 { id: 'criptoativos', icone: '⛓️', label: 'Contab. Criptoativos' },
+                { id: 'ia_contabil', icone: '🤖', label: 'IA na Contabilidade' },
+                { id: 'rural', icone: '🌾', label: 'Contabilidade Rural' },
+                { id: 'publica', icone: '🏛️', label: 'Contabilidade Pública' },
               ]
             },
             {
@@ -1101,6 +1135,8 @@ export default function App() {
       { id: 'economia_macro', icone: '🌍', label: 'Cenários Macroeconômicos' },
       { id: 'economia_micro', icone: '🔍', label: 'Dinâmica de Mercado' },
       { id: 'estatistica_avancada', icone: '📉', label: 'Estatística e Dados' },
+      { id: 'mercadocapitais', icone: '📊', label: 'Mercado de Capitais'},
+      { id: 'educacao_financeira', icone: '👨‍💼', label: 'Educação Financeira' },
     ]
   },
   {
@@ -1118,9 +1154,16 @@ export default function App() {
     ]
   },
   {
+    titulo: "Perícia contábil",
+    itens: [
+       { id: 'pericia_atualizacao', icone: '⚖️', label: 'Atualização Judiciária' },
+    ]
+  },
+  {
     titulo: "🎓 Academia & Conhecimento",
     itens: [
       { id: 'missoes', icone: '🎮', label: 'Missões & XP' },
+      { id: 'games', icone: '🎮', label: 'Games'},
       { id: 'crc', icone: '🎯', label: 'Desafio Exame CRC' },
       { id: 'hp12c', icone: '🧮', label: 'Calculadora HP 12c' },
       { id: 'ebook', icone: '📕', label: 'Caderno de Anotações' },
@@ -1372,44 +1415,130 @@ export default function App() {
                     </div>
                   )}
 
-                  {/* ABA 4: UPLOAD DE APOSTILAS */}
-                  {abaAdminAtiva === 'biblioteca' && (
-                    <div style={{ backgroundColor: 'white', padding: '25px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
-                      <h3 style={{ margin: '0 0 15px 0', color: '#0f172a' }}>Upload de Apostilas e Manuais</h3>
-                      <p style={{color: '#64748b', fontSize: '14px', marginBottom: '20px'}}>Insira um novo documento na tabela <strong>apostilas_docs</strong> do Supabase.</p>
-                      
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                        <div>
-                          <label style={{display: 'block', fontWeight: 'bold', fontSize: '13px', marginBottom: '8px', color: '#334155'}}>Título do Documento</label>
-                          <input type="text" placeholder="Ex: Manual de Contabilidade" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box' }} value={uploadForm.titulo} onChange={e => setUploadForm({...uploadForm, titulo: e.target.value})} />
-                        </div>
-                        <div>
-                          <label style={{display: 'block', fontWeight: 'bold', fontSize: '13px', marginBottom: '8px', color: '#334155'}}>Categoria</label>
-                          <select style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box' }} value={uploadForm.categoria} onChange={e => setUploadForm({...uploadForm, categoria: e.target.value})}>
-                            <option value="">Selecione...</option>
-                            <option value="Contabilidade">Contabilidade</option>
-                            <option value="Fiscal">Fiscal e Tributário</option>
-                            <option value="Departamento Pessoal">Departamento Pessoal</option>
-                            <option value="Gestão">Gestão e Negócios</option>
-                          </select>
-                        </div>
-                        <div style={{ gridColumn: '1 / -1' }}>
-                          <label style={{display: 'block', fontWeight: 'bold', fontSize: '13px', marginBottom: '8px', color: '#334155'}}>Palavras-Chave (Busca do Aluno)</label>
-                          <input type="text" placeholder="Ex: balanço, dre, auditoria, lançamentos" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box' }} value={uploadForm.palavras_chave} onChange={e => setUploadForm({...uploadForm, palavras_chave: e.target.value})} />
-                        </div>
-                      </div>
+                 {/* ABA 4: UPLOAD DE APOSTILAS */}
+{abaAdminAtiva === 'biblioteca' && (
+  <div style={{ backgroundColor: 'white', padding: '25px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+    <h3 style={{ margin: '0 0 15px 0', color: '#0f172a' }}>Upload de Apostilas e Manuais</h3>
+    <p style={{color: '#64748b', fontSize: '14px', marginBottom: '20px'}}>Insira um novo documento na tabela <strong>apostilas</strong> do Supabase.</p>
+    
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+      <div>
+        <label style={{display: 'block', fontWeight: 'bold', fontSize: '13px', marginBottom: '8px', color: '#334155'}}>Título do Documento</label>
+        <input type="text" placeholder="Ex: Manual de Contabilidade" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box' }} value={uploadForm.titulo} onChange={e => setUploadForm({...uploadForm, titulo: e.target.value})} />
+      </div>
+      <div>
+        <label style={{display: 'block', fontWeight: 'bold', fontSize: '13px', marginBottom: '8px', color: '#334155'}}>Categoria</label>
+        <select style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box' }} value={uploadForm.categoria} onChange={e => setUploadForm({...uploadForm, categoria: e.target.value})}>
+          <option value="">Selecione...</option>
+          <option value="Contabilidade">Contabilidade</option>
+          <option value="Fiscal">Fiscal e Tributário</option>
+          <option value="Departamento Pessoal">Departamento Pessoal</option>
+          <option value="Gestão">Gestão e Negócios</option>
+        </select>
+      </div>
+      <div style={{ gridColumn: '1 / -1' }}>
+        <label style={{display: 'block', fontWeight: 'bold', fontSize: '13px', marginBottom: '8px', color: '#334155'}}>Palavras-Chave (Busca do Aluno)</label>
+        <input type="text" placeholder="Ex: balanço, dre, auditoria, lançamentos" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box' }} value={uploadForm.palavras_chave} onChange={e => setUploadForm({...uploadForm, palavras_chave: e.target.value})} />
+      </div>
+    </div>
 
-                      <div style={{ border: '2px dashed #94a3b8', padding: '30px', borderRadius: '12px', textAlign: 'center', backgroundColor: '#f8fafc', marginTop: '20px' }}>
-                        <span style={{ fontSize: '40px' }}>📁</span>
-                        <p style={{ color: '#475569', fontWeight: 'bold', margin: '10px 0' }}>Selecione o arquivo PDF</p>
-                        <input type="file" accept=".pdf" onChange={e => setPdfFile(e.target.files[0])} style={{ margin: '0 auto', display: 'block' }} />
-                      </div>
+    {/* Caixa Única de Seleção de Ficheiro PDF (Via ArrayBuffer) */}
+    <div style={{ border: '2px dashed #94a3b8', padding: '24px', borderRadius: '12px', textAlign: 'center', backgroundColor: '#f8fafc', marginTop: '20px' }}>
+      <span style={{ fontSize: '36px', display: 'block', marginBottom: '8px' }}>📁</span>
+      <p style={{ color: '#475569', fontWeight: 'bold', margin: '0 0 12px 0', fontSize: '14px' }}>
+        {pdfFile ? `📄 ${pdfFile.name}` : 'Selecione o arquivo PDF'}
+      </p>
+      <input 
+        type="file" 
+        ref={inputFileRef}
+        accept=".pdf" 
+        onChange={e => {
+          const arquivo = e.target.files && e.target.files[0];
+          if (arquivo) {
+            const leitor = new FileReader();
+            leitor.onload = (evento) => {
+              // Guarda o ficheiro como Buffer Binário (leve e à prova de falhas no mobile)
+              setPdfFile({
+                name: arquivo.name,
+                type: arquivo.type || 'application/pdf',
+                buffer: evento.target.result
+              });
+              mostrarToast("PDF preparado para envio!", "sucesso");
+            };
+            leitor.onerror = () => mostrarToast("Erro ao ler o ficheiro no telemóvel.", "erro");
+            leitor.readAsArrayBuffer(arquivo);
+          }
+        }} 
+        style={{ margin: '0 auto', display: 'block', fontSize: '13px', color: '#64748b' }} 
+      />
+    </div>
+    {/* Botão de Envio Unificado */}
+    <div style={{ marginTop: '20px' }}>
+      <button 
+        onClick={async () => {
+          if (!uploadForm.titulo) {
+            return mostrarToast("Por favor, preencha o Título do Documento.", "erro");
+          }
+          if (!uploadForm.categoria) {
+            return mostrarToast("Por favor, selecione a Categoria.", "erro");
+          }
+          if (!pdfFile) {
+            return mostrarToast("Por favor, selecione um arquivo PDF.", "erro");
+          }
+          
+          setIsUploading(true);
+          try {
+            const nomeLimpo = pdfFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+            const finalFilePath = `${Date.now()}_${nomeLimpo}`;
 
-                      <button onClick={handleUploadApostila} disabled={isUploading} style={{ marginTop: '20px', padding: '14px 20px', backgroundColor: isUploading ? '#94a3b8' : '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: isUploading ? 'not-allowed' : 'pointer', width: '100%', fontSize: '15px' }}>
-                        {isUploading ? '⏳ Salvando no banco de dados...' : '🚀 Enviar para o Supabase'}
-                      </button>
-                    </div>
-                  )}
+            // 1. Upload do PDF para o Storage 'apostilas'
+            const { error: uploadError } = await supabase.storage.from('apostilas').upload(finalFilePath, pdfFile);
+            if (uploadError) throw uploadError;
+
+            // 2. Formata as palavras-chave em Array
+            const tagsArray = typeof uploadForm.palavras_chave === 'string' 
+              ? uploadForm.palavras_chave.split(',').map(tag => tag.trim()).filter(Boolean)
+              : [];
+
+            // 3. Registo na tabela 'apostilas'
+            const { error: dbError } = await supabase.from('apostilas').insert([{
+              titulo_livro: uploadForm.titulo,
+              categoria: uploadForm.categoria,
+              palavras_chave: tagsArray,
+              nome_arquivo_storage: finalFilePath
+            }]);
+            
+            if (dbError) throw dbError;
+
+            mostrarToast("Apostila enviada com sucesso!", "sucesso");
+            setUploadForm({ titulo: '', palavras_chave: '', categoria: '' });
+            setPdfFile(null);
+          } catch (error) {
+            console.error("Erro detalhado:", error);
+            mostrarToast("Erro ao fazer upload: " + error.message, "erro");
+          } finally {
+            setIsUploading(false);
+          }
+        }} 
+        disabled={isUploading} 
+        style={{ 
+          padding: '14px 20px', 
+          backgroundColor: isUploading ? '#94a3b8' : '#2563eb', 
+          color: 'white', 
+          border: 'none', 
+          borderRadius: '8px', 
+          fontWeight: 'bold', 
+          cursor: isUploading ? 'not-allowed' : 'pointer', 
+          width: '100%', 
+          fontSize: '15px',
+          boxShadow: '0 4px 6px rgba(37, 99, 235, 0.2)'
+        }}
+      >
+        {isUploading ? '⏳ Salvando no banco de dados...' : '🚀 Enviar para o Supabase'}
+      </button>
+    </div>
+  </div>
+)}
 
                 {/* ABA 5: CONFIGURAÇÕES GERAIS / SAC */}
                   {abaAdminAtiva === 'config' && (
@@ -1715,6 +1844,13 @@ export default function App() {
               {abaAtiva === 'pmp_10passos' && <SimuladorPMP10Passos mostrarToast={mostrarToast} />}
               {abaAtiva === 'laboratoriorh' && <LaboratorioFolha mostrarToast={mostrarToast} />}
               {abaAtiva === 'servicos' && <ServicosIniciais mostrarToast={mostrarToast} />}
+              {abaAtiva === 'educacao_financeira' && <LaboratorioEducacaoFinanceira mostrarToast={mostrarToast} />}
+              {abaAtiva === 'mercadocapitais' &&  <LaboratorioMercadoCapitais mostrarToast={mostrarToast} />}
+              {abaAtiva === 'ia_contabil' && <LaboratorioIAContabil mostrarToast={mostrarToast} />}
+              {abaAtiva === 'rural' && <LaboratorioContabilidadeRural mostrarToast={mostrarToast} />}
+              {abaAtiva === 'games' && <LaboratorioGamesContabeis mostrarToast={mostrarToast} />}
+{abaAtiva === 'publica' && <LaboratorioContabilidadePublica mostrarToast={mostrarToast} />}
+               {abaAtiva === 'pericia_atualizacao' && <SimuladorAtualizacaoJudiciaria />}
               {abaAtiva === 'laboratoriolancamentos' && !isGestor && (
   <LaboratorioLancamentos />
 )}
